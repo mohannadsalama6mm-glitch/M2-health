@@ -1,0 +1,10 @@
+pub mod active_ingredients;
+pub mod barcodes;
+pub mod branches;
+pub mod categories;
+pub mod manufacturers;
+pub mod price_history;
+pub mod product_ingredients;
+pub mod product_packages;
+pub mod products;
+pub mod routes;

@@ -1,0 +1,90 @@
+// Phase 1B view models only. These are not database schemas.
+export type Product = {
+  id: string;
+  name: string;
+  scientific: string;
+  manufacturer: string;
+  category: string;
+  form: string;
+  strength: string;
+  barcode: string;
+  pack: string;
+  price: number;
+  cost: number;
+  stock: number;
+  reorder: number;
+  status: string;
+  batch: string;
+  expiry: string;
+  days: number;
+  ingredients: string[];
+  notes: string;
+  barcodes?: string[];
+  packages?: string[];
+};
+export type Partner = {
+  id: string;
+  name: string;
+  contact: string;
+  phone: string;
+  email: string;
+  address: string;
+  balance: number;
+  status: string;
+  notes: string;
+};
+export type PurchaseLine = {
+  productId: string;
+  ordered: number;
+  received: number;
+  cost: number;
+  damaged?: number;
+  batch?: string;
+  expiry?: string;
+};
+export type Purchase = {
+  id: string;
+  supplier: string;
+  date: string;
+  delivery: string;
+  status: string;
+  items: number;
+  total: number;
+  paid: number;
+  lines?: PurchaseLine[];
+  notes?: string;
+  discount?: number;
+  tax?: number;
+};
+export type CartLine = { productId: string; quantity: number };
+export type Sale = {
+  id: string;
+  time: string;
+  customer: string;
+  items: number;
+  total: number;
+  payment: string;
+  status: string;
+  lines: CartLine[];
+};
+export type Branch = {
+  id: string;
+  name: string;
+  code: string;
+  address: string;
+  phone: string;
+  manager: string;
+  status: string;
+  devices: number;
+  sync: string;
+};
+export type Employee = {
+  id: string;
+  name: string;
+  role: string;
+  branch: string;
+  status: string;
+  phone: string;
+  email: string;
+  activity: string;
+};

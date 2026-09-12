@@ -1,0 +1,23 @@
+[package]
+name = "m2-health"
+version = "0.3.0"
+description = "M² Health local desktop foundation"
+edition = "2021"
+rust-version = "1.85"
+
+[lib]
+name = "m2_health_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"
+serde_json = "1"

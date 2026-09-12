@@ -1,0 +1,8 @@
+{
+  "id": "egyptian-drugs",
+  "path": "src/data/karem/egyptian-drugs.csv",
+  "format": "csv",
+  "encoding": "utf-8-sig",
+  "delimiter": ",",
+  "role": "canonical raw Egyptian catalog source; import deliberately deferred"
+}

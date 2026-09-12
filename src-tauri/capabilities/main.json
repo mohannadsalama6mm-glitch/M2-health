@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "Local application window. No filesystem, shell, HTTP, or SQL plugin permissions.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

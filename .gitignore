@@ -1,0 +1,10 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+*.local
+src-tauri/target/
+src-tauri/gen/
+*.db
+*.db-wal
+*.db-shm
