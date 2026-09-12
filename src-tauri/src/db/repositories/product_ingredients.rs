@@ -45,3 +45,32 @@ pub(crate) fn list_on(
     })
     .collect()
 }
+/// Replaces the full ingredient set of a product inside a caller-owned transaction.
+/// Duplicate ingredient inputs are rejected up front; positions follow input order.
+pub(crate) fn replace_on(
+    c: &Connection,
+    product_id: &str,
+    inputs: &[ProductIngredientInput],
+) -> Result<(), AppError> {
+    let mut seen = std::collections::HashSet::new();
+    for input in inputs {
+        id(&input.active_ingredient_id)?;
+        optional(&input.strength_text)?;
+        if !seen.insert(&input.active_ingredient_id) {
+            return Err(invalid(
+                "Each active ingredient may be linked to a product only once.",
+            ));
+        }
+    }
+    c.execute(
+        "DELETE FROM product_active_ingredients WHERE product_id=?1",
+        [product_id],
+    )?;
+    for (index, input) in inputs.iter().enumerate() {
+        c.execute(
+            "INSERT INTO product_active_ingredients(id,product_id,active_ingredient_id,strength_text,position) VALUES (?1,?2,?3,?4,?5)",
+            params![uuid::Uuid::new_v4().to_string(), product_id, input.active_ingredient_id, input.strength_text, index as i64],
+        )?;
+    }
+    Ok(())
+}

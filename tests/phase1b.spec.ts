@@ -96,24 +96,33 @@ for (const [width, height] of [
     }
     expect(errors).toEqual([]);
   });
-test("module loading empty error and no results", async ({ page }) => {
+test("catalog grid in the browser explains the desktop requirement", async ({
+  page,
+}) => {
   await page.goto("/catalog");
-  const state = page.getByLabel("Preview state");
-  await state.selectOption("loading");
-  await expect(page.getByText("Loading products…")).toBeVisible();
-  await state.selectOption("empty");
+  await expect(page.getByRole("heading", { name: "Products" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "No products yet" }),
+    page.getByRole("heading", { name: "Catalog requires the desktop app" }),
   ).toBeVisible();
-  await state.selectOption("error");
   await expect(
-    page.getByText("This workspace could not be loaded"),
+    page.getByRole("searchbox", { name: "Search Products" }),
+  ).toHaveCount(0);
+});
+test("catalog add edit and detail routes require the desktop app", async ({
+  page,
+}) => {
+  await page.goto("/catalog/new");
+  await expect(page.getByRole("heading", { name: "Add product" })).toBeVisible();
+  await expect(page.getByText("Desktop app required")).toBeVisible();
+  await page.goto("/catalog/p1");
+  await expect(
+    page.getByRole("heading", { name: "Product details" }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Retry preview" }).click();
-  await page
-    .getByRole("searchbox", { name: "Search Products" })
-    .fill("unmatched medicine");
-  await expect(page.getByText("No matching results")).toBeVisible();
+  await page.goto("/catalog/p1/edit");
+  await expect(page.getByRole("heading", { name: "Edit product" })).toBeVisible();
+  await expect(
+    page.getByText("Desktop app required").first(),
+  ).toBeVisible();
 });
 test("POS keyboard search hold resume complete and receipt", async ({
   page,
@@ -142,31 +151,13 @@ test("POS keyboard search hold resume complete and receipt", async ({
     page.getByRole("heading", { name: "Ready for your next sale" }),
   ).toBeVisible();
 });
-test("catalog add edit and in-memory reset", async ({ page }) => {
-  await page.goto("/catalog/new");
-  await page.getByLabel("Brand / product name").fill("Demo product QA");
-  await page.getByLabel("Scientific name").fill("Demo ingredient");
-  await page.getByLabel("Manufacturer", { exact: true }).fill("Demo maker");
-  await page.getByLabel("Strength", { exact: true }).fill("10 mg");
-  await page
-    .getByLabel("Ingredients 1", { exact: true })
-    .fill("Demo ingredient");
-  await page.getByLabel("Packages 1", { exact: true }).fill("Box · 10 tablets");
-  await page.getByLabel("Barcodes 1", { exact: true }).fill("6229999999991");
-  await page.getByRole("button", { name: "Save demo product" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Demo product QA" }),
-  ).toBeVisible();
-  await page.getByRole("link", { name: "Edit product" }).click();
-  await page.getByLabel("Brand / product name").fill("Updated QA product");
-  await page.getByRole("button", { name: "Save demo product" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Updated QA product" }),
-  ).toBeVisible();
-  await page.reload();
-  await expect(
-    page.getByRole("heading", { name: "Product not found" }),
-  ).toBeVisible();
+test("catalog create and edit flows stay read-only until the desktop app", async ({
+  page,
+}) => {
+  await page.goto("/catalog");
+  await page.getByRole("link", { name: "Add product", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Add product" })).toBeVisible();
+  await expect(page.getByText("Desktop app required").first()).toBeVisible();
 });
 test("purchase receiving and notification state", async ({ page }) => {
   await page.goto("/purchases/PO-1048/receive");

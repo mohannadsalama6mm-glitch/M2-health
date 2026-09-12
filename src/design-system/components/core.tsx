@@ -316,7 +316,7 @@ export function PageHeader({
 }
 export type Column<T> = {
   key: string;
-  header: string;
+  header: ReactNode;
   render: (row: T) => ReactNode;
 };
 export function Table<T>({

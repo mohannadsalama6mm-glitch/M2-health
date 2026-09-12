@@ -51,6 +51,8 @@ pub fn run() {
             commands::catalog::list_active_ingredients,
             commands::catalog::set_active_ingredient_active,
             commands::catalog::create_product,
+            commands::catalog::create_product_full,
+            commands::catalog::update_product_full,
             commands::catalog::get_product,
             commands::catalog::get_product_detail,
             commands::catalog::list_products,

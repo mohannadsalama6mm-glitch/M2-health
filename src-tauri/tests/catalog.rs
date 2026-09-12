@@ -45,6 +45,13 @@ fn price(db: &AppDb, p: &str, amount: i64) -> PackagePrice {
 fn scalar(c: &Connection, sql: &str) -> i64 {
     c.query_row(sql, [], |r| r.get(0)).unwrap()
 }
+fn package_input(label: &str) -> ProductPackageInput {
+    ProductPackageInput {
+        package_label: label.into(),
+        is_active: true,
+        ..Default::default()
+    }
+}
 
 #[test]
 fn upgrade_v1_to_v2_preserves_branch_and_reruns() {
@@ -748,4 +755,558 @@ fn representative_csv_rows_fit_without_import_or_medical_parsing() {
         assert!(detail.active_ingredients.is_empty());
         assert!(detail.packages[0].barcodes.is_empty());
     }
+}
+#[test]
+fn create_full_atomically_persists_all_related_rows() {
+    let db = AppDb::in_memory().unwrap();
+    let m = manufacturers::create(
+        &db,
+        &CreateManufacturer {
+            name: "Maker".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let i = active_ingredients::create(
+        &db,
+        &CreateActiveIngredient {
+            name: "Ibuprofen".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let product = products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("Brufen".into()),
+            manufacturer_id: Some(m.id.clone()),
+            active_ingredients: vec![ProductIngredientInput {
+                active_ingredient_id: i.id.clone(),
+                strength_text: Some("400 mg".into()),
+            }],
+            packages: vec![ProductPackageInput {
+                units_per_package: Some(20),
+                is_default: true,
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "6291041500109".into(),
+                    is_primary: true,
+                }],
+                selling_price_minor: Some(2250),
+                ..package_input("20 tablets")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let d = products::detail(&db, &product.id).unwrap();
+    assert_eq!(d.manufacturer.unwrap().id, m.id);
+    assert_eq!(d.active_ingredients.len(), 1);
+    assert_eq!(d.active_ingredients[0].active_ingredient.id, i.id);
+    assert_eq!(d.packages.len(), 1);
+    assert_eq!(d.packages[0].package.units_per_package, Some(20));
+    assert!(d.packages[0].package.is_default);
+    assert_eq!(d.packages[0].barcodes[0].barcode, "6291041500109");
+    assert_eq!(
+        d.packages[0]
+            .current_price
+            .as_ref()
+            .unwrap()
+            .selling_price_minor,
+        2250
+    );
+}
+#[test]
+fn create_full_failures_roll_back_the_whole_product() {
+    let db = AppDb::in_memory().unwrap();
+    let err = products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("Ghost".into()),
+            active_ingredients: vec![ProductIngredientInput {
+                active_ingredient_id: uuid::Uuid::new_v4().to_string(),
+                strength_text: None,
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(err.code, ErrorCode::NotFound);
+    assert_eq!(
+        products::list(&db, &ProductQuery::default()).unwrap().total,
+        0
+    );
+    assert_eq!(
+        products::create_full(&db, &CreateProductFull::default())
+            .unwrap_err()
+            .code,
+        ErrorCode::Validation
+    );
+    assert_eq!(
+        products::list(&db, &ProductQuery::default()).unwrap().total,
+        0
+    );
+    products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("Ghost package".into()),
+            packages: vec![ProductPackageInput::default()],
+            ..Default::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(
+        products::list(&db, &ProductQuery::default()).unwrap().total,
+        0
+    );
+}
+#[test]
+fn barcodes_cannot_cross_products_or_duplicate_within_one() {
+    let db = AppDb::in_memory().unwrap();
+    let mk = |name: &str, barcode: &str, primary: bool| {
+        products::create_full(
+            &db,
+            &CreateProductFull {
+                commercial_name_en: Some(name.into()),
+                packages: vec![ProductPackageInput {
+                    barcodes: vec![ProductBarcodeInput {
+                        barcode: barcode.into(),
+                        is_primary: primary,
+                    }],
+                    ..package_input(name)
+                }],
+                ..Default::default()
+            },
+        )
+    };
+    let first = mk("First", "SHARED", true).unwrap();
+    assert_eq!(
+        mk("Second", "SHARED", false).unwrap_err().code,
+        ErrorCode::Conflict
+    );
+    assert_eq!(
+        products::list(&db, &ProductQuery::default()).unwrap().total,
+        1
+    );
+    let err = products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("Third".into()),
+            packages: vec![ProductPackageInput {
+                barcodes: vec![
+                    ProductBarcodeInput {
+                        barcode: "DUPLICATE".into(),
+                        is_primary: true,
+                    },
+                    ProductBarcodeInput {
+                        barcode: "DUPLICATE".into(),
+                        is_primary: false,
+                    },
+                ],
+                ..package_input("Third")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(err.code, ErrorCode::Validation);
+    assert_eq!(
+        products::list(&db, &ProductQuery::default()).unwrap().total,
+        1
+    );
+    let second = mk("Second", "ANOTHER", true).unwrap();
+    let err = products::update_full(
+        &db,
+        &UpdateProductFull {
+            id: second.id.clone(),
+            commercial_name_en: Some("Second".into()),
+            is_active: true,
+            packages: vec![ProductPackageInput {
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "SHARED".into(),
+                    is_primary: false,
+                }],
+                ..package_input("Second-edit")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap_err();
+    assert_eq!(err.code, ErrorCode::Conflict);
+    assert_eq!(
+        products::detail(&db, &first.id).unwrap().packages[0].barcodes[0].barcode,
+        "SHARED"
+    );
+}
+#[test]
+fn update_full_rejects_foreign_packages_and_appends_prices() {
+    let db = AppDb::in_memory().unwrap();
+    let a = products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("A".into()),
+            packages: vec![package_input("A-box")],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let b = products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("B".into()),
+            packages: vec![package_input("B-box")],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let b_pkg = products::detail(&db, &b.id).unwrap().packages[0]
+        .package
+        .id
+        .clone();
+    assert_eq!(
+        products::update_full(
+            &db,
+            &UpdateProductFull {
+                id: a.id.clone(),
+                commercial_name_en: Some("A".into()),
+                is_active: true,
+                packages: vec![ProductPackageInput {
+                    id: Some(b_pkg),
+                    ..package_input("Hijacked")
+                }],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Validation
+    );
+    assert_eq!(
+        products::update_full(
+            &db,
+            &UpdateProductFull {
+                id: uuid::Uuid::new_v4().to_string(),
+                commercial_name_en: Some("Missing".into()),
+                is_active: true,
+                packages: vec![],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::NotFound
+    );
+    products::update_full(
+        &db,
+        &UpdateProductFull {
+            id: a.id.clone(),
+            commercial_name_en: Some("A".into()),
+            is_active: true,
+            packages: vec![ProductPackageInput {
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "AAA111".into(),
+                    is_primary: true,
+                }],
+                selling_price_minor: Some(100),
+                is_default: true,
+                ..package_input("Starter")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let d = products::detail(&db, &a.id).unwrap();
+    let pkg_id = d.packages[0].package.id.clone();
+    products::update_full(
+        &db,
+        &UpdateProductFull {
+            id: a.id.clone(),
+            commercial_name_en: Some("A".into()),
+            is_active: true,
+            packages: vec![ProductPackageInput {
+                id: Some(pkg_id.clone()),
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "BBB222".into(),
+                    is_primary: true,
+                }],
+                selling_price_minor: Some(200),
+                is_default: true,
+                ..package_input("Starter")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let d = products::detail(&db, &a.id).unwrap();
+    let pk = &d.packages[0];
+    assert_eq!(pk.barcodes[0].barcode, "BBB222");
+    assert_eq!(pk.current_price.as_ref().unwrap().selling_price_minor, 200);
+    let history = price_history::history(&db, &pkg_id).unwrap();
+    assert_eq!(history.len(), 2);
+    assert_eq!(history[1].selling_price_minor, 100);
+    assert!(history[0].effective_to.is_none());
+    products::update_full(
+        &db,
+        &UpdateProductFull {
+            id: a.id,
+            commercial_name_en: Some("A".into()),
+            is_active: true,
+            packages: vec![ProductPackageInput {
+                id: Some(pkg_id.clone()),
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "CCC333".into(),
+                    is_primary: false,
+                }],
+                selling_price_minor: Some(200),
+                is_default: true,
+                ..package_input("Starter")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(price_history::history(&db, &pkg_id).unwrap().len(), 2);
+}
+#[test]
+fn list_enriches_rows_and_enforces_sort_whitelist() {
+    let db = AppDb::in_memory().unwrap();
+    let m = manufacturers::create(
+        &db,
+        &CreateManufacturer {
+            name: "Zeta".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("Alpha".into()),
+            manufacturer_id: Some(m.id.clone()),
+            packages: vec![ProductPackageInput {
+                is_default: true,
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "1001".into(),
+                    is_primary: true,
+                }],
+                selling_price_minor: Some(300),
+                ..package_input("Small")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    products::create_full(
+        &db,
+        &CreateProductFull {
+            commercial_name_en: Some("BETA".into()),
+            packages: vec![ProductPackageInput {
+                is_default: true,
+                barcodes: vec![ProductBarcodeInput {
+                    barcode: "1002".into(),
+                    is_primary: true,
+                }],
+                selling_price_minor: Some(100),
+                ..package_input("Big")
+            }],
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let price_desc = products::list(
+        &db,
+        &ProductQuery {
+            sort: Some("price".into()),
+            sort_direction: Some("desc".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(price_desc.items[0].name_en.as_deref(), Some("Alpha"));
+    assert_eq!(price_desc.items[1].name_en.as_deref(), Some("BETA"));
+    let by_name = products::list(
+        &db,
+        &ProductQuery {
+            sort: Some("name".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(by_name.items[0].name_en.as_deref(), Some("Alpha"));
+    assert_eq!(by_name.items[0].manufacturer_name.as_deref(), Some("Zeta"));
+    assert_eq!(by_name.items[0].barcode.as_deref(), Some("1001"));
+    assert_eq!(by_name.items[0].selling_price_minor, Some(300));
+    assert_eq!(by_name.items[0].package_label.as_deref(), Some("Small"));
+    for term in ["alpha", "ZETA", "1002"] {
+        assert_eq!(
+            products::list(
+                &db,
+                &ProductQuery {
+                    search: Some(term.into()),
+                    ..Default::default()
+                }
+            )
+            .unwrap()
+            .total,
+            1,
+            "search {term}"
+        );
+    }
+    let filtered = products::list(
+        &db,
+        &ProductQuery {
+            manufacturer_id: Some(m.id),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(filtered.total, 1);
+    assert_eq!(filtered.active_total, 1);
+    let both = products::list(
+        &db,
+        &ProductQuery {
+            search: Some("alpha".into()),
+            sort: Some("updatedAt".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(both.total, 1);
+    let page2 = products::list(
+        &db,
+        &ProductQuery {
+            limit: Some(1),
+            offset: Some(1),
+            sort: Some("name".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(page2.items.len(), 1);
+    assert_eq!(page2.total, 2);
+    assert_eq!(page2.items[0].name_en.as_deref(), Some("BETA"));
+    assert!(products::list(
+        &db,
+        &ProductQuery {
+            sort: Some("id".into()),
+            ..Default::default()
+        }
+    )
+    .is_err());
+    assert!(products::list(
+        &db,
+        &ProductQuery {
+            sort_direction: Some("sideways".into()),
+            ..Default::default()
+        }
+    )
+    .is_err());
+}
+#[test]
+fn active_total_counts_only_active_products() {
+    let db = AppDb::in_memory().unwrap();
+    let a = product(&db);
+    let b = product(&db);
+    products::set_active(&db, &b.id, false).unwrap();
+    let page = products::list(&db, &ProductQuery::default()).unwrap();
+    assert_eq!(page.total, 1);
+    assert_eq!(page.active_total, 1);
+    let page = products::list(
+        &db,
+        &ProductQuery {
+            include_inactive: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(page.total, 2);
+    assert_eq!(page.active_total, 1);
+    assert_eq!(page.items.len(), 2);
+    assert!(page.items.iter().any(|i| i.id == a.id));
+}
+#[test]
+fn composite_input_validates_defaults_prices_and_units() {
+    let db = AppDb::in_memory().unwrap();
+    let p = product(&db);
+    assert_eq!(
+        products::update_full(
+            &db,
+            &UpdateProductFull {
+                id: p.id.clone(),
+                commercial_name_en: Some("X".into()),
+                is_active: true,
+                packages: vec![
+                    ProductPackageInput {
+                        is_default: true,
+                        ..package_input("One")
+                    },
+                    ProductPackageInput {
+                        is_default: true,
+                        ..package_input("Two")
+                    }
+                ],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Validation
+    );
+    assert_eq!(
+        products::create_full(
+            &db,
+            &CreateProductFull {
+                commercial_name_en: Some("Y".into()),
+                packages: vec![ProductPackageInput {
+                    is_default: true,
+                    is_active: false,
+                    ..Default::default()
+                }],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Validation
+    );
+    assert_eq!(
+        products::create_full(
+            &db,
+            &CreateProductFull {
+                commercial_name_en: Some("Z".into()),
+                packages: vec![ProductPackageInput {
+                    selling_price_minor: Some(-5),
+                    ..package_input("Priced")
+                }],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Validation
+    );
+    let id = uuid::Uuid::new_v4().to_string();
+    assert_eq!(
+        products::update_full(
+            &db,
+            &UpdateProductFull {
+                id: p.id,
+                commercial_name_en: Some("W".into()),
+                is_active: true,
+                packages: vec![
+                    ProductPackageInput {
+                        id: Some(id.clone()),
+                        ..package_input("A")
+                    },
+                    ProductPackageInput {
+                        id: Some(id),
+                        ..package_input("B")
+                    }
+                ],
+                ..Default::default()
+            }
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Validation
+    );
 }

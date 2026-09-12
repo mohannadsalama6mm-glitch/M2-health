@@ -1,50 +1,53 @@
 import { test, expect } from "@playwright/test";
+import { installCatalogDouble } from "./catalog-double";
 test("catalog retains multiple packages ingredients barcodes and pricing through edit", async ({
   page,
 }) => {
+  await installCatalogDouble(page);
   await page.goto("/catalog");
   await page
     .getByRole("searchbox", { name: "Search Products" })
     .fill("Panadol");
-  await page.getByLabel("Statuses", { exact: true }).selectOption("Active");
   await page
     .getByRole("link", { name: "Panadol 500 mg Paracetamol · Haleon" })
     .click();
   await page.getByRole("link", { name: "Edit product" }).click();
   await page.getByRole("button", { name: "Add package", exact: true }).click();
   await page
-    .getByLabel("Packages 2", { exact: true })
+    .getByLabel("Package 2 label", { exact: true })
     .fill("Strip · 12 tablets");
-  await page.getByRole("button", { name: "Add barcode", exact: true }).click();
-  await page.getByLabel("Barcodes 2", { exact: true }).fill("6229999999992");
+  await page
+    .getByLabel("Package 2 barcode 1", { exact: true })
+    .fill("6229999999992");
   await page
     .getByRole("button", { name: "Add ingredient", exact: true })
     .click();
   await page
-    .getByLabel("Ingredients 2", { exact: true })
-    .fill("Demo second ingredient");
-  await page.getByLabel("Selling price (EGP)", { exact: true }).fill("39.50");
-  await page.getByRole("button", { name: "Save demo product" }).click();
+    .getByLabel("Ingredient 2", { exact: true })
+    .selectOption("Demo second ingredient");
+  await page
+    .getByLabel("Package 2 selling price (EGP)", { exact: true })
+    .fill("39.50");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("tab", { name: "Packages & barcodes" }).click();
   await expect(page.getByText("6229999999992", { exact: true })).toBeVisible();
   await expect(
     page.getByText("Strip · 12 tablets", { exact: false }).first(),
   ).toBeVisible();
   await page.getByRole("link", { name: "Edit product" }).click();
-  await expect(page.getByLabel("Packages 2", { exact: true })).toHaveValue(
+  await expect(page.getByLabel("Package 2 label", { exact: true })).toHaveValue(
     "Strip · 12 tablets",
   );
-  await expect(page.getByLabel("Barcodes 2", { exact: true })).toHaveValue(
-    "6229999999992",
-  );
-  await expect(page.getByLabel("Ingredients 2", { exact: true })).toHaveValue(
-    "Demo second ingredient",
-  );
   await expect(
-    page.getByLabel("Selling price (EGP)", { exact: true }),
+    page.getByLabel("Package 2 barcode 1", { exact: true }),
+  ).toHaveValue("6229999999992");
+  await expect(
+    page.getByLabel("Package 2 selling price (EGP)", { exact: true }),
   ).toHaveValue("39.5");
-  await page.getByLabel("Brand / product name").fill("Panadol review edit");
-  await page.getByRole("button", { name: "Save demo product" }).click();
+  await page
+    .getByLabel("Brand / product name (English)", { exact: true })
+    .fill("Panadol review edit");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
   await page
     .getByRole("navigation", { name: "Pharmacy navigation" })
     .getByRole("link", { name: "Products", exact: true })

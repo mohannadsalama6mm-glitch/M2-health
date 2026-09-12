@@ -100,6 +100,20 @@ pub fn create_product(
     products::create(state.db()?, &input)
 }
 #[tauri::command]
+pub fn create_product_full(
+    state: State<'_, DatabaseState>,
+    input: CreateProductFull,
+) -> Result<Product, AppError> {
+    products::create_full(state.db()?, &input)
+}
+#[tauri::command]
+pub fn update_product_full(
+    state: State<'_, DatabaseState>,
+    input: UpdateProductFull,
+) -> Result<Product, AppError> {
+    products::update_full(state.db()?, &input)
+}
+#[tauri::command]
 pub fn get_product(state: State<'_, DatabaseState>, id: String) -> Result<Product, AppError> {
     products::get_product(state.db()?, &id)
 }

@@ -36,8 +36,7 @@ pub fn history(db: &AppDb, package_id: &str) -> Result<Vec<PackagePrice>, AppErr
     let rows = s.query_map([package_id], map)?;
     Ok(rows.collect::<Result<Vec<_>, _>>()?)
 }
-/// Effective immediately. No backdating/scheduling. Monotonic milliseconds handle fast updates and clock rollback.
-pub fn set(db: &AppDb, input: &SetPackagePrice) -> Result<PackagePrice, AppError> {
+fn validate_price(input: &SetPackagePrice) -> Result<(), AppError> {
     id(&input.product_package_id)?;
     optional(&input.reason)?;
     if !(0..=MAX_SAFE_MINOR).contains(&input.selling_price_minor)
@@ -49,30 +48,53 @@ pub fn set(db: &AppDb, input: &SetPackagePrice) -> Result<PackagePrice, AppError
             "Prices must be non-negative integer minor units within the supported range.",
         ));
     }
-    let mut c = db.lock()?;
-    let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let package = super::product_packages::get(&tx, &input.product_package_id)?;
-    let product = super::products::get(&tx, &package.product_id)?;
+    Ok(())
+}
+/// Effective immediately. No backdating/scheduling. Monotonic milliseconds handle fast
+/// updates and clock rollback. Runs inside a caller-owned transaction; the product and
+/// package must be active, and a no-op save returns the current row unchanged so repeat
+/// submissions never duplicate history.
+pub(crate) fn set_checked_on(
+    c: &Connection,
+    input: &SetPackagePrice,
+) -> Result<PackagePrice, AppError> {
+    let package = super::product_packages::get(c, &input.product_package_id)?;
+    let product = super::products::get(c, &package.product_id)?;
     if !package.is_active || !product.is_active {
         return Err(invalid(
             "Reactivate the product and package before setting a new price.",
         ));
     }
-    let old = current_on(&tx, &input.product_package_id)?;
-    let now:String=tx.query_row("SELECT strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),coalesce(julianday(?1)+0.001/86400,0)))",[old.as_ref().map(|p|p.effective_from.as_str())],|r|r.get(0))?;
+    let old = current_on(c, &input.product_package_id)?;
+    if let Some(ref old) = old {
+        if old.selling_price_minor == input.selling_price_minor
+            && old.cost_price_minor == input.cost_price_minor
+        {
+            return Ok(old.clone());
+        }
+    }
+    let now:String=c.query_row("SELECT strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),coalesce(julianday(?1)+0.001/86400,0)))",[old.as_ref().map(|p|p.effective_from.as_str())],|r|r.get(0))?;
     if let Some(old) = old {
-        tx.execute(
+        c.execute(
             "UPDATE product_price_history SET effective_to=?1 WHERE id=?2",
             params![now, old.id],
         )?;
     }
     let value = uuid::Uuid::new_v4().to_string();
-    tx.execute("INSERT INTO product_price_history(id,product_package_id,selling_price_minor,cost_price_minor,effective_from,reason) VALUES (?1,?2,?3,?4,?5,?6)",params![value,input.product_package_id,input.selling_price_minor,input.cost_price_minor,now,input.reason])?;
-    let price = tx.query_row(
+    c.execute("INSERT INTO product_price_history(id,product_package_id,selling_price_minor,cost_price_minor,effective_from,reason) VALUES (?1,?2,?3,?4,?5,?6)",params![value,input.product_package_id,input.selling_price_minor,input.cost_price_minor,now,input.reason])?;
+    let price = c.query_row(
         &format!("SELECT {COLUMNS} FROM product_price_history WHERE id=?1"),
         [value],
         map,
     )?;
+    Ok(price)
+}
+/// Effective immediately. No backdating/scheduling. Monotonic milliseconds handle fast updates and clock rollback.
+pub fn set(db: &AppDb, input: &SetPackagePrice) -> Result<PackagePrice, AppError> {
+    validate_price(input)?;
+    let mut c = db.lock()?;
+    let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let price = set_checked_on(&tx, input)?;
     tx.commit()?;
     Ok(price)
 }

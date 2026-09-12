@@ -161,18 +161,87 @@ export interface ProductDetail {
   activeIngredients: ProductIngredient[];
   packages: PackageDetail[];
 }
+export type CatalogSortKey =
+  | "name"
+  | "scientific"
+  | "manufacturer"
+  | "category"
+  | "route"
+  | "active"
+  | "price"
+  | "createdAt"
+  | "updatedAt";
 export interface ProductQuery {
   search?: string | null;
   manufacturerId?: string | null;
   categoryId?: string | null;
   routeId?: string | null;
   includeInactive?: boolean;
+  sort?: CatalogSortKey | null;
+  sortDirection?: "asc" | "desc" | null;
   limit?: number | null;
   offset?: number | null;
 }
+export interface ProductListItem {
+  id: string;
+  nameEn: string | null;
+  nameAr: string | null;
+  scientificName: string | null;
+  manufacturerName: string | null;
+  categoryName: string | null;
+  routeName: string | null;
+  isActive: boolean;
+  packageLabel: string | null;
+  packSize: string | null;
+  barcode: string | null;
+  sellingPriceMinor: number | null;
+  costPriceMinor: number | null;
+  packageCount: number;
+  barcodeCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface ProductPage {
-  items: Product[];
+  items: ProductListItem[];
   total: number;
+  activeTotal: number;
   limit: number;
   offset: number;
+}
+export interface ProductIngredientInput {
+  activeIngredientId: string;
+  strengthText?: string | null;
+}
+export interface ProductBarcodeInput {
+  barcode: string;
+  isPrimary?: boolean;
+}
+export interface ProductPackageInput {
+  id?: string | null;
+  packageLabel: string;
+  packSize?: string | null;
+  unitName?: string | null;
+  unitsPerPackage?: number | null;
+  strengthText?: string | null;
+  isDefault?: boolean;
+  isActive?: boolean;
+  barcodes?: ProductBarcodeInput[];
+  sellingPriceMinor?: number | null;
+  costPriceMinor?: number | null;
+}
+export interface CreateProductFull {
+  commercialNameEn?: string | null;
+  commercialNameAr?: string | null;
+  scientificName?: string | null;
+  manufacturerId?: string | null;
+  categoryId?: string | null;
+  routeId?: string | null;
+  description?: string | null;
+  notes?: string | null;
+  activeIngredients?: ProductIngredientInput[];
+  packages?: ProductPackageInput[];
+}
+export interface UpdateProductFull extends CreateProductFull {
+  id: string;
+  isActive: boolean;
 }

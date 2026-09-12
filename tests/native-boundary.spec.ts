@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { installCatalogDouble } from "./catalog-double";
 
 // Browser-only IPC test double; never installed in production code or a real DB.
 async function nativeBoundary(
@@ -35,10 +36,10 @@ async function nativeBoundary(
   }, mode);
 }
 
-test("desktop boundary supplies local UUID branch while catalog stays demo", async ({
+test("desktop boundary supplies local branches and a real catalog", async ({
   page,
 }) => {
-  await nativeBoundary(page, "success");
+  await installCatalogDouble(page);
   await page.goto("/dashboard");
   const selector = page.getByRole("combobox", { name: "Branch", exact: true });
   await expect(selector).toHaveValue("424b25b8-3c75-4d7a-87cd-988397081194");
@@ -46,6 +47,16 @@ test("desktop boundary supplies local UUID branch while catalog stays demo", asy
   await page.goto("/catalog");
   await expect(
     page.getByRole("searchbox", { name: "Search Products" }),
+  ).toBeVisible();
+  await expect(page.getByText("1 results · local SQLite")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Panadol 500 mg Paracetamol · Haleon" }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Panadol 500 mg Paracetamol · Haleon" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Panadol 500 mg" }),
   ).toBeVisible();
   await expect(selector).toHaveValue("424b25b8-3c75-4d7a-87cd-988397081194");
 });

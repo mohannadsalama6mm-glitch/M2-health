@@ -102,6 +102,105 @@ pub struct CreateProduct {
     pub description: Option<String>,
     pub notes: Option<String>,
 }
+/// Enriched catalog grid row: product identity plus the manufacturer/category/route
+/// display names, the default (or first) active package with its barcode and current
+/// price, and child-row counts. Computed by the backend; React never joins this data.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductListItem {
+    pub id: String,
+    pub name_en: Option<String>,
+    pub name_ar: Option<String>,
+    pub scientific_name: Option<String>,
+    pub manufacturer_name: Option<String>,
+    pub category_name: Option<String>,
+    pub route_name: Option<String>,
+    pub is_active: bool,
+    pub package_label: Option<String>,
+    pub pack_size: Option<String>,
+    pub barcode: Option<String>,
+    pub selling_price_minor: Option<i64>,
+    pub cost_price_minor: Option<i64>,
+    pub package_count: i64,
+    pub barcode_count: i64,
+    pub created_at: String,
+    pub updated_at: String,
+}
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ProductIngredientInput {
+    pub active_ingredient_id: String,
+    pub strength_text: Option<String>,
+}
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ProductBarcodeInput {
+    pub barcode: String,
+    #[serde(default)]
+    pub is_primary: bool,
+}
+fn package_default_active() -> bool {
+    true
+}
+/// One package as entered by the add/edit forms. `id` is present only when the
+/// package already exists and is being edited; prices are PLP minor units.
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ProductPackageInput {
+    pub id: Option<String>,
+    pub package_label: String,
+    pub pack_size: Option<String>,
+    pub unit_name: Option<String>,
+    pub units_per_package: Option<i64>,
+    pub strength_text: Option<String>,
+    #[serde(default)]
+    pub is_default: bool,
+    #[serde(default = "package_default_active")]
+    pub is_active: bool,
+    #[serde(default)]
+    pub barcodes: Vec<ProductBarcodeInput>,
+    pub selling_price_minor: Option<i64>,
+    pub cost_price_minor: Option<i64>,
+}
+/// Atomic product creation: product, ingredients, packages, barcodes and the initial
+/// price history entries are committed in a single transaction.
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CreateProductFull {
+    pub commercial_name_en: Option<String>,
+    pub commercial_name_ar: Option<String>,
+    pub scientific_name: Option<String>,
+    pub manufacturer_id: Option<String>,
+    pub category_id: Option<String>,
+    pub route_id: Option<String>,
+    pub description: Option<String>,
+    pub notes: Option<String>,
+    #[serde(default)]
+    pub active_ingredients: Vec<ProductIngredientInput>,
+    #[serde(default)]
+    pub packages: Vec<ProductPackageInput>,
+}
+/// Atomic product update: identity/classification fields, ingredient set replacement,
+/// package set reconciliation and append-only price changes in one transaction.
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct UpdateProductFull {
+    pub id: String,
+    pub commercial_name_en: Option<String>,
+    pub commercial_name_ar: Option<String>,
+    pub scientific_name: Option<String>,
+    pub manufacturer_id: Option<String>,
+    pub category_id: Option<String>,
+    pub route_id: Option<String>,
+    pub description: Option<String>,
+    pub notes: Option<String>,
+    #[serde(default)]
+    pub is_active: bool,
+    #[serde(default)]
+    pub active_ingredients: Vec<ProductIngredientInput>,
+    #[serde(default)]
+    pub packages: Vec<ProductPackageInput>,
+}
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProductPackage {
@@ -216,14 +315,20 @@ pub struct ProductQuery {
     pub route_id: Option<String>,
     #[serde(default)]
     pub include_inactive: bool,
+    /// Whitelisted backend sort key: name/scientific/manufacturer/category/route/
+    /// active/price/createdAt/updatedAt. Unknown values are rejected with a validation error.
+    pub sort: Option<String>,
+    /// "asc" or "desc"; anything else is rejected.
+    pub sort_direction: Option<String>,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProductPage {
-    pub items: Vec<Product>,
+    pub items: Vec<ProductListItem>,
     pub total: i64,
+    pub active_total: i64,
     pub limit: i64,
     pub offset: i64,
 }
