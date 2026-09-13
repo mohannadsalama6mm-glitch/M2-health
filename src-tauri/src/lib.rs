@@ -1,6 +1,8 @@
+pub mod catalog_import;
 pub mod commands;
 pub mod db;
 pub mod error;
+pub mod inventory;
 use commands::branches::DatabaseState;
 use db::{connection::AppDb, repositories::branches};
 use error::{AppError, ErrorCode};
@@ -31,9 +33,30 @@ pub fn run() {
     let result = tauri::Builder::default()
         .setup(|app| {
             app.manage(DatabaseState(initialize(app)));
+            app.manage(catalog_import::commands::ImportState::default());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            inventory::commands::create_inventory_batch,
+            inventory::commands::record_opening_stock,
+            inventory::commands::record_batch_opening_stock,
+            inventory::commands::record_adjustment,
+            inventory::commands::record_damage,
+            inventory::commands::record_expiry_write_off,
+            inventory::commands::transfer_inventory_stock,
+            inventory::commands::get_package_stock,
+            inventory::commands::get_batch_stock,
+            inventory::commands::list_branch_inventory,
+            inventory::commands::list_stock_movements,
+            inventory::commands::set_inventory_level,
+            inventory::commands::list_low_stock,
+            inventory::commands::list_expiring_batches,
+            inventory::commands::get_fefo_batches,
+            catalog_import::commands::profile_catalog_source,
+            catalog_import::commands::dry_run_catalog_import,
+            catalog_import::commands::apply_catalog_import,
+            catalog_import::commands::get_catalog_import_status,
+            catalog_import::commands::get_catalog_import_report,
             commands::branches::ensure_default_branch,
             commands::branches::list_branches,
             commands::branches::get_branch,

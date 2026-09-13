@@ -17,6 +17,21 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "catalog_core",
         sql: include_str!("../../migrations/002_catalog_core.sql"),
     },
+    Migration {
+        version: 3,
+        name: "catalog_import",
+        sql: include_str!("../../migrations/003_catalog_import.sql"),
+    },
+    Migration {
+        version: 4,
+        name: "inventory_core",
+        sql: include_str!("../../migrations/004_inventory_core.sql"),
+    },
+    Migration {
+        version: 5,
+        name: "inventory_workflows",
+        sql: include_str!("../../migrations/005_inventory_workflows.sql"),
+    },
 ];
 
 pub fn run(connection: &mut Connection) -> Result<(), AppError> {

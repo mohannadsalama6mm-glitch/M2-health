@@ -378,6 +378,16 @@ export function Pagination({
   pages: number;
   onChange: (page: number) => void;
 }) {
+  const visible = Array.from(
+    new Set([1, pages, ...Array.from({ length: 5 }, (_, i) => page + i - 2)]),
+  )
+    .filter((n) => n >= 1 && n <= pages)
+    .sort((a, b) => a - b);
+  const steps: (number | string)[] = [];
+  visible.forEach((n, i) => {
+    if (i > 0 && n - visible[i - 1] > 1) steps.push(`gap-${n}`);
+    steps.push(n);
+  });
   return (
     <nav className="pagination" aria-label="Pagination">
       <IconButton
@@ -387,17 +397,23 @@ export function Pagination({
       >
         <ChevronLeft size={16} />
       </IconButton>
-      {Array.from({ length: pages }, (_, i) => (
-        <Button
-          key={i}
-          size="sm"
-          variant={page === i + 1 ? "primary" : "ghost"}
-          aria-current={page === i + 1 ? "page" : undefined}
-          onClick={() => onChange(i + 1)}
-        >
-          {i + 1}
-        </Button>
-      ))}
+      {steps.map((n) =>
+        typeof n === "string" ? (
+          <span key={n} aria-hidden="true">
+            …
+          </span>
+        ) : (
+          <Button
+            key={n}
+            size="sm"
+            variant={page === n ? "primary" : "ghost"}
+            aria-current={page === n ? "page" : undefined}
+            onClick={() => onChange(n)}
+          >
+            {n}
+          </Button>
+        ),
+      )}
       <IconButton
         label="Next page"
         disabled={page >= pages}

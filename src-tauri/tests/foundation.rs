@@ -25,7 +25,7 @@ fn fresh_database_initializes_schema_and_pragmas() {
     let version: i64 = c
         .query_row("SELECT max(version) FROM _schema_version", [], |r| r.get(0))
         .unwrap();
-    assert_eq!(version, 2);
+    assert_eq!(version, 4);
     let foreign_keys: i64 = c
         .pragma_query_value(None, "foreign_keys", |r| r.get(0))
         .unwrap();
@@ -40,7 +40,7 @@ fn fresh_database_initializes_schema_and_pragmas() {
     assert_eq!(count, 0);
 }
 #[test]
-fn migrations_are_repeatable_and_leave_two_versions() {
+fn migrations_are_repeatable_and_leave_four_versions() {
     let db = AppDb::in_memory().unwrap();
     let mut c = db.lock().unwrap();
     migrations::run(&mut c).unwrap();
@@ -49,7 +49,7 @@ fn migrations_are_repeatable_and_leave_two_versions() {
         c.query_row("SELECT count(*) FROM _schema_version", [], |r| r
             .get::<_, i64>(0))
             .unwrap(),
-        2
+        4
     );
 }
 #[test]
@@ -71,6 +71,16 @@ fn migration_failure_rolls_back_schema_and_metadata_without_losing_data() {
             },
             Migration {
                 version: 3,
+                name: "catalog_import",
+                sql: "",
+            },
+            Migration {
+                version: 4,
+                name: "inventory_core",
+                sql: "",
+            },
+            Migration {
+                version: 5,
                 name: "broken",
                 sql: "CREATE TABLE should_rollback(id TEXT); INSERT INTO missing_table VALUES (1);",
             },
@@ -89,7 +99,7 @@ fn migration_failure_rolls_back_schema_and_metadata_without_losing_data() {
             c.query_row("SELECT count(*) FROM _schema_version", [], |r| r
                 .get::<_, i64>(0))
                 .unwrap(),
-            2
+            4
         );
     }
     assert_eq!(get_branch(&db, &branch.id).unwrap().id, branch.id);
@@ -99,7 +109,7 @@ fn newer_schema_is_refused_without_reset() {
     let db = AppDb::in_memory().unwrap();
     let mut c = db.lock().unwrap();
     c.execute(
-        "INSERT INTO _schema_version(version,name) VALUES(3,'future')",
+        "INSERT INTO _schema_version(version,name) VALUES(5,'future')",
         [],
     )
     .unwrap();
@@ -108,7 +118,7 @@ fn newer_schema_is_refused_without_reset() {
         c.query_row("SELECT count(*) FROM _schema_version", [], |r| r
             .get::<_, i64>(0))
             .unwrap(),
-        3
+        5
     );
 }
 #[test]

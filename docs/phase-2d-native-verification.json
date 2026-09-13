@@ -1,0 +1,292 @@
+{
+  "searchChecks": [
+    {
+      "label": "English",
+      "query": "ABDOMINAL BELT",
+      "firstRow": "ABDOMINAL BELT\n\tDefault Package\n\t.\t170.00 EGP\t\nActive\t\nView ABDOMINAL BELT\nEdit ABDOMINAL BELT"
+    },
+    {
+      "label": "Arabic",
+      "query": "أبدومينال",
+      "firstRow": "ABDOMINAL BELT\n\tDefault Package\n\t.\t170.00 EGP\t\nActive\t\nView ABDOMINAL BELT\nEdit ABDOMINAL BELT"
+    },
+    {
+      "label": "Scientific",
+      "query": "CARBOCYSTEINE",
+      "firstRow": "AVICHEST 2% 100ML SYRUP FOR CHILDREN & INFANTS\nCARBOCYSTEINE · SANOFI\n\tDefault Package\n\tMUCOLYTIC\t5.80 EGP\t\nActive\t\nView AVICHEST 2% 100ML SYRUP FOR CHILDREN & INFANTS\nEdit AVICHEST 2% 100ML SYRUP FOR CHILDREN & INFANTS"
+    },
+    {
+      "label": "Manufacturer",
+      "query": "HIKMA PHARMA",
+      "firstRow": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE · HIKMA PHARMA\n\tDefault Package\n\tCOLD PRODUCTS\t10.00 EGP\t\nActive\t\nView 1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nEdit 1 2 3 (ONE TWO THREE) 20 F.C.TABS."
+    }
+  ],
+  "filterChecks": [
+    {
+      "label": "Manufacturer",
+      "value": "HIKMA PHARMA",
+      "firstRow": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE · HIKMA PHARMA\n\tDefault Package\n\tCOLD PRODUCTS\t10.00 EGP\t\nActive\t\nView 1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nEdit 1 2 3 (ONE TWO THREE) 20 F.C.TABS."
+    },
+    {
+      "label": "Category",
+      "value": "COLD PRODUCTS",
+      "firstRow": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE · HIKMA PHARMA\n\tDefault Package\n\tCOLD PRODUCTS\t10.00 EGP\t\nActive\t\nView 1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nEdit 1 2 3 (ONE TWO THREE) 20 F.C.TABS."
+    },
+    {
+      "label": "Route",
+      "value": "UNKNOWN",
+      "firstRow": "2M WHITES BEEGU MARIN SPRAY\nSEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID · NILL FACTORY COSMETICS > 2M WHITES PHARMA\n\tDefault Package\n\tSOOTHING & MOISTURIZING SPRAY\t32.00 EGP\t\nActive\t\nView 2M WHITES BEEGU MARIN SPRAY\nEdit 2M WHITES BEEGU MARIN SPRAY"
+    }
+  ],
+  "detailChecks": [
+    {
+      "case": "bilingual_combination",
+      "general": "Products\n1 2 3 (ONE TWO THREE) 20 F.C.TABS.\n\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE · HIKMA PHARMA · COLD PRODUCTS · ORAL.SOLID\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nBrand name\n1 2 3 (ONE TWO THREE) 20 F.C.TABS.\nArabic name\n1 2 3\nScientific name\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE\nManufacturer\nHIKMA PHARMA\nCategory\nCOLD PRODUCTS\nRoute\nORAL.SOLID\nActive ingredients\n—\nDescription\n—\nNotes\nImported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+      "packages": "Products\n1 2 3 (ONE TWO THREE) 20 F.C.TABS.\n\nCHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE · HIKMA PHARMA · COLD PRODUCTS · ORAL.SOLID\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nPackage\nDefault Package\nPack size\n—\nUnit\n—\nUnits per package\n—\nStrength\n—\nStatus\nDefault\nActive\nSelling price\n10.00 EGP\nCost\n—\n\nNo barcodes assigned."
+    },
+    {
+      "case": "missing_scientific",
+      "general": "Products\n4 WET INTIMATE GEL 100 ML\n\nTURKUAZ MEDICAL CO. > BROTHER PHARMA · TOPICAL LUBRICANT · TOPICAL\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nBrand name\n4 WET INTIMATE GEL 100 ML\nArabic name\n4 ويت إنتيماتي\nScientific name\n—\nManufacturer\nTURKUAZ MEDICAL CO. > BROTHER PHARMA\nCategory\nTOPICAL LUBRICANT\nRoute\nTOPICAL\nActive ingredients\n—\nDescription\n—\nNotes\nImported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+      "packages": "Products\n4 WET INTIMATE GEL 100 ML\n\nTURKUAZ MEDICAL CO. > BROTHER PHARMA · TOPICAL LUBRICANT · TOPICAL\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nPackage\nDefault Package\nPack size\n—\nUnit\n—\nUnits per package\n—\nStrength\n—\nStatus\nDefault\nActive\nSelling price\n40.00 EGP\nCost\n—\n\nNo barcodes assigned."
+    },
+    {
+      "case": "missing_manufacturer",
+      "general": "Products\nABDOMINAL BELT\n\n. · UNKNOWN\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nBrand name\nABDOMINAL BELT\nArabic name\nأبدومينال بيلت\nScientific name\n—\nManufacturer\n—\nCategory\n.\nRoute\nUNKNOWN\nActive ingredients\n—\nDescription\n—\nNotes\nImported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+      "packages": "Products\nABDOMINAL BELT\n\n. · UNKNOWN\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nPackage\nDefault Package\nPack size\n—\nUnit\n—\nUnits per package\n—\nStrength\n—\nStatus\nDefault\nActive\nSelling price\n170.00 EGP\nCost\n—\n\nNo barcodes assigned."
+    },
+    {
+      "case": "unknown_route",
+      "general": "Products\n2M WHITES BEEGU MARIN SPRAY\n\nSEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID · NILL FACTORY COSMETICS > 2M WHITES PHARMA · SOOTHING & MOISTURIZING SPRAY · UNKNOWN\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nBrand name\n2M WHITES BEEGU MARIN SPRAY\nArabic name\n2م وهيتيس بيجو مارين\nScientific name\nSEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID\nManufacturer\nNILL FACTORY COSMETICS > 2M WHITES PHARMA\nCategory\nSOOTHING & MOISTURIZING SPRAY\nRoute\nUNKNOWN\nActive ingredients\n—\nDescription\n—\nNotes\nImported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+      "packages": "Products\n2M WHITES BEEGU MARIN SPRAY\n\nSEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID · NILL FACTORY COSMETICS > 2M WHITES PHARMA · SOOTHING & MOISTURIZING SPRAY · UNKNOWN\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nPackage\nDefault Package\nPack size\n—\nUnit\n—\nUnits per package\n—\nStrength\n—\nStatus\nDefault\nActive\nSelling price\n32.00 EGP\nCost\n—\n\nNo barcodes assigned."
+    },
+    {
+      "case": "two_decimals",
+      "general": "Products\nABIONEM CREAM 60 GM\n\nHYALURONIC ACID+COLLAGEN+NIGELLA SATIVA+MENTHOL · EL-HELOU PERFUMES & COSMETICS > ALLIANCE PHARMA · MASSAGE CREAM · TOPICAL\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nBrand name\nABIONEM CREAM 60 GM\nArabic name\nأبيونيم\nScientific name\nHYALURONIC ACID+COLLAGEN+NIGELLA SATIVA+MENTHOL\nManufacturer\nEL-HELOU PERFUMES & COSMETICS > ALLIANCE PHARMA\nCategory\nMASSAGE CREAM\nRoute\nTOPICAL\nActive ingredients\n—\nDescription\n—\nNotes\nImported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+      "packages": "Products\nABIONEM CREAM 60 GM\n\nHYALURONIC ACID+COLLAGEN+NIGELLA SATIVA+MENTHOL · EL-HELOU PERFUMES & COSMETICS > ALLIANCE PHARMA · MASSAGE CREAM · TOPICAL\n\nActive\nEdit product\nGeneral information\nPackages & barcodes\nPrice history\nPackage\nDefault Package\nPack size\n—\nUnit\n—\nUnits per package\n—\nStrength\n—\nStatus\nDefault\nActive\nSelling price\n20.95 EGP\nCost\n—\n\nNo barcodes assigned."
+    }
+  ],
+  "errors": [],
+  "secondDry": {
+    "id": "6f0db72e-8aa0-41a5-b56f-e86c9ffdf8fc",
+    "mode": "dry_run",
+    "status": "validated",
+    "profile": {
+      "path": "\\\\?\\D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+      "hash": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+      "size": 3785303,
+      "totalRows": 25070,
+      "columns": [
+        "commercial_name_en",
+        "commercial_name_ar",
+        "scientific_name",
+        "manufacturer",
+        "drug_class",
+        "route",
+        "price_egp"
+      ],
+      "profiledAt": "1789284147135"
+    },
+    "counts": {
+      "already_imported": 25061,
+      "ambiguous_price": 1,
+      "exact_duplicate_source": 4,
+      "ingredient_relations_deferred": 22762,
+      "missing_class": 97,
+      "missing_manufacturer": 71,
+      "missing_scientific_name": 2308,
+      "possible_duplicate": 4,
+      "review_required": 5,
+      "unknown_route": 2597
+    },
+    "lookupCreated": {
+      "categories": 0,
+      "manufacturers": 0,
+      "routes": 0
+    },
+    "lookupReused": {
+      "categories": 0,
+      "manufacturers": 0,
+      "routes": 0
+    },
+    "imported": 0,
+    "processed": 0,
+    "durationMs": 22736,
+    "rowsPerSecond": 0,
+    "reportPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\6f0db72e-8aa0-41a5-b56f-e86c9ffdf8fc-dry-run.json",
+    "backupPath": null,
+    "error": null,
+    "rows": [
+      {
+        "number": 2000,
+        "fields": [
+          "AVICHEST 5% SYRUP FOR ADULT 100ML",
+          "أفيتشيست 5% أدولت",
+          "CARBOCYSTEINE",
+          "SANOFI",
+          "MUCOLYTIC",
+          "ORAL.LIQUID",
+          "7.0"
+        ],
+        "fingerprint": "01849611afb4766d8c1c750610c751bacab2d5c5bb471442d2d261790d5f5498",
+        "identity": "2770111e38c7b719e5ee066190b9d0eb64c1be6c698c2b79b8aa0dfc899219b6",
+        "disposition": "exact_duplicate_source",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 700
+      },
+      {
+        "number": 4518,
+        "fields": [
+          "CITICOLINE 500 MG  20 CAPSULES",
+          "سيتيكوليني",
+          "CITICOLINE",
+          "ORGANIX > KODAK",
+          "CEREBRAL CIRCULATORY INHANCER",
+          "ORAL.SOLID",
+          "22.0"
+        ],
+        "fingerprint": "9832900dbbbecc96ce93edf328cc32cab18044d18ad16cce47cb9a49f4a96c7c",
+        "identity": "a55b6991815dc3b22069fadaa26a1a635d966fcb30a4d54eb5c20f8219a2c1f0",
+        "disposition": "possible_duplicate",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 2200
+      },
+      {
+        "number": 4519,
+        "fields": [
+          "CITICOLINE 500 MG 20 CAPSULES",
+          "سيتيكوليني",
+          "CITICOLINE",
+          "LIFE SAVER -INTERNATIONAL > AFRI PHARMA",
+          "SUPPORT NORMAL BRAIN FUNCTIONS",
+          "ORAL.SOLID",
+          "298.0"
+        ],
+        "fingerprint": "c952a09f8d1d0634a28b94bc163d9bdbbb313e4ea5e9f1e109e0681967d55391",
+        "identity": "3dc2a21207a27c102b811eb1abae0553c032a7af1d9ce86e37945eb16704c757",
+        "disposition": "possible_duplicate",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 29800
+      },
+      {
+        "number": 10340,
+        "fields": [
+          "HESSTA 50 MG CREAM",
+          "هيسستا",
+          "BETA SITOSTEROL- BEESWAX- CALENDULA EX.- TRICLOSAN - ALPHA BISABOLOL - ALPHA PINENE",
+          "COSMOPACK > MASTER PHARM",
+          "HEALING AND MOISTURIZER CREAM",
+          "TOPICAL",
+          "80.0"
+        ],
+        "fingerprint": "8242236c82ba4b6db1201736c05e933e04bc356cce5ebf90f8a8500463173efc",
+        "identity": "8766229a43e9d3f88dc71cd1fc4b05b3af228349be271dca697b74b56c269dfc",
+        "disposition": "exact_duplicate_source",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 8000
+      },
+      {
+        "number": 19937,
+        "fields": [
+          "SCAR NOT GEL 30 GM",
+          "سكار نوت",
+          "SILICONE",
+          "LEVEN > VIDA TECH",
+          "SCAR IMPROVEMENT",
+          "TOPICAL",
+          "555.0"
+        ],
+        "fingerprint": "7e474cb698f17aecd2814a0aee4212cc09878b7559acab30c26590c1b527c828",
+        "identity": "652738dfb0c47dbb9357c52361a1e17b5cabdb7aada5337ae3d827ecf83f4f57",
+        "disposition": "exact_duplicate_source",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 55500
+      },
+      {
+        "number": 20232,
+        "fields": [
+          "SEPTOLA LOZENGES 24 TAB HONEY AND LEMON",
+          "سيبتولا لوزينجيس هوني أند ليمون",
+          "VITAMIN C",
+          "EP PHARMA > MARVEL",
+          "DIETRY SUPPLEMENT",
+          "ORAL.SOLID",
+          "75.0"
+        ],
+        "fingerprint": "33d42c17d834347eb36ba7a6ccfcb61e4e04a8594f10bcf97410966d11c632cb",
+        "identity": "53608aa3eda72abd4ac06d9650b2e880a8b822123615f751ac20c5d60646bf09",
+        "disposition": "possible_duplicate",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 7500
+      },
+      {
+        "number": 20233,
+        "fields": [
+          "SEPTOLA LOZENGES 24 TAB HONEY AND LEMON",
+          "سيبتولا لوزينجيس هوني أند ليمون",
+          "VITAMIN C",
+          "MARVEL PHARMA > EP PHARMA",
+          "DIETARY SUPPLEMENT",
+          "ORAL.SOLID",
+          "75.0"
+        ],
+        "fingerprint": "f859d16892db63b030eb40ebba64df23bce46d6eeedb755b94d079efc4633c0d",
+        "identity": "2ad4b61d3638f09b54fde624fc4c30540b7ba3f1781ae175fe7f698b8cb7efa7",
+        "disposition": "possible_duplicate",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 7500
+      },
+      {
+        "number": 20421,
+        "fields": [
+          "SIGMACYN 1500MG VIAL I.M. I.V.",
+          "سيجماسين",
+          "AMPICILLIN+SULBACTAM",
+          "SIGMA",
+          "PENICILLINS.PENICILLIN WITH B-LACTAMASE INHBITOR",
+          "INJECTION",
+          "16.5"
+        ],
+        "fingerprint": "8c827072f0fb008de2a1c929238f6467de917d51b48a1db5e72192f6b6178652",
+        "identity": "738c60b2e660304d0720e65fd53159d671efe0f6d6e0db3b127800087508f854",
+        "disposition": "exact_duplicate_source",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": 1650
+      },
+      {
+        "number": 22201,
+        "fields": [
+          "TETRAVITON 3 DOUBLE AMP. (N/A)",
+          "تيترافيتون 3 دوبلي",
+          "VITAMIN B1+VITAMIN B2+VITAMIN B6+VITAMIN B12",
+          "KAHIRA",
+          "VITAMIN B",
+          "INJECTION",
+          "4.415"
+        ],
+        "fingerprint": "8ddcc13eceb2dfe705d49ba1468bb867d9d546f0aa06a5f18e6d639106c78768",
+        "identity": "3714801d8545d37e4b7064c26101a96a0c77237b8661bbcc16854f0ef124eee3",
+        "disposition": "ambiguous_price",
+        "warnings": [
+          "ingredient_relations_deferred"
+        ],
+        "priceMinor": null
+      }
+    ]
+  }
+}

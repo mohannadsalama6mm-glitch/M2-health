@@ -75,7 +75,7 @@ fn upgrade_v1_to_v2_preserves_branch_and_reruns() {
         .is_empty());
     let mut c = db.lock().unwrap();
     migrations::run(&mut c).unwrap();
-    assert_eq!(scalar(&c, "SELECT count(*) FROM _schema_version"), 2);
+    assert_eq!(scalar(&c, "SELECT count(*) FROM _schema_version"), 4);
     assert_eq!(scalar(&c, "SELECT count(*) FROM branches"), 1);
     for table in [
         "manufacturers",

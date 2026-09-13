@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Dashboard } from "../features/dashboard/Dashboard";
 import { DesignSystem } from "../features/design-system/DesignSystem";
 import { Catalog } from "../features/catalog/Catalog";
+import { ImportProducts } from "../features/catalog/ImportProducts";
 import { ProductDetails } from "../features/catalog/ProductDetails";
 import { ProductForm } from "../features/catalog/ProductForm";
 import { Sales, SaleDetails } from "../features/sales/Sales";
@@ -62,6 +63,7 @@ export function AppRoutes() {
       <Route path="/sales" element={<Sales />} />
       <Route path="/sales/:id" element={<SaleDetails />} />
       <Route path="/catalog" element={<Catalog />} />
+      <Route path="/catalog/import" element={<ImportProducts />} />
       <Route path="/catalog/new" element={<ProductForm key="new" />} />
       <Route path="/catalog/:id" element={<ProductDetails />} />
       <Route path="/catalog/:id/edit" element={<ProductForm />} />

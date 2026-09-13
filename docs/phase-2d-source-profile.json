@@ -1,0 +1,220 @@
+{
+  "sourceFile": "egyptian-drugs.csv",
+  "sourcePath": "src/data/karem/egyptian-drugs.csv",
+  "format": "csv",
+  "sha256": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+  "columns": [
+    "commercial_name_en",
+    "commercial_name_ar",
+    "scientific_name",
+    "manufacturer",
+    "drug_class",
+    "route",
+    "price_egp"
+  ],
+  "rowCount": 25070,
+  "missing": {
+    "commercial_name_en": 0,
+    "commercial_name_ar": 0,
+    "scientific_name": 2308,
+    "manufacturer": 71,
+    "drug_class": 97,
+    "route": 0,
+    "price_egp": 0
+  },
+  "maxLengths": {
+    "commercial_name_en": 87,
+    "commercial_name_ar": 66,
+    "scientific_name": 397,
+    "manufacturer": 144,
+    "drug_class": 315,
+    "route": 11,
+    "price_egp": 8
+  },
+  "exactDuplicateRows": 4,
+  "normalizedEnglishDuplicateGroups": 6,
+  "routes": {
+    "ORAL.SOLID": 10589,
+    "ORAL.LIQUID": 2236,
+    "UNKNOWN": 2597,
+    "TOPICAL": 4140,
+    "INJECTION": 2635,
+    "SOAP": 130,
+    "EFF": 1037,
+    "SPRAY": 488,
+    "RECTAL": 171,
+    "EYE": 473,
+    "EAR": 41,
+    "VAGINAL": 359,
+    "MOUTH": 174
+  },
+  "lookupVariants": {
+    "manufacturer": [
+      [
+        "SMARTEC FOR MEDICAL PRODUCTS &COSMETICS > MARAN  ASSA",
+        "SMARTEC FOR MEDICAL PRODUCTS &COSMETICS > MARAN ASSA"
+      ],
+      [
+        "MERCK KGAA  F.R.GERMANY > MERCK LIMITED EGYPT",
+        "MERCK KGAA F.R.GERMANY > MERCK LIMITED EGYPT"
+      ],
+      [
+        "EGYPTIAN COMPANY FOR COSMETICS  (E.C.C) > EUREKA BEAUTY FOUNDATION",
+        "EGYPTIAN COMPANY FOR COSMETICS (E.C.C) > EUREKA BEAUTY FOUNDATION"
+      ],
+      [
+        "APEX PHARMA",
+        "Apex pharma"
+      ],
+      [
+        "AMOUN > MERCK KGAA  F.R.GERMANY",
+        "AMOUN > MERCK KGAA F.R.GERMANY"
+      ],
+      [
+        "ORGANIX FOR DIETARY SUPPLEMENTS > HEALTHY  SUPPLEMENT COMPANY",
+        "ORGANIX FOR DIETARY SUPPLEMENTS > HEALTHY SUPPLEMENT COMPANY"
+      ],
+      [
+        "MISR > APC (ARAB PERFUMES  CHEMICALS AND PHARMACEUTICAL CO.)",
+        "MISR > APC (ARAB PERFUMES CHEMICALS AND PHARMACEUTICAL CO.)"
+      ],
+      [
+        "KERMAN FACTORY  AND BMS > LUMINA PHARMA",
+        "KERMAN FACTORY AND BMS > LUMINA PHARMA"
+      ],
+      [
+        "SIGMA > FERRER INTERNATIONAL    SA  -SPAIN",
+        "SIGMA > FERRER INTERNATIONAL   SA  -SPAIN"
+      ],
+      [
+        "MEDCARE > DIAMOND  PHARMA COMPANY",
+        "MEDCARE > DIAMOND PHARMA COMPANY"
+      ]
+    ],
+    "drug_class": [
+      [
+        "NEUROPATHIC PAIN",
+        "Neuropathic pain"
+      ],
+      [
+        "SKIN CARE.SOOTHING",
+        "skin care.SOOTHING"
+      ],
+      [
+        "SKIN CARE",
+        "skin care"
+      ],
+      [
+        "IMMUNITY BOOSTER",
+        "immunity booster"
+      ],
+      [
+        "OMEGA 3",
+        "omega 3"
+      ],
+      [
+        "ORAL CARE",
+        "oral care"
+      ],
+      [
+        "VAGINAL CARE",
+        "VAGINAL care",
+        "vaginal care"
+      ],
+      [
+        "COUGH PRODUCTS",
+        "COUGH products",
+        "cough products"
+      ],
+      [
+        "SKIN CARE.ACNE",
+        "skin care.acne"
+      ],
+      [
+        "ANTI-ACNE",
+        "anti-acne"
+      ]
+    ],
+    "route": []
+  },
+  "scientificCombinations": 9571,
+  "priceMin": "0.3",
+  "priceMax": "375504.0",
+  "invalidPriceLines": [
+    22225
+  ],
+  "invalidPriceExamples": [
+    {
+      "sourceEndLine": 22225,
+      "commercial_name_en": "TETRAVITON 3 DOUBLE AMP. (N/A)",
+      "commercial_name_ar": "تيترافيتون 3 دوبلي",
+      "scientific_name": "VITAMIN B1+VITAMIN B2+VITAMIN B6+VITAMIN B12",
+      "manufacturer": "KAHIRA",
+      "drug_class": "VITAMIN B",
+      "route": "INJECTION",
+      "price_egp": "4.415"
+    }
+  ],
+  "representativeRows": [
+    {
+      "sourceEndLine": 2,
+      "commercial_name_en": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+      "commercial_name_ar": "1 2 3",
+      "scientific_name": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+      "manufacturer": "HIKMA PHARMA",
+      "drug_class": "COLD PRODUCTS",
+      "route": "ORAL.SOLID",
+      "price_egp": "10.0"
+    },
+    {
+      "sourceEndLine": 11,
+      "commercial_name_en": "4 WET INTIMATE GEL 100 ML",
+      "commercial_name_ar": "4 ويت إنتيماتي",
+      "scientific_name": "",
+      "manufacturer": "TURKUAZ MEDICAL CO. > BROTHER PHARMA",
+      "drug_class": "TOPICAL LUBRICANT",
+      "route": "TOPICAL",
+      "price_egp": "40.0"
+    },
+    {
+      "sourceEndLine": 33,
+      "commercial_name_en": "ABDOMINAL BELT",
+      "commercial_name_ar": "أبدومينال بيلت",
+      "scientific_name": "",
+      "manufacturer": "",
+      "drug_class": ".",
+      "route": "UNKNOWN",
+      "price_egp": "170.0"
+    },
+    {
+      "sourceEndLine": 14,
+      "commercial_name_en": "9999999999RR",
+      "commercial_name_ar": "9999999999رر",
+      "scientific_name": "",
+      "manufacturer": "DRUGEYR > DRUGEYE",
+      "drug_class": "",
+      "route": "ORAL.SOLID",
+      "price_egp": "12.0"
+    },
+    {
+      "sourceEndLine": 6,
+      "commercial_name_en": "2M WHITES BEEGU MARIN SPRAY",
+      "commercial_name_ar": "2م وهيتيس بيجو مارين",
+      "scientific_name": "SEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID",
+      "manufacturer": "NILL FACTORY COSMETICS > 2M WHITES PHARMA",
+      "drug_class": "SOOTHING & MOISTURIZING SPRAY",
+      "route": "UNKNOWN",
+      "price_egp": "32.0"
+    },
+    {
+      "sourceEndLine": 12,
+      "commercial_name_en": "5-FLUOROURACIL-EBEWE 250MG/5ML I.V. VIAL",
+      "commercial_name_ar": "5-فلووروراسيل-إبيوي /",
+      "scientific_name": "FLUOROURACIL",
+      "manufacturer": "EBEWE > NOVARTIS PHARMA SANDOZ DIVISION",
+      "drug_class": "ANTINEOPLASTIC",
+      "route": "INJECTION",
+      "price_egp": "47.5"
+    }
+  ]
+}

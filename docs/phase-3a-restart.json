@@ -1,0 +1,114 @@
+{
+  "database": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\m2-health.db",
+  "counts": {
+    "branches": 1,
+    "products": 25062,
+    "product_packages": 25062,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 1,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 1,
+    "inventory_movements": 2,
+    "inventory_transfers": 0,
+    "inventory_levels": 0
+  },
+  "catalogDigests": {
+    "branches": "e6652079b48bdec72fa07f59bcb4ce9bb078093794a0547c69c2167c00c24f6e",
+    "products": "90362008a8bb37db4fcc154883102ca420547a03e3d8097b17c0df98bdc5862b",
+    "product_packages": "a781585c41919ed7b60801e4b9e74b40f794859e06ba9bde2ed0d39107e58ef4",
+    "manufacturers": "926d54a503acb4b470cdee4f4d7049c50db232fc550abaa46a517c43f7e95f44",
+    "categories": "0027a03654628d71b6775b57ee29fa7ed1b1a90cbb09e0e5aa387dba3321bf45",
+    "routes": "81b1e610aa295f660fd2afa1f0ab3aaa0c46cd5867a3c6cecd11ef2af69fb84b",
+    "active_ingredients": "32cae0026a31dcef79b260fcfc6d83157775a5cd82f09ddedfcae671356ee4ec",
+    "product_active_ingredients": "c4ab06665a1c06c89a88b409827bcf1b498d3e22daa66f027ca88927540308a0",
+    "barcodes": "7b528971e005aabe85c6cf82538b44313f1b545c4d55e1f564961765253581fa",
+    "product_price_history": "853bd3f109cf6879a9eafc806f70722cc57575986ffe2a3f64c128655e69b9c4",
+    "catalog_import_runs": "50c690a413613e038cd492226fddb4418a4d9b032eaa7b883e28bb1710fbadd1",
+    "catalog_import_rows": "c8183de6a6a5d08cd16d5d957f1aae19ea78b5f1b8f717514d3207080f07e712"
+  },
+  "schemaVersions": [
+    [
+      1,
+      "branches"
+    ],
+    [
+      2,
+      "catalog_core"
+    ],
+    [
+      3,
+      "catalog_import"
+    ],
+    [
+      4,
+      "inventory_core"
+    ]
+  ],
+  "sourceHash": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+  "priorMigrationHashes": {
+    "001_branches.sql": "192b2f0e16bf13e6d8fc355a173efbc19b15be753d21a44c7027658f4d6cb6fb",
+    "002_catalog_core.sql": "c71291d00c8d7580d9650bbb465a0b6e1e8aa056d50896d4e963c9982d440738",
+    "003_catalog_import.sql": "860281f335d2877fcd77c04bc8d9a84b297ecc3ac673b24eae126f508d8c6be2"
+  },
+  "inventoryUiHash": "4c5e70fadc07a27030fe11cbf2d35afcc71b2c2c848bcd237596a605edcdd588",
+  "integrity": "ok",
+  "foreignKeyErrors": [],
+  "stockByPackage": [
+    [
+      "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      8
+    ]
+  ],
+  "batches": [
+    [
+      "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+      "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "PHASE3A-DEV-SMOKE-20260913",
+      null,
+      null,
+      null,
+      "Controlled Phase 3A development verification only",
+      1,
+      "2026-09-13T07:53:06.676Z",
+      "2026-09-13T07:53:06.676Z"
+    ]
+  ],
+  "movements": [
+    [
+      "99ab7852-3348-40dc-8f91-42cc280abdae",
+      "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+      "OPENING",
+      10,
+      null,
+      null,
+      "Phase 3A controlled development smoke test: explicit opening +10; not actual pharmacy stock.",
+      null,
+      null,
+      "2026-09-13T07:53:06.676Z"
+    ],
+    [
+      "d9bfe09a-9841-4c3b-9631-ea38d05a3d81",
+      "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+      "ADJUSTMENT_OUT",
+      -2,
+      null,
+      null,
+      "Phase 3A controlled development smoke test: adjustment -2; not actual pharmacy stock.",
+      null,
+      null,
+      "2026-09-13T07:53:26.512Z"
+    ]
+  ]
+}
