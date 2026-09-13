@@ -1,12 +1,7 @@
-import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { IconButton, Select } from "../design-system";
 import { isDesktopRuntime } from "../lib/tauri/client";
-import {
-  ensureDefaultBranch,
-  listBranches,
-  type LocalBranch,
-} from "../lib/tauri/branches";
+import { useBranch } from "./BranchContext";
 import { useDemo } from "./DemoContext";
 export function BranchSelector() {
   return isDesktopRuntime() ? <LocalBranchSelector /> : <DemoBranchSelector />;
@@ -31,62 +26,23 @@ function DemoBranchSelector() {
   );
 }
 function LocalBranchSelector() {
-  const [state, setState] = useState<{
-    loading: boolean;
-    branches: LocalBranch[];
-    selected: string;
-    error: string;
-  }>({ loading: true, branches: [], selected: "", error: "" });
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        const initial = await ensureDefaultBranch();
-        const branches = await listBranches();
-        if (active)
-          setState({
-            loading: false,
-            branches,
-            selected: initial.id,
-            error: "",
-          });
-      } catch (error: unknown) {
-        if (active)
-          setState({
-            loading: false,
-            branches: [],
-            selected: "",
-            error:
-              error instanceof Error
-                ? error.message
-                : "Local branches could not be loaded.",
-          });
-      }
-    }
-    void load();
-    return () => {
-      active = false;
-    };
-  }, [attempt]);
+  const { branchId, branchName, branches, loading, error, select, refresh } =
+    useBranch();
   return (
-    <div className="native-branch-selector" aria-busy={state.loading}>
+    <div className="native-branch-selector" aria-busy={loading}>
       <Select
         label="Branch"
-        title={
-          state.error ||
-          "Branches from local SQLite · other screens still use demo data"
-        }
-        disabled={state.loading || !!state.error || !state.branches.length}
-        value={state.selected}
-        onChange={(e) => setState({ ...state, selected: e.target.value })}
+        title={error || "Branches from local SQLite · inventory is branch-scoped"}
+        disabled={loading || !!error || !branches.length}
+        value={branchId}
+        onChange={(e) => select(e.target.value)}
       >
-        {state.loading ? (
+        {loading ? (
           <option value="">Loading local branches…</option>
-        ) : state.error ? (
+        ) : error ? (
           <option value="">Branch unavailable</option>
         ) : (
-          state.branches.map((b) => (
+          branches.map((b) => (
             <option key={b.id} value={b.id} disabled={!b.isActive}>
               {b.name}
               {b.isActive ? "" : " (inactive)"}
@@ -94,27 +50,24 @@ function LocalBranchSelector() {
           ))
         )}
       </Select>
-      {state.error && (
+      {error && (
         <>
           <span role="alert" className="sr-only">
-            {state.error}
+            {error}
           </span>
           <IconButton
             label="Retry local branch connection"
-            title={state.error}
-            onClick={() => {
-              setState({
-                loading: true,
-                branches: [],
-                selected: "",
-                error: "",
-              });
-              setAttempt((v) => v + 1);
-            }}
+            title={error}
+            onClick={refresh}
           >
             <RefreshCw size={15} />
           </IconButton>
         </>
+      )}
+      {!error && !loading && branchName && (
+        <span className="text-dim" role="status">
+          {branchName}
+        </span>
       )}
     </div>
   );

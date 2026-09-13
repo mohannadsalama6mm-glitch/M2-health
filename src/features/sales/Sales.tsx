@@ -1,8 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ShoppingCart, Plus, Pause, Play, Trash2, Printer } from "lucide-react";
 import {
-  FeaturePage,
   Card,
   SectionHeader,
   SearchInput,
@@ -23,97 +22,223 @@ import {
   BackLink,
   LinkButton,
   Alert,
+  PageHeader,
 } from "../../design-system";
+import { isDesktopRuntime } from "../../lib/tauri/client";
+import { useBranch } from "../../app/BranchContext";
 import { useDemo } from "../../app/DemoContext";
-import type { Product, Sale } from "../../mock/types";
+import {
+  completeSale,
+  voidSale,
+  listSales,
+  getSale,
+  posSearch,
+} from "../../lib/tauri/sales";
+import { listCustomers } from "../../lib/tauri/partners";
+import { toMajor, toMinor } from "../../lib/tauri/inventory";
+import type {
+  PosProduct,
+  Sale,
+  SaleRow,
+  SaleDetail,
+} from "../../lib/tauri/sales.types";
+import type { Customer } from "../../lib/tauri/partners.types";
 import "./sales.css";
+interface CartLine {
+  packageId: string;
+  productName: string;
+  packageLabel: string;
+  sellingPriceMinor: number;
+  quantity: number;
+}
 export function Sales() {
-  const {
-    products,
-    cart,
-    setCart,
-    held,
-    setHeld,
-    customers,
-    sales,
-    setSales,
-    notify,
-  } = useDemo();
-  const [query, setQuery] = useState(""),
-    [barcode, setBarcode] = useState(""),
-    [customer, setCustomer] = useState("Walk-in customer"),
-    [payment, setPayment] = useState("Cash"),
-    [cash, setCash] = useState(0),
-    [discount, setDiscount] = useState(0),
-    [dialog, setDialog] = useState(""),
-    [receipt, setReceipt] = useState<Sale | null>(null),
-    [searchError, setSearchError] = useState("");
+  const desktop = isDesktopRuntime();
+  const { branchId } = useBranch();
+  const { notify } = useDemo();
+  const [query, setQuery] = useState("");
+  const [barcode, setBarcode] = useState("");
+  const [customer, setCustomer] = useState("Walk-in customer");
+  const [customerId, setCustomerId] = useState<string | null>(null);
+  const [customersList, setCustomersList] = useState<Customer[]>([]);
+  const [payment, setPayment] = useState("Cash");
+  const [cash, setCash] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [dialog, setDialog] = useState("");
+  const [receipt, setReceipt] = useState<Sale | null>(null);
+  const [searchError, setSearchError] = useState("");
+  const [cart, setCart] = useState<CartLine[]>([]);
+  const [held, setHeld] = useState<CartLine[][]>([]);
+  const [products, setProducts] = useState<PosProduct[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [historySales, setHistorySales] = useState<SaleRow[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
-  const lines = cart.flatMap((l) => {
-    const p = products.find((p) => p.id === l.productId);
-    return p ? [{ ...l, product: p }] : [];
-  });
-  const subtotal = lines.reduce(
-    (sum, l) => sum + l.product.price * l.quantity,
+  useEffect(() => {
+    if (!desktop) return;
+    let active = true;
+    const timer = window.setTimeout(
+      () => {
+        if (!active) return;
+        setLoading(true);
+        setError("");
+        posSearch({ branchId, search: query || null })
+          .then((result) => {
+            if (!active) return;
+            setProducts(result.items);
+            setLoading(false);
+          })
+          .catch((err: unknown) => {
+            if (!active) return;
+            setError(
+              err instanceof Error
+                ? err.message
+                : "Products could not be loaded.",
+            );
+            setLoading(false);
+          });
+      },
+      query ? 250 : 0,
+    );
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [desktop, branchId, query, attempt]);
+  useEffect(() => {
+    if (!desktop) return;
+    let active = true;
+    listCustomers({ isActive: true })
+      .then((result) => {
+        if (active) setCustomersList(result.items);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [desktop, attempt]);
+  useEffect(() => {
+    if (!desktop || dialog !== "history") return;
+    let active = true;
+    listSales({ branchId })
+      .then((result) => {
+        if (active) setHistorySales(result.items);
+      })
+      .catch(() => {
+        if (active) setHistorySales([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [desktop, dialog, branchId]);
+  if (!desktop)
+    return (
+      <EmptyState
+        title="Connect to the desktop app to use the POS."
+        description=""
+      />
+    );
+  const subtotalMinor = cart.reduce(
+    (sum, l) => sum + l.sellingPriceMinor * l.quantity,
     0,
   );
-  const total = Math.max(0, subtotal - discount);
-  const results = products.filter(
-    (p) =>
-      p.status === "Active" &&
-      `${p.name} ${p.scientific} ${(p.barcodes ?? [p.barcode]).join(" ")}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
-  const add = (p: Product) => {
-    if (p.stock === 0) {
-      notify("This demo product is out of stock.");
+  const discountMinor = toMinor(String(discount)) ?? 0;
+  const totalMinor = Math.max(0, subtotalMinor - discountMinor);
+  const cashMinor = payment === "Cash" ? (toMinor(String(cash)) ?? 0) : 0;
+  const changeMinor = Math.max(0, cashMinor - totalMinor);
+  const add = (p: PosProduct) => {
+    if (p.status === "out_of_stock") {
+      notify("This product is out of stock.");
       return;
     }
     setCart((current) =>
-      current.some((l) => l.productId === p.id)
+      current.some((l) => l.packageId === p.packageId)
         ? current.map((l) =>
-            l.productId === p.id ? { ...l, quantity: l.quantity + 1 } : l,
+            l.packageId === p.packageId
+              ? { ...l, quantity: l.quantity + 1 }
+              : l,
           )
-        : [...current, { productId: p.id, quantity: 1 }],
+        : [
+            ...current,
+            {
+              packageId: p.packageId,
+              productName: p.productName,
+              packageLabel: p.packageLabel,
+              sellingPriceMinor: p.sellingPriceMinor ?? 0,
+              quantity: 1,
+            },
+          ],
     );
     setSearchError("");
   };
+  const handleBarcode = () => {
+    posSearch({ branchId, search: barcode })
+      .then((result) => {
+        const match = result.items[0];
+        if (match) {
+          add(match);
+          setBarcode("");
+        } else {
+          setSearchError("No product matches this barcode.");
+        }
+      })
+      .catch(() => setSearchError("No product matches this barcode."));
+  };
   const complete = () => {
-    const next: Sale = {
-      id: `DEMO-${Date.now().toString().slice(-6)}`,
-      time: "Just now (demo)",
-      customer,
-      items: cart.reduce((s, l) => s + l.quantity, 0),
-      total,
-      payment,
-      status: "Completed",
-      lines: cart.map((l) => ({ ...l })),
-    };
-    setSales([next, ...sales]);
-    setReceipt(next);
-    setCart([]);
-    setCash(0);
-    setDiscount(0);
-    setDialog("");
-    notify(
-      "Demo sale completed in memory. No stock or accounting records were posted.",
-    );
+    setSubmitting(true);
+    completeSale({
+      branchId,
+      customerId,
+      paymentMethod: payment === "Account" ? "other" : payment.toLowerCase(),
+      paidMinor: payment === "Cash" ? cashMinor : totalMinor,
+      discountMinor,
+      customerName: customer,
+      lines: cart.map((l) => ({
+        productPackageId: l.packageId,
+        quantity: l.quantity,
+      })),
+    })
+      .then((result) => {
+        setReceipt(result.sale);
+        setCart([]);
+        setCash(0);
+        setDiscount(0);
+        setDialog("");
+        setAttempt((v) => v + 1);
+        notify("Sale completed successfully.");
+        setSubmitting(false);
+      })
+      .catch((err: unknown) => {
+        setSubmitting(false);
+        notify(
+          err instanceof Error ? err.message : "Sale could not be completed.",
+        );
+      });
   };
   return (
-    <FeaturePage
-      title="POS / Sales"
-      description="Find a product, build a basket, and preview checkout."
-      actions={
-        <>
-          <Button onClick={() => setDialog("history")}>Sales history</Button>
-          <Button disabled={!held.length} onClick={() => setDialog("held")}>
-            <Play size={15} />
-            Held sales ({held.length})
+    <div className="feature-page">
+      <PageHeader
+        title="POS / Sales"
+        description="Find a product, build a basket, and preview checkout."
+        actions={
+          <>
+            <Button onClick={() => setDialog("history")}>Sales history</Button>
+            <Button disabled={!held.length} onClick={() => setDialog("held")}>
+              <Play size={15} />
+              Held sales ({held.length})
+            </Button>
+          </>
+        }
+      />
+      {error && (
+        <Alert title="Products could not be loaded" tone="danger">
+          {error}
+          <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
+            Retry
           </Button>
-        </>
-      }
-    >
+        </Alert>
+      )}
       <div className="pos-layout">
         <div className="content-stack">
           <Card>
@@ -125,12 +250,12 @@ export function Sales() {
             <div ref={searchRef}>
               <SearchInput
                 label="POS product search"
-                placeholder="Search name, ingredient, or barcode…"
+                placeholder="Search name or barcode…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && results[0]) {
-                    add(results[0]);
+                  if (e.key === "Enter" && products[0]) {
+                    add(products[0]);
                     setQuery("");
                   }
                 }}
@@ -143,93 +268,88 @@ export function Sales() {
                 placeholder="Try 6221001000011"
                 onChange={(e) => setBarcode(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const p = products.find(
-                      (p) =>
-                        (p.barcodes ?? [p.barcode]).includes(barcode) &&
-                        p.status === "Active",
-                    );
-                    if (p) {
-                      add(p);
-                      setBarcode("");
-                    } else
-                      setSearchError(
-                        "No active demo product matches this barcode.",
-                      );
-                  }
+                  if (e.key === "Enter") handleBarcode();
                 }}
               />
-              <Button
-                onClick={() => {
-                  const p = products.find(
-                    (p) =>
-                      (p.barcodes ?? [p.barcode]).includes(barcode) &&
-                      p.status === "Active",
-                  );
-                  if (p) {
-                    add(p);
-                    setBarcode("");
-                  } else
-                    setSearchError(
-                      "No active demo product matches this barcode.",
-                    );
-                }}
-              >
-                Add barcode
-              </Button>
+              <Button onClick={handleBarcode}>Add barcode</Button>
             </div>
             {searchError && (
               <Alert title="Product not found" tone="warning">
                 {searchError}
               </Alert>
             )}
-            <p className="muted">
-              Keyboard-wedge scanner input is prepared. No hardware connection
-              is active.
-            </p>
           </Card>
           <Card>
             <SectionHeader
               title="Available products"
-              action={<span className="muted">{results.length} matches</span>}
+              action={<span className="muted">{products.length} matches</span>}
             />
-            <Table
-              label="POS products"
-              rows={results}
-              rowKey={(p) => p.id}
-              columns={[
-                {
-                  key: "name",
-                  header: "Product",
-                  render: (p) => (
-                    <>
-                      {p.name}
-                      <span className="cell-secondary">{p.pack}</span>
-                    </>
-                  ),
-                },
-                { key: "stock", header: "Available", render: (p) => p.stock },
-                {
-                  key: "price",
-                  header: "Price",
-                  render: (p) => <PriceDisplay amount={p.price} />,
-                },
-                {
-                  key: "add",
-                  header: "Add",
-                  render: (p) => (
-                    <Button
-                      size="sm"
-                      disabled={!p.stock}
-                      aria-label={`Add ${p.name} to cart`}
-                      onClick={() => add(p)}
-                    >
-                      <Plus size={15} />
-                    </Button>
-                  ),
-                },
-              ]}
-            />
+            {loading && !products.length ? (
+              <div className="stack" role="status">
+                <Alert title="Loading products…" tone="info" />
+              </div>
+            ) : (
+              <Table
+                label="POS products"
+                rows={products}
+                rowKey={(p) => p.packageId}
+                columns={[
+                  {
+                    key: "name",
+                    header: "Product",
+                    render: (p) => (
+                      <>
+                        {p.productName}
+                        <span className="cell-secondary">
+                          {p.packageLabel}
+                        </span>
+                      </>
+                    ),
+                  },
+                  {
+                    key: "stock",
+                    header: "Available",
+                    render: (p) => (
+                      <span className="row">
+                        {p.quantity}
+                        <Badge
+                          dot
+                          tone={
+                            p.status === "in_stock" ? "success" : "danger"
+                          }
+                        >
+                          {p.status === "in_stock" ? "In stock" : "Out"}
+                        </Badge>
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "price",
+                    header: "Price",
+                    render: (p) =>
+                      p.sellingPriceMinor != null ? (
+                        <PriceDisplay amount={toMajor(p.sellingPriceMinor)} />
+                      ) : (
+                        <span className="muted">—</span>
+                      ),
+                  },
+                  {
+                    key: "add",
+                    header: "Add",
+                    render: (p) => (
+                      <Button
+                        size="sm"
+                        disabled={p.status === "out_of_stock"}
+                        aria-label={`Add ${p.productName} to cart`}
+                        onClick={() => add(p)}
+                      >
+                        <Plus size={15} />
+                      </Button>
+                    ),
+                  },
+                ]}
+              />
+            )}
           </Card>
         </div>
         <Card className="pos-cart">
@@ -238,18 +358,23 @@ export function Sales() {
             action={<Badge>{cart.length} lines</Badge>}
           />
           <Select
-            showLabel
             label="Sale customer"
-            value={customer}
-            onChange={(e) => setCustomer(e.target.value)}
+            value={customerId ?? ""}
+            onChange={(e) => {
+              const choice = customersList.find((c) => c.id === e.target.value);
+              setCustomer(choice?.name ?? "Walk-in customer");
+              setCustomerId(choice?.id ?? null);
+            }}
           >
-            <option>Walk-in customer</option>
-            {customers.map((c) => (
-              <option key={c.id}>{c.name}</option>
+            <option value="">Walk-in customer</option>
+            {customersList.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </Select>
           <div className="cart-lines">
-            {!lines.length ? (
+            {!cart.length ? (
               <EmptyState
                 title="Ready for your next sale"
                 description="Search or enter a barcode to add an item."
@@ -264,22 +389,25 @@ export function Sales() {
                 }
               />
             ) : (
-              lines.map((l) => (
-                <div className="cart-line" key={l.productId}>
+              cart.map((l) => (
+                <div className="cart-line" key={l.packageId}>
                   <div className="row spread">
-                    <strong>{l.product.name}</strong>
+                    <strong>{l.productName}</strong>
                     <Button
                       size="sm"
-                      aria-label={`Remove ${l.product.name}`}
+                      aria-label={`Remove ${l.productName}`}
                       onClick={() =>
-                        setCart(cart.filter((c) => c.productId !== l.productId))
+                        setCart(
+                          cart.filter((c) => c.packageId !== l.packageId),
+                        )
                       }
                     >
                       <Trash2 size={14} />
                     </Button>
                   </div>
                   <p className="muted">
-                    {l.product.pack} · <PriceDisplay amount={l.product.price} />
+                    {l.packageLabel} ·{" "}
+                    <PriceDisplay amount={toMajor(l.sellingPriceMinor)} />
                   </p>
                   <div className="row spread">
                     <QuantityStepper
@@ -288,14 +416,16 @@ export function Sales() {
                       onChange={(quantity) =>
                         setCart(
                           cart.map((c) =>
-                            c.productId === l.productId
+                            c.packageId === l.packageId
                               ? { ...c, quantity }
                               : c,
                           ),
                         )
                       }
                     />
-                    <PriceDisplay amount={l.quantity * l.product.price} />
+                    <PriceDisplay
+                      amount={toMajor(l.sellingPriceMinor * l.quantity)}
+                    />
                   </div>
                 </div>
               ))
@@ -306,15 +436,15 @@ export function Sales() {
               items={[
                 {
                   label: "Subtotal",
-                  value: <PriceDisplay amount={subtotal} />,
+                  value: <PriceDisplay amount={toMajor(subtotalMinor)} />,
                 },
-                { label: "Tax", value: "0.00 EGP · demo only" },
+                { label: "Tax", value: "0.00 EGP" },
               ]}
             />
             <Input
               type="number"
               min={0}
-              max={subtotal}
+              max={toMajor(subtotalMinor)}
               label="Sale discount (EGP)"
               value={discount}
               onChange={(e) => setDiscount(Math.max(0, Number(e.target.value)))}
@@ -322,7 +452,7 @@ export function Sales() {
             <div className="row spread checkout-total">
               <strong>Grand total</strong>
               <span className="receipt-total">
-                <PriceDisplay amount={total} />
+                <PriceDisplay amount={toMajor(totalMinor)} />
               </span>
             </div>
             <div className="form-grid">
@@ -347,26 +477,25 @@ export function Sales() {
             </div>
             <div className="row spread">
               <span className="muted">Change</span>
-              <PriceDisplay
-                amount={payment === "Cash" ? Math.max(0, cash - total) : 0}
-              />
+              <PriceDisplay amount={toMajor(changeMinor)} />
             </div>
-            {discount > subtotal && (
+            {discountMinor > subtotalMinor && (
               <Alert title="Discount exceeds subtotal" tone="danger">
                 Reduce the discount before checkout.
               </Alert>
             )}
             <Button
               variant="primary"
+              loading={submitting}
               disabled={
-                !lines.length ||
-                discount > subtotal ||
-                (payment === "Cash" && cash < total) ||
+                !cart.length ||
+                discountMinor > subtotalMinor ||
+                (payment === "Cash" && cashMinor < totalMinor) ||
                 (payment === "Account" && customer === "Walk-in customer")
               }
               onClick={() => setDialog("complete")}
             >
-              Complete sale · demo
+              Complete sale
             </Button>
             <div className="row">
               <Button
@@ -434,22 +563,25 @@ export function Sales() {
         open={dialog === "complete"}
         onOpenChange={() => setDialog("")}
         title="Review checkout"
-        description="UI demonstration only. No payment is charged and no inventory is changed."
+        description="Review the sale details before posting to the ledger."
       >
         <div className="stack">
           <DetailList
             items={[
               { label: "Customer", value: customer },
               { label: "Payment", value: payment },
-              { label: "Total", value: <PriceDisplay amount={total} /> },
+              {
+                label: "Total",
+                value: <PriceDisplay amount={toMajor(totalMinor)} />,
+              },
               {
                 label: "Items",
                 value: cart.reduce((s, l) => s + l.quantity, 0),
               },
             ]}
           />
-          <Button variant="primary" onClick={complete}>
-            Confirm demo sale
+          <Button variant="primary" loading={submitting} onClick={complete}>
+            Confirm sale
           </Button>
         </div>
       </Modal>
@@ -462,7 +594,7 @@ export function Sales() {
           setCart([]);
           setCash(0);
           setDiscount(0);
-          notify("Demo basket cleared.");
+          notify("Basket cleared.");
         }}
       />
       <OutputPreview
@@ -472,103 +604,322 @@ export function Sales() {
       >
         <DetailList
           items={[
-            { label: "Invoice", value: receipt?.id },
-            { label: "Customer", value: receipt?.customer },
+            { label: "Receipt", value: receipt?.receiptNumber },
+            { label: "Customer", value: receipt?.customerName },
             {
               label: "Total",
-              value: <PriceDisplay amount={receipt?.total ?? 0} />,
+              value: <PriceDisplay amount={toMajor(receipt?.totalMinor ?? 0)} />,
             },
-            { label: "Payment", value: receipt?.payment },
+            { label: "Payment", value: receipt?.paymentMethod },
           ]}
         />
-        <p className="muted">No fiscal receipt was issued.</p>
       </OutputPreview>
       <Modal
         open={dialog === "history"}
         onOpenChange={() => setDialog("")}
         title="Recent sales"
-        description="Fictional sales and transactions completed in this UI session."
+        description="Sales completed from this branch."
       >
         <div className="stack">
-          {sales.map((s) => (
-            <Link
-              key={s.id}
-              to={`/sales/${s.id}`}
-              className="text-link"
-              onClick={() => setDialog("")}
-            >
-              #{s.id} · {s.customer} · {s.total.toFixed(2)} EGP
-            </Link>
-          ))}
+          {!historySales.length ? (
+            <EmptyState
+              title="No sales found"
+              description="No sales have been recorded for this branch yet."
+            />
+          ) : (
+            historySales.map((s) => (
+              <Link
+                key={s.id}
+                to={`/sales/${s.id}`}
+                className="text-link"
+                onClick={() => setDialog("")}
+              >
+                #{s.receiptNumber} · {s.customerName} ·{" "}
+                {toMajor(s.totalMinor).toFixed(2)} EGP
+              </Link>
+            ))
+          )}
         </div>
       </Modal>
-    </FeaturePage>
+    </div>
   );
 }
 export function SaleDetails() {
   const { id } = useParams();
-  const { sales, products } = useDemo();
+  const desktop = isDesktopRuntime();
+  const { notify } = useDemo();
   const [print, setPrint] = useState(false);
-  const sale = sales.find((s) => s.id === id);
-  if (!sale)
+  const [detail, setDetail] = useState<SaleDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [voidOpen, setVoidOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState("");
+  const [voidSubmitting, setVoidSubmitting] = useState(false);
+  useEffect(() => {
+    if (!desktop || !id) return;
+    let active = true;
+    getSale(id)
+      .then((result) => {
+        if (!active) return;
+        setDetail(result);
+        setError("");
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setError(
+          err instanceof Error ? err.message : "Sale could not be loaded.",
+        );
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [desktop, id, attempt]);
+  if (!desktop)
+    return (
+      <EmptyState
+        title="Connect to the desktop app to use the POS."
+        description=""
+      />
+    );
+  if (loading)
+    return (
+      <Card>
+        <SectionHeader title="Loading sale…" />
+      </Card>
+    );
+  if (error)
+    return (
+      <>
+        <BackLink to="/sales" label="POS / Sales" />
+        <Alert title="Sale could not be loaded" tone="danger">
+          {error}
+          <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
+            Retry
+          </Button>
+        </Alert>
+      </>
+    );
+  if (!detail)
     return (
       <EmptyState
         title="Sale not found"
-        description="The sale may have been cleared when the UI was reloaded."
+        description="The sale could not be loaded."
         action={<LinkButton to="/sales">Return to POS</LinkButton>}
       />
     );
+  const { sale, items, returns } = detail;
+  const handleVoid = () => {
+    setVoidSubmitting(true);
+    voidSale({ saleId: id!, reason: voidReason })
+      .then(() => {
+        notify("Sale voided.");
+        setAttempt((v) => v + 1);
+        setVoidOpen(false);
+        setVoidReason("");
+        setVoidSubmitting(false);
+      })
+      .catch((err: unknown) => {
+        setVoidSubmitting(false);
+        notify(err instanceof Error ? err.message : "Could not void sale.");
+      });
+  };
   return (
     <>
       <BackLink to="/sales" label="POS / Sales" />
-      <FeaturePage
-        title={`Sale #${sale.id}`}
-        description="Demo transaction details · no fiscal record"
-        actions={
-          <Button onClick={() => setPrint(true)}>
-            <Printer size={15} />
-            Print receipt
-          </Button>
-        }
-      >
+      <div className="feature-page">
+        <PageHeader
+          title={`Sale #${sale.receiptNumber}`}
+          description={`${sale.customerName} · ${sale.paymentMethod}`}
+          actions={
+            <>
+              <Button onClick={() => setPrint(true)}>
+                <Printer size={15} />
+                Print receipt
+              </Button>
+              {sale.status === "completed" && (
+                <Button variant="danger" onClick={() => setVoidOpen(true)}>
+                  Void sale
+                </Button>
+              )}
+            </>
+          }
+        />
         <Card>
           <DetailList
             items={[
-              { label: "Customer", value: sale.customer },
-              { label: "Payment method", value: sale.payment },
-              { label: "Time", value: sale.time },
+              { label: "Branch", value: detail.branchName },
+              { label: "Customer", value: sale.customerName },
+              { label: "Payment method", value: sale.paymentMethod },
+              { label: "User", value: sale.user || "—" },
+              {
+                label: "Time",
+                value: sale.completedAt
+                  ? sale.completedAt.slice(0, 16).replace("T", " ")
+                  : "—",
+              },
               { label: "Status", value: <Status value={sale.status} /> },
-              { label: "Total", value: <PriceDisplay amount={sale.total} /> },
+              {
+                label: "Total",
+                value: <PriceDisplay amount={toMajor(sale.totalMinor)} />,
+              },
+              {
+                label: "Paid",
+                value: <PriceDisplay amount={toMajor(sale.paidMinor)} />,
+              },
+              {
+                label: "Change",
+                value: <PriceDisplay amount={toMajor(sale.changeMinor)} />,
+              },
+              {
+                label: "Discount",
+                value: <PriceDisplay amount={toMajor(sale.discountMinor)} />,
+              },
             ]}
           />
         </Card>
         <DataGrid
           label="Sale lines"
-          rows={sale.lines}
-          rowKey={(l) => l.productId}
-          searchText={(l) =>
-            products.find((p) => p.id === l.productId)?.name ?? ""
-          }
+          rows={items}
+          rowKey={(l) => l.id}
+          searchText={(l) => `${l.productName} ${l.packageLabel}`}
           columns={[
             {
               key: "product",
               header: "Product",
-              render: (l) => products.find((p) => p.id === l.productId)?.name,
+              render: (l) => (
+                <>
+                  {l.productName}
+                  <span className="cell-secondary">{l.packageLabel}</span>
+                </>
+              ),
             },
             { key: "qty", header: "Quantity", render: (l) => l.quantity },
             {
               key: "price",
-              header: "Current catalog unit price",
+              header: "Unit price",
               render: (l) => (
-                <PriceDisplay
-                  amount={
-                    products.find((p) => p.id === l.productId)?.price ?? 0
-                  }
-                />
+                <PriceDisplay amount={toMajor(l.sellingPriceMinor)} />
+              ),
+            },
+            {
+              key: "total",
+              header: "Line total",
+              render: (l) => (
+                <PriceDisplay amount={toMajor(l.lineTotalMinor)} />
               ),
             },
           ]}
         />
+        {items.some((l) => l.batches.length > 0) && (
+          <Card>
+            <SectionHeader title="Batch allocations" />
+            <Table
+              label="Batch allocations"
+              rows={items.flatMap((l) =>
+                l.batches.map((b) => ({
+                  productName: l.productName,
+                  packageLabel: l.packageLabel,
+                  ...b,
+                })),
+              )}
+              rowKey={(b) => b.batchId}
+              columns={[
+                {
+                  key: "product",
+                  header: "Product",
+                  render: (b) => (
+                    <>
+                      {b.productName}
+                      <span className="cell-secondary">{b.packageLabel}</span>
+                    </>
+                  ),
+                },
+                {
+                  key: "batch",
+                  header: "Batch",
+                  render: (b) => (
+                    <>
+                      {b.batchNumber}
+                      {b.expiryDate && (
+                        <span className="cell-secondary">
+                          Exp {b.expiryDate}
+                        </span>
+                      )}
+                    </>
+                  ),
+                },
+                { key: "qty", header: "Quantity", render: (b) => b.quantity },
+              ]}
+            />
+          </Card>
+        )}
+        {returns.length > 0 && (
+          <Card>
+            <SectionHeader title="Returns" />
+            <Table
+              label="Returns"
+              rows={returns}
+              rowKey={(r) => r.id}
+              columns={[
+                {
+                  key: "id",
+                  header: "Return",
+                  render: (r) => (
+                    <>
+                      {r.id}
+                      <span className="cell-secondary">
+                        {r.returnedAt.slice(0, 16).replace("T", " ")}
+                      </span>
+                    </>
+                  ),
+                },
+                { key: "reason", header: "Reason", render: (r) => r.reason },
+                { key: "user", header: "User", render: (r) => r.user || "—" },
+                {
+                  key: "total",
+                  header: "Refund",
+                  render: (r) => (
+                    <PriceDisplay amount={toMajor(r.totalRefundMinor)} />
+                  ),
+                },
+              ]}
+            />
+          </Card>
+        )}
+        <Modal
+          open={voidOpen}
+          onOpenChange={setVoidOpen}
+          title="Void this sale?"
+          description="This will mark the sale as void in the ledger. This action cannot be undone."
+        >
+          <div className="stack">
+            <Input
+              label="Reason for void"
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+              placeholder="Enter reason…"
+            />
+            <div className="row end">
+              <Button
+                disabled={voidSubmitting}
+                onClick={() => setVoidOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                loading={voidSubmitting}
+                disabled={!voidReason.trim()}
+                onClick={handleVoid}
+              >
+                Void sale
+              </Button>
+            </div>
+          </div>
+        </Modal>
         <OutputPreview
           title="Receipt preview"
           open={print}
@@ -576,12 +927,18 @@ export function SaleDetails() {
         >
           <DetailList
             items={[
-              { label: "Invoice", value: sale.id },
-              { label: "Total", value: <PriceDisplay amount={sale.total} /> },
+              { label: "Receipt", value: sale.receiptNumber },
+              { label: "Customer", value: sale.customerName },
+              {
+                label: "Total",
+                value: <PriceDisplay amount={toMajor(sale.totalMinor)} />,
+              },
+              { label: "Payment", value: sale.paymentMethod },
+              { label: "Status", value: <Status value={sale.status} /> },
             ]}
           />
         </OutputPreview>
-      </FeaturePage>
+      </div>
     </>
   );
 }

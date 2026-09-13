@@ -21,7 +21,7 @@ fn map(row: &Row<'_>) -> rusqlite::Result<Branch> {
         updated_at: row.get(7)?,
     })
 }
-fn get(connection: &Connection, id: &str) -> Result<Branch, AppError> {
+pub(crate) fn get(connection: &Connection, id: &str) -> Result<Branch, AppError> {
     connection
         .query_row(
             &format!("SELECT {COLUMNS} FROM branches WHERE id = ?1"),

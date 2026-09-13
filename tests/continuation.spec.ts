@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { installCatalogDouble } from "./catalog-double";
+import { installInventoryDouble } from "./inventory-double";
+import { installSalesDouble } from "./sales-double";
 test("catalog retains multiple packages ingredients barcodes and pricing through edit", async ({
   page,
 }) => {
@@ -68,6 +70,9 @@ for (const [width, height] of [
     page,
   }) => {
     await page.setViewportSize({ width, height });
+    await installCatalogDouble(page);
+    await installInventoryDouble(page);
+    await installSalesDouble(page);
     await page.goto("/sales");
     for (const name of [
       "Panadol 500 mg",
@@ -82,7 +87,7 @@ for (const [width, height] of [
       .locator(".cart-lines")
       .evaluate((e) => (e.scrollTop = e.scrollHeight));
     const button = await page
-      .getByRole("button", { name: "Complete sale · demo" })
+      .getByRole("button", { name: "Complete sale" })
       .boundingBox();
     const main = await page.locator("main").boundingBox();
     expect(button!.y + button!.height).toBeLessThanOrEqual(
@@ -105,6 +110,9 @@ for (const [width, height] of [
 test("POS quantity discount customer card and void confirmation", async ({
   page,
 }) => {
+  await installCatalogDouble(page);
+  await installInventoryDouble(page);
+  await installSalesDouble(page);
   await page.goto("/sales");
   await page.getByLabel("Barcode input").fill("6221001000011");
   await page.getByLabel("Barcode input").press("Enter");
@@ -113,16 +121,19 @@ test("POS quantity discount customer card and void confirmation", async ({
   await page.getByLabel("Sale customer").selectOption("Sara Mohamed");
   await page.getByLabel("Payment method", { exact: true }).selectOption("Card");
   await expect(page.getByLabel("Cash received (EGP)")).toBeDisabled();
-  await page.getByRole("button", { name: "Complete sale · demo" }).click();
+  await page.getByRole("button", { name: "Complete sale" }).click();
   await expect(
     page.getByRole("dialog").getByText("Sara Mohamed", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("dialog").getByText("60.00", { exact: false }),
+    page.getByRole("dialog").getByText("73.00", { exact: false }),
   ).toBeVisible();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Cancel / void" }).click();
-  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Cancel", exact: true })
+    .click();
   await expect(
     page.getByRole("spinbutton", { name: "Quantity", exact: true }),
   ).toHaveValue("2");
@@ -132,90 +143,52 @@ test("POS quantity discount customer card and void confirmation", async ({
     page.getByRole("heading", { name: "Ready for your next sale" }),
   ).toBeVisible();
 });
-test("inventory adjustment transfer and expiry review", async ({ page }) => {
-  await page.goto("/inventory");
-  await page.getByRole("button", { name: "Adjust stock", exact: true }).click();
-  await page.getByLabel("New stock quantity").fill("125");
-  await page.getByLabel("Reason / reference").fill("Count review");
-  await page.getByRole("button", { name: "Apply demo change" }).click();
-  await expect(
-    page
-      .getByRole("table", { name: "Inventory" })
-      .getByRole("row")
-      .filter({ hasText: "Panadol" }),
-  ).toContainText("125");
-  await page.getByRole("button", { name: "Transfer", exact: true }).click();
-  await page.getByLabel("Transfer quantity").fill("2");
-  await page.getByLabel("Reason / reference").fill("Branch review");
-  await page.getByRole("button", { name: "Apply demo change" }).click();
-  await expect(
-    page
-      .getByRole("table", { name: "Inventory" })
-      .getByRole("row")
-      .filter({ hasText: "Panadol" }),
-  ).toContainText("125");
-  await page
-    .getByRole("link", { name: "Expiry management", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Review", exact: true })
-    .first()
-    .click();
-  await page
-    .getByRole("button", { name: "Return to supplier", exact: true })
-    .click();
-  await page.getByLabel("Reason", { exact: true }).fill("Near expiry");
-  await page.getByRole("button", { name: "Apply demo change" }).click();
-  await expect(page.getByRole("dialog")).not.toBeVisible();
-});
-test("created purchase keeps its selected lines through receiving", async ({
+test("completed purchase posts stock and opens its detail page", async ({
   page,
 }) => {
+  await installCatalogDouble(page);
+  await installInventoryDouble(page);
+  await installSalesDouble(page);
   await page.goto("/purchases/new");
-  await page
-    .getByLabel("Purchase supplier")
-    .selectOption("Nile Medical Supplies");
-  await page.getByLabel("Purchase product 1").selectOption("p3");
-  await page.getByLabel("Order quantity 1").fill("4");
-  await page.getByRole("button", { name: "Save demo draft" }).click();
-  await expect(
-    page.getByRole("table", { name: "Purchase order lines" }),
-  ).toContainText("Vitamin C 1000 mg");
-  await expect(
-    page.getByRole("table", { name: "Purchase order lines" }).getByRole("row"),
-  ).toHaveCount(2);
-  await page.getByRole("button", { name: "Mark ordered" }).click();
-  await page
-    .getByRole("link", { name: "Receive purchase", exact: true })
+  await page.getByLabel("Supplier").selectOption("Nile Medical Supplies");
+  await page.getByLabel("Search products").fill("Vitamin C 1000 mg");
+  const results = page.getByRole("table", { name: "Product search results" });
+  await expect(results).toContainText("Vitamin C 1000 mg");
+  await results
+    .getByRole("row")
+    .filter({ hasText: "Vitamin C 1000 mg" })
+    .getByRole("button", { name: "Add", exact: true })
     .click();
-  await expect(page.getByLabel("Received p3")).toHaveValue("4");
-  await page.getByLabel("Batch p3", { exact: true }).fill("QA-VC");
-  await page.getByLabel("Expiry p3", { exact: true }).fill("2028-01-01");
-  await page.getByRole("button", { name: "Review receiving" }).click();
-  await page.getByRole("button", { name: "Confirm", exact: true }).click();
   await expect(
-    page.getByRole("table", { name: "Purchase order lines" }),
+    page.getByRole("table", { name: "Purchase lines" }),
   ).toContainText("Vitamin C 1000 mg");
+  await page.getByLabel("Quantity pkg-3").fill("4");
+  await page.getByLabel("Paid amount (EGP)").fill("48");
+  await page.getByRole("button", { name: "Complete purchase" }).click();
+  await expect(page.getByRole("heading", { name: "00002" })).toBeVisible();
   await expect(
-    page.getByText("Received", { exact: true }).first(),
-  ).toBeVisible();
+    page.getByRole("table", { name: "Purchase items" }),
+  ).toContainText("Vitamin C 1000 mg");
 });
 test("contacts management reports finance and system controls", async ({
   page,
 }) => {
   test.setTimeout(90000);
+  await installCatalogDouble(page);
+  await installInventoryDouble(page);
+  await installSalesDouble(page);
   await page.goto("/suppliers");
   await page
     .getByRole("link", { name: "United Pharma Distribution Karim Adel" })
     .click();
-  await page.getByRole("tab", { name: "Products supplied" }).click();
   await expect(
-    page.getByRole("table", { name: "Supplier products" }),
+    page.getByRole("heading", { name: "United Pharma Distribution Karim Adel" }),
   ).toBeVisible();
+  await expect(page.getByText("Code", { exact: true })).toBeVisible();
   await page.goto("/customers/c1");
-  await page.getByRole("button", { name: "Edit contact" }).click();
+  await page.getByRole("button", { name: "Edit customer" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Ahmed UI review");
-  await page.getByRole("button", { name: "Apply demo change" }).click();
+  await page.getByRole("button", { name: "Save changes" }).click();
   await expect(
     page.getByRole("heading", { name: "Ahmed UI review" }),
   ).toBeVisible();
@@ -281,6 +254,8 @@ for (const [width, height] of [
 ])
   test(`dialog drawer brand and collapsed shell ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height });
+    await installCatalogDouble(page);
+    await installInventoryDouble(page);
     await page.goto("/inventory/counts");
     await expect(page.locator(".sidebar .brand-superscript")).toBeVisible();
     const logo = await page.locator(".sidebar .logo svg").boundingBox();
@@ -300,8 +275,9 @@ for (const [width, height] of [
     await page
       .getByRole("link", { name: "Expiry management", exact: true })
       .click();
+    await page.getByRole("button", { name: "Expired", exact: true }).click();
     await page
-      .getByRole("button", { name: "Review", exact: true })
+      .getByRole("button", { name: "Write-off", exact: true })
       .first()
       .click();
     await expect(page.getByRole("dialog")).toBeVisible();
@@ -310,7 +286,7 @@ for (const [width, height] of [
         .getByRole("dialog")
         .evaluate((el) => el.scrollWidth <= el.clientWidth),
     ).toBe(true);
-    await page.screenshot({ path: `test-results/expiry-drawer-${width}.png` });
+    await page.screenshot({ path: `test-results/expiry-dialog-${width}.png` });
     await page.keyboard.press("Escape");
     await page
       .getByRole("button", { name: "Collapse sidebar", exact: true })

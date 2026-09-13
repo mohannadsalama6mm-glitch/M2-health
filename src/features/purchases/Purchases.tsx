@@ -1,361 +1,674 @@
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import {
-  FeaturePage,
+  PageHeader,
   LinkButton,
   BackLink,
+  Card,
+  SectionHeader,
+  TableToolbar,
+  SearchInput,
   DataGrid,
   PriceDisplay,
   Status,
-  SummaryStrip,
-  Card,
-  DetailList,
-  Table,
-  Button,
-  ConfirmationModal,
-  EmptyState,
-  FormSection,
   Select,
   Input,
   Textarea,
+  Button,
+  Table,
+  DetailList,
+  FormSection,
+  Modal,
   Alert,
+  Badge,
+  EmptyState,
 } from "../../design-system";
+import { isDesktopRuntime } from "../../lib/tauri/client";
+import { useBranch } from "../../app/BranchContext";
 import { useDemo } from "../../app/DemoContext";
-import { purchaseLines } from "../../mock/fixtures";
+import {
+  completePurchase,
+  voidPurchase,
+  listPurchases,
+  getPurchase,
+  purchasePosSearch,
+} from "../../lib/tauri/purchases";
+import { listSuppliers } from "../../lib/tauri/partners";
+import { toMajor, toMinor } from "../../lib/tauri/inventory";
+import type { Supplier } from "../../lib/tauri/partners.types";
+import type {
+  PurchaseDetail,
+  PurchaseProduct,
+  PurchaseRow,
+} from "../../lib/tauri/purchases.types";
+const formatTime = (iso: string) =>
+  iso ? iso.slice(0, 16).replace("T", " ") : "—";
+const statusLabel = (status: string) =>
+  status === "completed" ? "Completed" : "Void";
 export function Purchases() {
-  const { purchases } = useDemo();
+  const desktop = isDesktopRuntime();
+  const { branchId } = useBranch();
+  const [rows, setRows] = useState<PurchaseRow[]>([]);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!desktop) return;
+    let active = true;
+    const timer = window.setTimeout(
+      () => {
+        if (!active) return;
+        setLoading(true);
+        setError("");
+        listPurchases({
+          branchId,
+          search: search || null,
+          status: status || null,
+        })
+          .then((result) => {
+            if (!active) return;
+            setRows(result.items);
+            setLoading(false);
+          })
+          .catch((err: unknown) => {
+            if (!active) return;
+            setError(
+              err instanceof Error
+                ? err.message
+                : "Purchases could not be loaded.",
+            );
+            setLoading(false);
+          });
+      },
+      search ? 250 : 0,
+    );
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [desktop, branchId, search, status, attempt]);
+  if (!desktop)
+    return (
+      <EmptyState
+        title="Connect to the desktop app to view purchases."
+        description=""
+      />
+    );
   return (
-    <FeaturePage
-      title="Purchases"
-      description="Plan supplier orders and track receiving progress."
-      actions={
-        <LinkButton primary to="/purchases/new">
-          <Plus size={16} />
-          Create purchase
-        </LinkButton>
-      }
-    >
-      <SummaryStrip
-        items={[
-          {
-            label: "Open orders",
-            value: purchases.filter((p) =>
-              ["Ordered", "Partially Received"].includes(p.status),
-            ).length,
-          },
-          {
-            label: "Drafts",
-            value: purchases.filter((p) => p.status === "Draft").length,
-          },
-          {
-            label: "Outstanding · demo",
-            value: (
-              <PriceDisplay
-                amount={purchases
-                  .filter((p) => p.status !== "Cancelled")
-                  .reduce((s, p) => s + p.total - p.paid, 0)}
-              />
-            ),
-          },
-        ]}
+    <div className="feature-page">
+      <PageHeader
+        title="Purchases"
+        description="Supplier orders and receiving history, sourced from the local database."
+        actions={
+          <LinkButton primary to="/purchases/new">
+            <Plus size={16} />
+            Complete purchase
+          </LinkButton>
+        }
       />
-      <DataGrid
-        label="Purchases"
-        rows={purchases}
-        rowKey={(p) => p.id}
-        searchText={(p) => `${p.id} ${p.supplier}`}
-        filters={[
-          {
-            label: "Statuses",
-            options: [
-              "Draft",
-              "Ordered",
-              "Partially Received",
-              "Received",
-              "Cancelled",
-            ],
-            value: (p) => p.status,
-          },
-        ]}
-        columns={[
-          {
-            key: "id",
-            header: "Invoice / supplier",
-            render: (p) => (
-              <Link className="text-link" to={`/purchases/${p.id}`}>
-                {p.id}
-                <span className="cell-secondary">{p.supplier}</span>
-              </Link>
-            ),
-          },
-          { key: "date", header: "Date", render: (p) => p.date },
-          {
-            key: "status",
-            header: "Status",
-            render: (p) => <Status value={p.status} />,
-          },
-          { key: "items", header: "Items", render: (p) => p.items },
-          {
-            key: "total",
-            header: "Total",
-            render: (p) => <PriceDisplay amount={p.total} />,
-          },
-          {
-            key: "paid",
-            header: "Paid",
-            render: (p) => <PriceDisplay amount={p.paid} />,
-          },
-          {
-            key: "balance",
-            header: "Balance",
-            render: (p) => <PriceDisplay amount={p.total - p.paid} />,
-          },
-        ]}
-      />
-    </FeaturePage>
+      {error && (
+        <Alert title="Purchases could not be loaded" tone="danger">
+          {error}
+          <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
+            Retry
+          </Button>
+        </Alert>
+      )}
+      <TableToolbar>
+        <SearchInput
+          label="Search purchases"
+          placeholder="Search by purchase or invoice number…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <div className="row">
+          <Select
+            label="Status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">All statuses</option>
+            <option value="completed">Completed</option>
+            <option value="void">Void</option>
+          </Select>
+        </div>
+      </TableToolbar>
+      {loading && rows.length === 0 ? (
+        <Card>
+          <SectionHeader title="Loading purchases…" />
+        </Card>
+      ) : (
+        <DataGrid
+          label="Purchases"
+          rows={rows}
+          rowKey={(p) => p.id}
+          searchText={(p) =>
+            `${p.purchaseNumber} ${p.invoiceNumber} ${p.supplierName ?? ""}`
+          }
+          columns={[
+            {
+              key: "purchase",
+              header: "Purchase / supplier",
+              render: (p) => (
+                <Link className="text-link" to={`/purchases/${p.id}`}>
+                  {p.purchaseNumber}
+                  <span className="cell-secondary">
+                    {p.supplierName ?? "Supplier —"}
+                  </span>
+                </Link>
+              ),
+            },
+            {
+              key: "invoice",
+              header: "Invoice",
+              render: (p) => p.invoiceNumber || "—",
+            },
+            {
+              key: "date",
+              header: "Date",
+              render: (p) => formatTime(p.completedAt),
+            },
+            {
+              key: "status",
+              header: "Status",
+              render: (p) => <Status value={statusLabel(p.status)} />,
+            },
+            { key: "items", header: "Items", render: (p) => p.itemCount },
+            {
+              key: "total",
+              header: "Total",
+              render: (p) => <PriceDisplay amount={toMajor(p.totalMinor)} />,
+            },
+            {
+              key: "paid",
+              header: "Paid",
+              render: (p) => <PriceDisplay amount={toMajor(p.paidMinor)} />,
+            },
+            { key: "user", header: "User", render: (p) => p.user || "—" },
+          ]}
+        />
+      )}
+    </div>
   );
 }
 export function PurchaseDetails() {
   const { id } = useParams();
-  const { purchases, setPurchases, products, notify } = useDemo();
-  const [cancel, setCancel] = useState(false);
-  const p = purchases.find((p) => p.id === id);
-  if (!p)
+  const desktop = isDesktopRuntime();
+  const { notify } = useDemo();
+  const [detail, setDetail] = useState<PurchaseDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const [voidOpen, setVoidOpen] = useState(false);
+  const [voidReason, setVoidReason] = useState("");
+  const [voidSubmitting, setVoidSubmitting] = useState(false);
+  useEffect(() => {
+    if (!desktop || !id) return;
+    let active = true;
+    getPurchase(id)
+      .then((result) => {
+        if (!active) return;
+        setDetail(result);
+        setError("");
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setError(
+          err instanceof Error ? err.message : "Purchase could not be loaded.",
+        );
+        setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [desktop, id, attempt]);
+  if (!desktop)
+    return (
+      <EmptyState
+        title="Connect to the desktop app to view purchases."
+        description=""
+      />
+    );
+  if (loading)
+    return (
+      <Card>
+        <SectionHeader title="Loading purchase…" />
+      </Card>
+    );
+  if (error)
+    return (
+      <>
+        <BackLink to="/purchases" label="Purchases" />
+        <Alert title="Purchase could not be loaded" tone="danger">
+          {error}
+          <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
+            Retry
+          </Button>
+        </Alert>
+      </>
+    );
+  if (!detail)
     return (
       <EmptyState
         title="Purchase not found"
-        description="This order is not in the current UI session."
-        action={<LinkButton to="/purchases">Purchases</LinkButton>}
+        description="The purchase could not be loaded."
+        action={<LinkButton to="/purchases">Return to purchases</LinkButton>}
       />
     );
+  const { purchase, branchName, supplierName, items } = detail;
+  const handleVoid = () => {
+    if (!voidReason.trim()) return;
+    setVoidSubmitting(true);
+    voidPurchase({ purchaseId: purchase.id, reason: voidReason })
+      .then(() => {
+        notify("Purchase voided and stock reversed.");
+        setAttempt((v) => v + 1);
+        setVoidOpen(false);
+        setVoidReason("");
+        setVoidSubmitting(false);
+      })
+      .catch((err: unknown) => {
+        setVoidSubmitting(false);
+        notify(
+          err instanceof Error
+            ? err.message
+            : "Purchase could not be voided.",
+        );
+      });
+  };
   return (
     <>
       <BackLink to="/purchases" label="Purchases" />
-      <FeaturePage
-        title={p.id}
-        description={`${p.supplier} · supplier purchase order`}
-        actions={
-          <>
-            <Status value={p.status} />
-            {["Ordered", "Partially Received"].includes(p.status) && (
-              <LinkButton primary to={`/purchases/${p.id}/receive`}>
-                Receive purchase
-              </LinkButton>
-            )}
-            {p.status === "Draft" && (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setPurchases(
-                    purchases.map((v) =>
-                      v.id === p.id ? { ...v, status: "Ordered" } : v,
-                    ),
-                  );
-                  notify(
-                    "Demo order marked ordered. Nothing was sent to the supplier.",
-                  );
-                }}
-              >
-                Mark ordered
-              </Button>
-            )}
-            <Button
-              disabled={["Cancelled", "Received"].includes(p.status)}
-              onClick={() => setCancel(true)}
-            >
-              Cancel order
-            </Button>
-          </>
-        }
-      >
+      <div className="feature-page">
+        <PageHeader
+          title={purchase.purchaseNumber}
+          description={`${branchName} · ${statusLabel(purchase.status)}`}
+          actions={
+            <>
+              <Status value={statusLabel(purchase.status)} />
+              {purchase.status === "completed" && (
+                <Button variant="danger" onClick={() => setVoidOpen(true)}>
+                  Void purchase
+                </Button>
+              )}
+            </>
+          }
+        />
         <div className="content-stack">
           <Card>
             <DetailList
               items={[
-                { label: "Supplier", value: p.supplier },
-                { label: "Order date", value: p.date },
-                { label: "Expected delivery", value: p.delivery },
-                { label: "Supplier invoice", value: `INV-${p.id.slice(3)}` },
-                { label: "Paid", value: <PriceDisplay amount={p.paid} /> },
+                { label: "Branch", value: branchName },
+                { label: "Supplier", value: supplierName ?? "—" },
                 {
-                  label: "Balance",
-                  value: <PriceDisplay amount={p.total - p.paid} />,
+                  label: "Invoice number",
+                  value: purchase.invoiceNumber || "—",
                 },
+                {
+                  label: "Purchase number",
+                  value: purchase.purchaseNumber,
+                },
+                { label: "Completed", value: formatTime(purchase.completedAt) },
+                {
+                  label: "Payment method",
+                  value: purchase.paymentMethod || "—",
+                },
+                {
+                  label: "Subtotal",
+                  value: (
+                    <PriceDisplay amount={toMajor(purchase.subtotalMinor)} />
+                  ),
+                },
+                {
+                  label: "Discount",
+                  value: (
+                    <PriceDisplay amount={toMajor(purchase.discountMinor)} />
+                  ),
+                },
+                {
+                  label: "Tax",
+                  value: <PriceDisplay amount={toMajor(purchase.taxMinor)} />,
+                },
+                {
+                  label: "Total",
+                  value: <PriceDisplay amount={toMajor(purchase.totalMinor)} />,
+                },
+                {
+                  label: "Paid",
+                  value: <PriceDisplay amount={toMajor(purchase.paidMinor)} />,
+                },
+                {
+                  label: "Change",
+                  value: (
+                    <PriceDisplay amount={toMajor(purchase.changeMinor)} />
+                  ),
+                },
+                { label: "User", value: purchase.user || "—" },
+                { label: "Note", value: purchase.note || "—" },
               ]}
             />
           </Card>
+          {purchase.status === "void" && (
+            <Alert title="This purchase was voided" tone="danger">
+              Voided by {purchase.voidedBy || "—"}
+              {purchase.voidReason ? `: ${purchase.voidReason}` : ""}
+            </Alert>
+          )}
           <Card>
             <Table
-              label="Purchase order lines"
-              rows={p.lines ?? purchaseLines}
-              rowKey={(l) => l.productId}
-              columns={[
-                {
-                  key: "name",
-                  header: "Product",
-                  render: (l) =>
-                    products.find((v) => v.id === l.productId)?.name,
-                },
-                {
-                  key: "pack",
-                  header: "Package",
-                  render: (l) =>
-                    products.find((v) => v.id === l.productId)?.pack,
-                },
-                { key: "qty", header: "Ordered", render: (l) => l.ordered },
-                {
-                  key: "received",
-                  header: "Received",
-                  render: (l) =>
-                    p.status === "Received" ? l.ordered : l.received,
-                },
-                {
-                  key: "cost",
-                  header: "Cost",
-                  render: (l) => <PriceDisplay amount={l.cost} />,
-                },
-              ]}
-            />
-            <p className="muted">
-              UI-only order lines. No supplier or stock ledger is connected.
-            </p>
-          </Card>
-        </div>
-        <ConfirmationModal
-          open={cancel}
-          onOpenChange={setCancel}
-          title="Cancel this purchase?"
-          description="Only the demo order status changes. No supplier communication or financial posting occurs."
-          onConfirm={() => {
-            setPurchases(
-              purchases.map((v) =>
-                v.id === p.id ? { ...v, status: "Cancelled" } : v,
-              ),
-            );
-            notify("Demo order cancelled.");
-          }}
-        />
-      </FeaturePage>
-    </>
-  );
-}
-export function PurchaseForm() {
-  const { products, suppliers, purchases, setPurchases, notify } = useDemo();
-  const navigate = useNavigate();
-  const [lines, setLines] = useState([
-    { productId: products[0].id, quantity: 1, cost: products[0].cost },
-  ]);
-  return (
-    <>
-      <BackLink to="/purchases" label="Purchases" />
-      <FeaturePage
-        title="Create purchase"
-        description="Prepare a supplier order. This draft is held only in memory."
-      >
-        <form
-          className="content-stack"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const f = new FormData(e.currentTarget);
-            const id = `PO-${Date.now().toString().slice(-5)}`;
-            const subtotal = lines.reduce((s, l) => s + l.quantity * l.cost, 0);
-            setPurchases([
-              {
-                id,
-                supplier: String(f.get("supplier")),
-                date: "2026-09-11",
-                delivery: String(f.get("delivery")),
-                status: "Draft",
-                items: lines.length,
-                total: Math.max(
-                  0,
-                  subtotal - Number(f.get("discount")) + Number(f.get("tax")),
-                ),
-                paid: 0,
-                lines: lines.map((l) => ({
-                  productId: l.productId,
-                  ordered: l.quantity,
-                  received: 0,
-                  cost: l.cost,
-                })),
-                notes: String(f.get("notes")),
-                discount: Number(f.get("discount")),
-                tax: Number(f.get("tax")),
-              },
-              ...purchases,
-            ]);
-            notify("Purchase draft created in this preview.");
-            navigate(`/purchases/${id}`);
-          }}
-        >
-          <FormSection title="Supplier & delivery">
-            <Select showLabel name="supplier" label="Purchase supplier">
-              {suppliers.map((s) => (
-                <option key={s.id}>{s.name}</option>
-              ))}
-            </Select>
-            <Input
-              name="delivery"
-              label="Expected delivery"
-              type="date"
-              defaultValue="2026-09-13"
-              required
-            />
-          </FormSection>
-          <Card>
-            <div className="row spread">
-              <h3>Order lines</h3>
-              <Button
-                onClick={() =>
-                  setLines([
-                    ...lines,
-                    {
-                      productId: products[0].id,
-                      quantity: 1,
-                      cost: products[0].cost,
-                    },
-                  ])
-                }
-              >
-                Add line
-              </Button>
-            </div>
-            <Table
-              label="New purchase lines"
-              rows={lines.map((l, i) => ({ ...l, index: i }))}
-              rowKey={(l) => String(l.index)}
+              label="Purchase items"
+              rows={items}
+              rowKey={(l) => l.id}
               columns={[
                 {
                   key: "product",
                   header: "Product / package",
                   render: (l) => (
-                    <Select
-                      label={`Purchase product ${l.index + 1}`}
-                      value={l.productId}
-                      onChange={(e) =>
-                        setLines(
-                          lines.map((v, i) =>
-                            i === l.index
-                              ? {
-                                  ...v,
-                                  productId: e.target.value,
-                                  cost:
-                                    products.find(
-                                      (p) => p.id === e.target.value,
-                                    )?.cost ?? 0,
-                                }
-                              : v,
-                          ),
-                        )
-                      }
-                    >
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name} · {p.pack}
-                        </option>
-                      ))}
-                    </Select>
+                    <>
+                      {l.productName}
+                      <span className="cell-secondary">{l.packageLabel}</span>
+                    </>
+                  ),
+                },
+                { key: "quantity", header: "Quantity", render: (l) => l.quantity },
+                {
+                  key: "cost",
+                  header: "Unit cost",
+                  render: (l) => (
+                    <PriceDisplay amount={toMajor(l.unitCostMinor)} />
+                  ),
+                },
+                {
+                  key: "lineTotal",
+                  header: "Line total",
+                  render: (l) => (
+                    <PriceDisplay amount={toMajor(l.lineTotalMinor)} />
+                  ),
+                },
+                {
+                  key: "batches",
+                  header: "Lots",
+                  render: (l) =>
+                    l.batches.length > 0 ? (
+                      <Badge>{l.batches.length}</Badge>
+                    ) : (
+                      "—"
+                    ),
+                },
+              ]}
+            />
+            <p className="muted">
+              Stock was added to local lots when this purchase was completed.
+            </p>
+          </Card>
+        </div>
+        <Modal
+          open={voidOpen}
+          onOpenChange={setVoidOpen}
+          title="Void this purchase?"
+          description="Voiding reverses the posted stock and ledger movements."
+        >
+          <div className="content-stack">
+            <Input
+              label="Void reason"
+              placeholder="Required"
+              value={voidReason}
+              onChange={(e) => setVoidReason(e.target.value)}
+            />
+            <div className="row end">
+              <Button onClick={() => setVoidOpen(false)}>Cancel</Button>
+              <Button
+                variant="danger"
+                loading={voidSubmitting}
+                disabled={!voidReason.trim()}
+                onClick={handleVoid}
+              >
+                Void purchase
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </>
+  );
+}
+interface Line {
+  productPackageId: string;
+  productName: string;
+  packageLabel: string;
+  quantity: number;
+  unitCostMinor: number;
+}
+export function PurchaseForm() {
+  const desktop = isDesktopRuntime();
+  const { branchId } = useBranch();
+  const { notify } = useDemo();
+  const navigate = useNavigate();
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [supplierId, setSupplierId] = useState("");
+  const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<PurchaseProduct[]>([]);
+  const [lines, setLines] = useState<Line[]>([]);
+  const [discount, setDiscount] = useState("0");
+  const [tax, setTax] = useState("0");
+  const [payment, setPayment] = useState("Cash");
+  const [paid, setPaid] = useState("");
+  const [invoice, setInvoice] = useState("");
+  const [note, setNote] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  useEffect(() => {
+    if (!desktop) return;
+    let active = true;
+    listSuppliers({ isActive: true })
+      .then((result) => {
+        if (active) setSuppliers(result.items);
+      })
+      .catch(() => {
+        if (active) setSuppliers([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [desktop]);
+  useEffect(() => {
+    if (!desktop) return;
+    let active = true;
+    const timer = window.setTimeout(
+      () => {
+        if (!active) return;
+        purchasePosSearch({ branchId, search: search || null, limit: 50 })
+          .then((result) => {
+            if (active) setProducts(result.items);
+          })
+          .catch(() => {
+            if (active) setProducts([]);
+          });
+      },
+      search ? 250 : 0,
+    );
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [desktop, branchId, search]);
+  const subtotalMinor = lines.reduce(
+    (sum, l) => sum + l.unitCostMinor * l.quantity,
+    0,
+  );
+  const discountMinor = toMinor(discount) ?? 0;
+  const taxMinor = toMinor(tax) ?? 0;
+  const totalMinor = Math.max(0, subtotalMinor - discountMinor + taxMinor);
+  const paidMinor = toMinor(paid) ?? 0;
+  const changeMinor = Math.max(0, paidMinor - totalMinor);
+  const canSubmit =
+    lines.length > 0 &&
+    lines.every((l) => l.quantity >= 1 && l.unitCostMinor >= 0) &&
+    paidMinor >= totalMinor;
+  const addLine = (p: PurchaseProduct) => {
+    setLines((current) =>
+      current.some((l) => l.productPackageId === p.packageId)
+        ? current.map((l) =>
+            l.productPackageId === p.packageId
+              ? { ...l, quantity: l.quantity + 1 }
+              : l,
+          )
+        : [
+            ...current,
+            {
+              productPackageId: p.packageId,
+              productName: p.productName,
+              packageLabel: p.packageLabel,
+              quantity: 1,
+              unitCostMinor: p.costPriceMinor ?? 0,
+            },
+          ],
+    );
+  };
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!canSubmit || submitting) return;
+    setSubmitting(true);
+    setError("");
+    completePurchase({
+      branchId,
+      supplierId: supplierId || null,
+      invoiceNumber: invoice.trim() || undefined,
+      discountMinor,
+      taxMinor,
+      paidMinor,
+      paymentMethod: payment.toLowerCase(),
+      user: null,
+      note: note.trim() || undefined,
+      lines: lines.map((l) => ({
+        productPackageId: l.productPackageId,
+        quantity: l.quantity,
+        unitCostMinor: l.unitCostMinor,
+      })),
+    })
+      .then((result) => {
+        notify("Purchase completed. Stock has been posted to local lots.");
+        navigate(`/purchases/${result.purchase.id}`);
+      })
+      .catch((err: unknown) => {
+        setSubmitting(false);
+        setError(
+          err instanceof Error
+            ? err.message
+            : "The purchase could not be completed.",
+        );
+      });
+  };
+  if (!desktop)
+    return (
+      <EmptyState
+        title="Connect to the desktop app to complete a purchase."
+        description=""
+      />
+    );
+  return (
+    <>
+      <BackLink to="/purchases" label="Purchases" />
+      <div className="feature-page">
+        <PageHeader
+          title="Complete purchase"
+          description="Select products, set quantities, and pay the supplier. Completing posts stock and ledger movements immediately."
+        />
+        <form className="content-stack" onSubmit={handleSubmit}>
+          {error && (
+            <Alert title="Purchase could not be completed" tone="danger">
+              {error}
+            </Alert>
+          )}
+          <FormSection title="Supplier">
+            <Select
+              label="Supplier"
+              showLabel
+              value={supplierId}
+              onChange={(e) => setSupplierId(e.target.value)}
+            >
+              <option value="">No supplier</option>
+              {suppliers.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </Select>
+          </FormSection>
+          <Card>
+            <SectionHeader title="Add products" />
+            <SearchInput
+              label="Search products"
+              placeholder="Search name…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Table
+              label="Product search results"
+              rows={products}
+              rowKey={(p) => p.packageId}
+              columns={[
+                {
+                  key: "product",
+                  header: "Product / package",
+                  render: (p) => (
+                    <>
+                      {p.productName}
+                      <span className="cell-secondary">{p.packageLabel}</span>
+                    </>
+                  ),
+                },
+                {
+                  key: "pack",
+                  header: "Pack size",
+                  render: (p) => p.packSize ?? "—",
+                },
+                {
+                  key: "cost",
+                  header: "Cost",
+                  render: (p) =>
+                    p.costPriceMinor != null ? (
+                      <PriceDisplay amount={toMajor(p.costPriceMinor)} />
+                    ) : (
+                      <span className="muted">—</span>
+                    ),
+                },
+                {
+                  key: "add",
+                  header: "Action",
+                  render: (p) => (
+                    <Button size="sm" variant="outline" onClick={() => addLine(p)}>
+                      Add
+                    </Button>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+          <Card>
+            <div className="row spread">
+              <h3>Purchase lines</h3>
+              <span className="muted">
+                {lines.length} line{lines.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <Table
+              label="Purchase lines"
+              rows={lines}
+              rowKey={(l) => l.productPackageId}
+              columns={[
+                {
+                  key: "product",
+                  header: "Product / package",
+                  render: (l) => (
+                    <>
+                      {l.productName}
+                      <span className="cell-secondary">{l.packageLabel}</span>
+                    </>
                   ),
                 },
                 {
@@ -364,16 +677,18 @@ export function PurchaseForm() {
                   render: (l) => (
                     <Input
                       hideLabel
-                      label={`Order quantity ${l.index + 1}`}
+                      label={`Quantity ${l.productPackageId}`}
                       type="number"
                       min={1}
-                      required
                       value={l.quantity}
                       onChange={(e) =>
                         setLines(
-                          lines.map((v, i) =>
-                            i === l.index
-                              ? { ...v, quantity: Number(e.target.value) }
+                          lines.map((v) =>
+                            v.productPackageId === l.productPackageId
+                              ? {
+                                  ...v,
+                                  quantity: Math.max(1, Number(e.target.value)),
+                                }
                               : v,
                           ),
                         )
@@ -383,21 +698,23 @@ export function PurchaseForm() {
                 },
                 {
                   key: "cost",
-                  header: "Cost",
+                  header: "Unit cost (EGP)",
                   render: (l) => (
                     <Input
                       hideLabel
-                      label={`Order cost ${l.index + 1}`}
+                      label={`Unit cost ${l.productPackageId}`}
                       type="number"
                       min={0}
                       step="0.01"
-                      required
-                      value={l.cost}
+                      value={toMajor(l.unitCostMinor)}
                       onChange={(e) =>
                         setLines(
-                          lines.map((v, i) =>
-                            i === l.index
-                              ? { ...v, cost: Number(e.target.value) }
+                          lines.map((v) =>
+                            v.productPackageId === l.productPackageId
+                              ? {
+                                  ...v,
+                                  unitCostMinor: toMinor(e.target.value) ?? 0,
+                                }
                               : v,
                           ),
                         )
@@ -406,13 +723,27 @@ export function PurchaseForm() {
                   ),
                 },
                 {
+                  key: "lineTotal",
+                  header: "Line total",
+                  render: (l) => (
+                    <PriceDisplay
+                      amount={toMajor(l.unitCostMinor * l.quantity)}
+                    />
+                  ),
+                },
+                {
                   key: "remove",
                   header: "Action",
                   render: (l) => (
                     <Button
-                      disabled={lines.length === 1}
+                      size="sm"
+                      variant="ghost"
                       onClick={() =>
-                        setLines(lines.filter((_, i) => i !== l.index))
+                        setLines(
+                          lines.filter(
+                            (v) => v.productPackageId !== l.productPackageId,
+                          ),
+                        )
                       }
                     >
                       Remove
@@ -422,255 +753,128 @@ export function PurchaseForm() {
               ]}
             />
           </Card>
-          <FormSection title="Order totals & notes">
+          <Card>
+            <SectionHeader title="Totals" />
+            <div className="form-grid">
+              <Input
+                label="Discount (EGP)"
+                type="number"
+                min={0}
+                step="0.01"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+              />
+              <Input
+                label="Tax (EGP)"
+                type="number"
+                min={0}
+                step="0.01"
+                value={tax}
+                onChange={(e) => setTax(e.target.value)}
+              />
+            </div>
+            <DetailList
+              items={[
+                {
+                  label: "Subtotal",
+                  value: <PriceDisplay amount={toMajor(subtotalMinor)} />,
+                },
+                {
+                  label: "Discount",
+                  value: <PriceDisplay amount={toMajor(discountMinor)} />,
+                },
+                {
+                  label: "Tax",
+                  value: <PriceDisplay amount={toMajor(taxMinor)} />,
+                },
+                {
+                  label: "Total",
+                  value: <PriceDisplay amount={toMajor(totalMinor)} />,
+                },
+                {
+                  label: "Paid",
+                  value: <PriceDisplay amount={toMajor(paidMinor)} />,
+                },
+                {
+                  label: "Change",
+                  value: <PriceDisplay amount={toMajor(changeMinor)} />,
+                },
+              ]}
+            />
+          </Card>
+          <FormSection title="Payment & completion">
+            <Select
+              label="Payment method"
+              showLabel
+              value={payment}
+              onChange={(e) => setPayment(e.target.value)}
+            >
+              <option>Cash</option>
+              <option>Card</option>
+              <option>Other</option>
+            </Select>
             <Input
-              name="discount"
-              label="Discount (EGP)"
+              label="Paid amount (EGP)"
               type="number"
               min={0}
-              defaultValue={0}
+              step="0.01"
+              value={paid}
+              onChange={(e) => setPaid(e.target.value)}
             />
             <Input
-              name="tax"
-              label="Tax (EGP) · demo field"
-              type="number"
-              min={0}
-              defaultValue={0}
+              label="Invoice number"
+              value={invoice}
+              onChange={(e) => setInvoice(e.target.value)}
             />
-            <Textarea name="notes" label="Supplier notes" />
+            <Textarea
+              label="Notes"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
           </FormSection>
           <div className="form-actions">
             <LinkButton to="/purchases">Cancel</LinkButton>
-            <Button type="submit" variant="primary">
-              Save demo draft
+            <Button
+              type="submit"
+              variant="primary"
+              loading={submitting}
+              disabled={!canSubmit}
+            >
+              Complete purchase
             </Button>
           </div>
+          {!canSubmit && (
+            <p className="muted">
+              {lines.length === 0
+                ? "Add at least one product line above."
+                : "Enter a paid amount at least equal to the total to complete the purchase."}
+            </p>
+          )}
         </form>
-      </FeaturePage>
+      </div>
     </>
   );
 }
 export function ReceivePurchase() {
   const { id } = useParams();
-  const { purchases, setPurchases, products, notify } = useDemo();
-  const p = purchases.find((p) => p.id === id);
-  const [rows, setRows] = useState(
-      (p?.lines ?? purchaseLines).map((l) => ({
-        ...l,
-        received: l.ordered,
-        damaged: 0,
-        batch: l.batch ?? "",
-        expiry: l.expiry ?? "2027-09-01",
-      })),
-    ),
-    [error, setError] = useState(""),
-    [confirm, setConfirm] = useState(false);
-  const navigate = useNavigate();
-  if (!p)
-    return (
-      <EmptyState
-        title="Purchase not found"
-        description="Choose an order from Purchases."
-      />
-    );
   return (
     <>
-      <BackLink to={`/purchases/${id}`} label={p.id} />
-      <FeaturePage
-        title="Receive purchase"
-        description={`${p.id} · ${p.supplier}`}
-      >
-        <div className="workflow-steps">
-          <span>1. Order</span>
-          <strong>2. Receive & inspect</strong>
-          <span>3. Review</span>
-        </div>
-        {!["Ordered", "Partially Received"].includes(p.status) ? (
-          <Alert title="This order cannot be received" tone="warning">
-            Only ordered or partially received demo purchases can enter
-            receiving.
-          </Alert>
-        ) : (
-          <form
-            className="content-stack"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (
-                rows.some(
-                  (r) => r.received > r.ordered || r.damaged > r.received,
-                )
-              ) {
-                setError(
-                  "Received quantity cannot exceed ordered quantity; damaged quantity cannot exceed received quantity.",
-                );
-                return;
-              }
-              setError("");
-              setConfirm(true);
-            }}
-          >
-            {error && (
-              <Alert title="Review receiving quantities" tone="danger">
-                {error}
-              </Alert>
-            )}
-            <Card>
-              <Table
-                label="Receiving lines"
-                rows={rows}
-                rowKey={(r) => r.productId}
-                columns={[
-                  {
-                    key: "name",
-                    header: "Product / ordered",
-                    render: (r) => (
-                      <>
-                        {products.find((p) => p.id === r.productId)?.name}
-                        <span className="cell-secondary">
-                          Ordered: {r.ordered}
-                        </span>
-                      </>
-                    ),
-                  },
-                  {
-                    key: "qty",
-                    header: "Received",
-                    render: (r) => (
-                      <Input
-                        hideLabel
-                        label={`Received ${r.productId}`}
-                        type="number"
-                        min={0}
-                        max={r.ordered}
-                        required
-                        value={r.received}
-                        onChange={(e) =>
-                          setRows(
-                            rows.map((v) =>
-                              v.productId === r.productId
-                                ? { ...v, received: Number(e.target.value) }
-                                : v,
-                            ),
-                          )
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: "damage",
-                    header: "Damaged",
-                    render: (r) => (
-                      <Input
-                        hideLabel
-                        label={`Damaged ${r.productId}`}
-                        type="number"
-                        min={0}
-                        max={r.received}
-                        required
-                        value={r.damaged}
-                        onChange={(e) =>
-                          setRows(
-                            rows.map((v) =>
-                              v.productId === r.productId
-                                ? { ...v, damaged: Number(e.target.value) }
-                                : v,
-                            ),
-                          )
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: "batch",
-                    header: "Batch / lot",
-                    render: (r) => (
-                      <Input
-                        hideLabel
-                        label={`Batch ${r.productId}`}
-                        required
-                        value={r.batch}
-                        onChange={(e) =>
-                          setRows(
-                            rows.map((v) =>
-                              v.productId === r.productId
-                                ? { ...v, batch: e.target.value }
-                                : v,
-                            ),
-                          )
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: "expiry",
-                    header: "Expiry date",
-                    render: (r) => (
-                      <Input
-                        hideLabel
-                        label={`Expiry ${r.productId}`}
-                        type="date"
-                        required
-                        value={r.expiry}
-                        onChange={(e) =>
-                          setRows(
-                            rows.map((v) =>
-                              v.productId === r.productId
-                                ? { ...v, expiry: e.target.value }
-                                : v,
-                            ),
-                          )
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: "cost",
-                    header: "Unit cost",
-                    render: (r) => <PriceDisplay amount={r.cost} />,
-                  },
-                ]}
-              />
-            </Card>
-            <FormSection title="Receiving notes">
-              <Textarea label="Delivery / inspection notes" />
-            </FormSection>
-            <div className="form-actions">
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={rows.every((r) => r.received === 0)}
-              >
-                Review receiving
-              </Button>
-            </div>
-          </form>
-        )}
-        <ConfirmationModal
-          open={confirm}
-          onOpenChange={setConfirm}
-          title="Confirm demo receiving?"
-          description="Order status will change in memory. Batch, stock, supplier balances and accounting are not posted."
-          onConfirm={() => {
-            setPurchases(
-              purchases.map((v) =>
-                v.id === id
-                  ? {
-                      ...v,
-                      lines: rows,
-                      status: rows.every(
-                        (r) => r.received - r.damaged === r.ordered,
-                      )
-                        ? "Received"
-                        : "Partially Received",
-                    }
-                  : v,
-              ),
-            );
-            notify("Demo receiving reviewed. No inventory was posted.");
-            navigate(`/purchases/${id}`);
-          }}
+      <BackLink to={`/purchases/${id}`} label="Purchase" />
+      <div className="feature-page">
+        <PageHeader
+          title="Receive purchase"
+          description="Receiving is handled when the purchase is completed."
         />
-      </FeaturePage>
+        <Alert title="No separate receiving step" tone="info">
+          Receiving is part of completing a purchase. This order has already
+          posted its stock.
+        </Alert>
+        <EmptyState
+          title="Stock already received"
+          description="Receiving is part of completing a purchase. This order has already posted its stock to local lots."
+          action={<LinkButton to={`/purchases/${id}`}>View purchase</LinkButton>}
+        />
+      </div>
     </>
   );
 }

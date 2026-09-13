@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Toast } from "../design-system";
 import { DemoProvider } from "./DemoContext";
+import { BranchProvider } from "./BranchContext";
 import { AppShell } from "./AppShell";
 
 export function App() {
@@ -14,7 +15,9 @@ export function App() {
   return (
     <BrowserRouter>
       <DemoProvider notify={setToast}>
-        <AppShell />
+        <BranchProvider>
+          <AppShell />
+        </BranchProvider>
         {toast && <Toast message={toast} onClose={() => setToast("")} />}
       </DemoProvider>
     </BrowserRouter>

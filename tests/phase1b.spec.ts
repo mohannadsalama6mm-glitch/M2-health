@@ -1,4 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { installCatalogDouble } from "./catalog-double";
+import { installInventoryDouble } from "./inventory-double";
+import { installSalesDouble } from "./sales-double";
 const routes = [
   "/dashboard",
   "/sales",
@@ -49,7 +52,7 @@ for (const [width, height] of [
     await page.setViewportSize({ width, height });
     for (const route of routes) {
       await page.goto(route);
-      await expect(page.locator("main h1")).toBeVisible();
+      await expect(page.locator("main h1, main h3").first()).toBeVisible();
       expect(
         await page
           .locator("main")
@@ -127,6 +130,9 @@ test("catalog add edit and detail routes require the desktop app", async ({
 test("POS keyboard search hold resume complete and receipt", async ({
   page,
 }) => {
+  await installCatalogDouble(page);
+  await installInventoryDouble(page);
+  await installSalesDouble(page);
   await page.goto("/sales");
   await page
     .getByRole("searchbox", { name: "POS product search" })
@@ -141,8 +147,8 @@ test("POS keyboard search hold resume complete and receipt", async ({
   await page.getByRole("button", { name: "Held sales (1)" }).click();
   await page.getByRole("button", { name: "Resume", exact: true }).click();
   await page.getByLabel("Cash received (EGP)").fill("100");
-  await page.getByRole("button", { name: "Complete sale · demo" }).click();
-  await page.getByRole("button", { name: "Confirm demo sale" }).click();
+  await page.getByRole("button", { name: "Complete sale" }).click();
+  await page.getByRole("button", { name: "Confirm sale" }).click();
   await expect(
     page.getByRole("heading", { name: "Receipt preview" }),
   ).toBeVisible();
@@ -160,14 +166,13 @@ test("catalog create and edit flows stay read-only until the desktop app", async
   await expect(page.getByText("Desktop app required").first()).toBeVisible();
 });
 test("purchase receiving and notification state", async ({ page }) => {
+  await installCatalogDouble(page);
+  await installInventoryDouble(page);
+  await installSalesDouble(page);
   await page.goto("/purchases/PO-1048/receive");
-  for (const id of ["p1", "p2", "p7"])
-    await page.getByLabel(`Batch ${id}`, { exact: true }).fill(`QA-${id}`);
-  await page.getByRole("button", { name: "Review receiving" }).click();
-  await page.getByRole("button", { name: "Confirm", exact: true }).click();
-  await expect(
-    page.getByText("Received", { exact: true }).first(),
-  ).toBeVisible();
+  await expect(page.getByText("No separate receiving step")).toBeVisible();
+  await page.getByRole("link", { name: "View purchase", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "00001" })).toBeVisible();
   await page
     .getByRole("navigation", { name: "Pharmacy navigation" })
     .getByRole("link", { name: "Notifications", exact: true })
@@ -175,19 +180,13 @@ test("purchase receiving and notification state", async ({ page }) => {
   await page.getByRole("button", { name: "Mark all read" }).click();
   await expect(page.getByText("0 unread")).toBeVisible();
 });
-test("stock count review completion and backup destructive preview", async ({
-  page,
-}) => {
+test("stock counts and backup destructive preview", async ({ page }) => {
   await page.goto("/inventory/counts");
-  await page.getByRole("button", { name: "SC-003", exact: true }).click();
-  await page.getByLabel("Count Panadol 500 mg").fill("118");
-  await page.getByRole("button", { name: "Review differences" }).click();
-  await page
-    .getByRole("button", { name: "Complete count", exact: true })
-    .click();
-  await page.getByRole("button", { name: "Confirm", exact: true }).click();
-  await expect(page.getByText("Count completed in this preview")).toBeVisible();
-  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("heading", {
+      name: "Stock counts require the desktop app",
+    }),
+  ).toBeVisible();
   await page.goto("/backup");
   await page
     .getByRole("button", { name: "Restore", exact: true })
