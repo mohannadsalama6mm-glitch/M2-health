@@ -1,0 +1,75 @@
+{
+  "package": {
+    "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": null,
+    "quantity": 8
+  },
+  "batch": {
+    "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+    "quantity": 8
+  },
+  "movements": [
+    {
+      "id": "d9bfe09a-9841-4c3b-9631-ea38d05a3d81",
+      "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "batchId": "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+      "movementType": "ADJUSTMENT_OUT",
+      "quantityDelta": -2,
+      "referenceType": null,
+      "referenceId": null,
+      "reason": "Phase 3A controlled development smoke test: adjustment -2; not actual pharmacy stock.",
+      "createdBy": null,
+      "transferId": null,
+      "createdAt": "2026-09-13T07:53:26.512Z"
+    },
+    {
+      "id": "99ab7852-3348-40dc-8f91-42cc280abdae",
+      "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "batchId": "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+      "movementType": "OPENING",
+      "quantityDelta": 10,
+      "referenceType": null,
+      "referenceId": null,
+      "reason": "Phase 3A controlled development smoke test: explicit opening +10; not actual pharmacy stock.",
+      "createdBy": null,
+      "transferId": null,
+      "createdAt": "2026-09-13T07:53:06.676Z"
+    }
+  ],
+  "branch": {
+    "id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+    "code": "MAIN",
+    "name": "Main Pharmacy",
+    "phone": "",
+    "address": "",
+    "isActive": true,
+    "createdAt": "2026-09-12T09:31:52.894Z",
+    "updatedAt": "2026-09-12T09:31:52.894Z"
+  },
+  "fefo": [
+    {
+      "batch": {
+        "id": "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "lotNumber": "PHASE3A-DEV-SMOKE-20260913",
+        "expiryDate": null,
+        "receivedAt": null,
+        "costPriceMinor": null,
+        "supplierReference": "Controlled Phase 3A development verification only",
+        "isActive": true,
+        "createdAt": "2026-09-13T07:53:06.676Z",
+        "updatedAt": "2026-09-13T07:53:06.676Z"
+      },
+      "quantity": 8
+    }
+  ],
+  "low": [],
+  "expiring": [],
+  "errors": []
+}

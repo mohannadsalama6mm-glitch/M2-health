@@ -51,7 +51,7 @@ impl From<rusqlite::Error> for AppError {
                 )
             }
             rusqlite::Error::SqliteFailure(e, _) if e.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_FOREIGNKEY => Self::new(ErrorCode::Validation,"A referenced record does not exist or is still in use."),
-            rusqlite::Error::SqliteFailure(e, _) if e.code == rusqlite::ErrorCode::ConstraintViolation => Self::new(ErrorCode::Validation,"The operation violates a catalog data constraint."),
+            rusqlite::Error::SqliteFailure(e, _) if e.code == rusqlite::ErrorCode::ConstraintViolation => Self::new(ErrorCode::Validation,"The operation violates a database data constraint."),
             _ => Self::new(
                 ErrorCode::Database,
                 "The local database operation failed. Please retry or contact support.",

@@ -263,10 +263,13 @@ export function Catalog() {
         title="Products"
         description="Your pharmacy catalog, from active ingredients to package pricing."
         actions={
-          <LinkButton primary to="/catalog/new">
-            <Plus size={16} />
-            Add product
-          </LinkButton>
+          <div className="row">
+            <LinkButton to="/catalog/import">Import Products</LinkButton>
+            <LinkButton primary to="/catalog/new">
+              <Plus size={16} />
+              Add product
+            </LinkButton>
+          </div>
         }
       />
       {!desktop && (

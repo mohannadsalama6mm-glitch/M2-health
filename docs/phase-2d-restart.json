@@ -1,0 +1,238 @@
+{
+  "sourceHash": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+  "sourceBytes": 3785303,
+  "database": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\m2-health.db",
+  "counts": {
+    "branches": 1,
+    "products": 25062,
+    "product_packages": 25062,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 1,
+    "catalog_import_rows": 25061
+  },
+  "schema": [
+    {
+      "version": 1,
+      "name": "branches",
+      "applied_at": "2026-09-12T09:31:52.890Z"
+    },
+    {
+      "version": 2,
+      "name": "catalog_core",
+      "applied_at": "2026-09-12T10:06:57.913Z"
+    },
+    {
+      "version": 3,
+      "name": "catalog_import",
+      "applied_at": "2026-09-12T20:32:32.305Z"
+    }
+  ],
+  "branches": [
+    {
+      "id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "code": "MAIN",
+      "name": "Main Pharmacy",
+      "phone": "",
+      "address": "",
+      "is_active": 1,
+      "created_at": "2026-09-12T09:31:52.894Z",
+      "updated_at": "2026-09-12T09:31:52.894Z"
+    }
+  ],
+  "integrity": "ok",
+  "foreignKeyErrors": [],
+  "runs": [
+    {
+      "id": "cb5c12a4-bfcf-41d8-9012-bdcf0fd07700",
+      "source_hash": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+      "source_path": "\\\\?\\D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+      "started_at": "2026-09-12T20:33:32.844Z",
+      "finished_at": "2026-09-12T20:34:22.110Z",
+      "total_rows": 25070,
+      "imported_rows": 25061,
+      "status": "complete",
+      "report_path": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\cb5c12a4-bfcf-41d8-9012-bdcf0fd07700-apply.json",
+      "backup_path": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\backups\\catalog-before-cb5c12a4-bfcf-41d8-9012-bdcf0fd07700.sqlite3"
+    }
+  ],
+  "placeholderErrors": 0,
+  "importedBarcodeCount": 0,
+  "samples": [
+    {
+      "case": "bilingual_combination",
+      "source": {
+        "commercial_name_en": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "commercial_name_ar": "1 2 3",
+        "scientific_name": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "manufacturer": "HIKMA PHARMA",
+        "drug_class": "COLD PRODUCTS",
+        "route": "ORAL.SOLID",
+        "price_egp": "10.0"
+      },
+      "stored": {
+        "id": "1e49bfb5-878c-458b-bce0-5849485282bf",
+        "commercial_name_en": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "commercial_name_ar": "1 2 3",
+        "normalized_name_en": "1 2 3 (one two three) 20 f.c.tabs.",
+        "normalized_name_ar": "1 2 3",
+        "scientific_name": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "normalized_scientific_name": "chlorpheniramine+paracetamol(acetaminophen)+pseudoephedrine",
+        "manufacturer_id": "76a00111-48be-493e-b75a-72452c232d72",
+        "category_id": "f15b7ed2-4aff-4822-a633-9626e52d341f",
+        "route_id": "6918ca07-2764-48eb-b88c-06b14cfd2feb",
+        "description": null,
+        "notes": "Imported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+        "is_active": 1,
+        "created_at": "2026-09-12T20:33:32.848Z",
+        "updated_at": "2026-09-12T20:33:32.848Z",
+        "manufacturer_name": "HIKMA PHARMA",
+        "category_name": "COLD PRODUCTS",
+        "route_name": "ORAL.SOLID",
+        "package_label": "Default Package",
+        "selling_price_minor": 1000
+      }
+    },
+    {
+      "case": "missing_scientific",
+      "source": {
+        "commercial_name_en": "4 WET INTIMATE GEL 100 ML",
+        "commercial_name_ar": "4 ويت إنتيماتي",
+        "scientific_name": "",
+        "manufacturer": "TURKUAZ MEDICAL CO. > BROTHER PHARMA",
+        "drug_class": "TOPICAL LUBRICANT",
+        "route": "TOPICAL",
+        "price_egp": "40.0"
+      },
+      "stored": {
+        "id": "dfbe4de7-bb2d-4076-b3eb-27cd3afe13e6",
+        "commercial_name_en": "4 WET INTIMATE GEL 100 ML",
+        "commercial_name_ar": "4 ويت إنتيماتي",
+        "normalized_name_en": "4 wet intimate gel 100 ml",
+        "normalized_name_ar": "4 ويت إنتيماتي",
+        "scientific_name": null,
+        "normalized_scientific_name": null,
+        "manufacturer_id": "6567e177-9330-4237-96e8-d3d59f3b68ed",
+        "category_id": "eae6927f-e632-4e5e-985d-4ce8ee45e5e0",
+        "route_id": "5d1b42bd-fe55-4c51-83fa-fb650f1dcd2b",
+        "description": null,
+        "notes": "Imported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+        "is_active": 1,
+        "created_at": "2026-09-12T20:33:32.848Z",
+        "updated_at": "2026-09-12T20:33:32.848Z",
+        "manufacturer_name": "TURKUAZ MEDICAL CO. > BROTHER PHARMA",
+        "category_name": "TOPICAL LUBRICANT",
+        "route_name": "TOPICAL",
+        "package_label": "Default Package",
+        "selling_price_minor": 4000
+      }
+    },
+    {
+      "case": "missing_manufacturer",
+      "source": {
+        "commercial_name_en": "ABDOMINAL BELT",
+        "commercial_name_ar": "أبدومينال بيلت",
+        "scientific_name": "",
+        "manufacturer": "",
+        "drug_class": ".",
+        "route": "UNKNOWN",
+        "price_egp": "170.0"
+      },
+      "stored": {
+        "id": "61035803-321a-47b6-b1b2-e2a69c9541b7",
+        "commercial_name_en": "ABDOMINAL BELT",
+        "commercial_name_ar": "أبدومينال بيلت",
+        "normalized_name_en": "abdominal belt",
+        "normalized_name_ar": "أبدومينال بيلت",
+        "scientific_name": null,
+        "normalized_scientific_name": null,
+        "manufacturer_id": null,
+        "category_id": "fa37ff51-385a-48b5-b56f-125e524a0c03",
+        "route_id": "154e50aa-89fb-4c6e-875b-a684d121d340",
+        "description": null,
+        "notes": "Imported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+        "is_active": 1,
+        "created_at": "2026-09-12T20:33:32.860Z",
+        "updated_at": "2026-09-12T20:33:32.860Z",
+        "manufacturer_name": null,
+        "category_name": ".",
+        "route_name": "UNKNOWN",
+        "package_label": "Default Package",
+        "selling_price_minor": 17000
+      }
+    },
+    {
+      "case": "unknown_route",
+      "source": {
+        "commercial_name_en": "2M WHITES BEEGU MARIN SPRAY",
+        "commercial_name_ar": "2م وهيتيس بيجو مارين",
+        "scientific_name": "SEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID",
+        "manufacturer": "NILL FACTORY COSMETICS > 2M WHITES PHARMA",
+        "drug_class": "SOOTHING & MOISTURIZING SPRAY",
+        "route": "UNKNOWN",
+        "price_egp": "32.0"
+      },
+      "stored": {
+        "id": "b5a48b6b-86c4-435d-a126-b1c329e6b149",
+        "commercial_name_en": "2M WHITES BEEGU MARIN SPRAY",
+        "commercial_name_ar": "2م وهيتيس بيجو مارين",
+        "normalized_name_en": "2m whites beegu marin spray",
+        "normalized_name_ar": "2م وهيتيس بيجو مارين",
+        "scientific_name": "SEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID",
+        "normalized_scientific_name": "sea water+eucalyptus+glycerin+hyaluronic acid",
+        "manufacturer_id": "2b766c92-71d4-4863-b8ec-7a78c5aba6a8",
+        "category_id": "0f824fa8-5fec-4632-bf5d-e6fa99c893c5",
+        "route_id": "154e50aa-89fb-4c6e-875b-a684d121d340",
+        "description": null,
+        "notes": "Imported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+        "is_active": 1,
+        "created_at": "2026-09-12T20:33:32.848Z",
+        "updated_at": "2026-09-12T20:33:32.848Z",
+        "manufacturer_name": "NILL FACTORY COSMETICS > 2M WHITES PHARMA",
+        "category_name": "SOOTHING & MOISTURIZING SPRAY",
+        "route_name": "UNKNOWN",
+        "package_label": "Default Package",
+        "selling_price_minor": 3200
+      }
+    },
+    {
+      "case": "two_decimals",
+      "source": {
+        "commercial_name_en": "ABIONEM CREAM 60 GM",
+        "commercial_name_ar": "أبيونيم",
+        "scientific_name": "HYALURONIC ACID+COLLAGEN+NIGELLA SATIVA+MENTHOL",
+        "manufacturer": "EL-HELOU PERFUMES & COSMETICS > ALLIANCE PHARMA",
+        "drug_class": "MASSAGE CREAM",
+        "route": "TOPICAL",
+        "price_egp": "20.95"
+      },
+      "stored": {
+        "id": "d807fe26-ca98-44fd-bcba-635df4321d76",
+        "commercial_name_en": "ABIONEM CREAM 60 GM",
+        "commercial_name_ar": "أبيونيم",
+        "normalized_name_en": "abionem cream 60 gm",
+        "normalized_name_ar": "أبيونيم",
+        "scientific_name": "HYALURONIC ACID+COLLAGEN+NIGELLA SATIVA+MENTHOL",
+        "normalized_scientific_name": "hyaluronic acid+collagen+nigella sativa+menthol",
+        "manufacturer_id": "fde7dc6d-9af4-48ea-bf24-5f0326ead935",
+        "category_id": "4209e8a4-856a-46e9-9201-045819e957aa",
+        "route_id": "5d1b42bd-fe55-4c51-83fa-fb650f1dcd2b",
+        "description": null,
+        "notes": "Imported from Egyptian catalog. Default Package is an import-derived placeholder; package size and ingredient relations are unverified.",
+        "is_active": 1,
+        "created_at": "2026-09-12T20:33:32.860Z",
+        "updated_at": "2026-09-12T20:33:32.860Z",
+        "manufacturer_name": "EL-HELOU PERFUMES & COSMETICS > ALLIANCE PHARMA",
+        "category_name": "MASSAGE CREAM",
+        "route_name": "TOPICAL",
+        "package_label": "Default Package",
+        "selling_price_minor": 2095
+      }
+    }
+  ]
+}

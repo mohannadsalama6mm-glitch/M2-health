@@ -4,5 +4,5 @@
   "format": "csv",
   "encoding": "utf-8-sig",
   "delimiter": ",",
-  "role": "canonical raw Egyptian catalog source; import deliberately deferred"
+  "role": "canonical raw Egyptian catalog source; controlled dry-run and confirmed import"
 }

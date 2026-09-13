@@ -1,0 +1,205 @@
+{
+  "verifiedAtUtc": "2026-09-13T07:25:30.808656+00:00",
+  "status": "complete",
+  "source": {
+    "path": "D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+    "hash": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+    "size": 3785303,
+    "totalRows": 25070,
+    "columns": [
+      "commercial_name_en",
+      "commercial_name_ar",
+      "scientific_name",
+      "manufacturer",
+      "drug_class",
+      "route",
+      "price_egp"
+    ],
+    "profiledAt": "1789245180363"
+  },
+  "ready": 25061,
+  "importedSourceRows": 25061,
+  "created": {
+    "branches": 0,
+    "products": 25061,
+    "product_packages": 25061,
+    "manufacturers": 5544,
+    "categories": 2445,
+    "routes": 13,
+    "active_ingredients": 0,
+    "product_active_ingredients": 0,
+    "barcodes": 0,
+    "product_price_history": 25061
+  },
+  "lookupsCreated": {
+    "categories": 2445,
+    "manufacturers": 5544,
+    "routes": 13
+  },
+  "lookupsReusedFromExistingCatalog": {
+    "categories": 0,
+    "manufacturers": 0,
+    "routes": 0
+  },
+  "exactDuplicates": 4,
+  "reviewRequired": 5,
+  "skipped": 9,
+  "failed": 0,
+  "durationMs": 49966,
+  "rowsPerSecond": 501.5511511537539,
+  "backup": {
+    "path": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\backups\\catalog-before-cb5c12a4-bfcf-41d8-9012-bdcf0fd07700.sqlite3",
+    "sizeBytes": 204800,
+    "timestampUtc": "2026-09-12T20:33:32.844673+00:00",
+    "integrity": "ok",
+    "countsMatchBefore": true,
+    "preexistingRowsUnchanged": true
+  },
+  "beforeCounts": {
+    "branches": 1,
+    "products": 1,
+    "product_packages": 1,
+    "manufacturers": 1,
+    "categories": 1,
+    "routes": 1,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 2
+  },
+  "finalCounts": {
+    "branches": 1,
+    "products": 25062,
+    "product_packages": 25062,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 1,
+    "catalog_import_rows": 25061
+  },
+  "reportPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\cb5c12a4-bfcf-41d8-9012-bdcf0fd07700-apply.json",
+  "reportSizeBytes": 11035977,
+  "secondDryRunPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\6f0db72e-8aa0-41a5-b56f-e86c9ffdf8fc-dry-run.json",
+  "secondDryRunCounts": {
+    "already_imported": 25061,
+    "ambiguous_price": 1,
+    "exact_duplicate_source": 4,
+    "ingredient_relations_deferred": 22762,
+    "missing_class": 97,
+    "missing_manufacturer": 71,
+    "missing_scientific_name": 2308,
+    "possible_duplicate": 4,
+    "review_required": 5,
+    "unknown_route": 2597
+  },
+  "reviewQueue": [
+    {
+      "number": 4518,
+      "fields": [
+        "CITICOLINE 500 MG  20 CAPSULES",
+        "سيتيكوليني",
+        "CITICOLINE",
+        "ORGANIX > KODAK",
+        "CEREBRAL CIRCULATORY INHANCER",
+        "ORAL.SOLID",
+        "22.0"
+      ],
+      "fingerprint": "9832900dbbbecc96ce93edf328cc32cab18044d18ad16cce47cb9a49f4a96c7c",
+      "identity": "a55b6991815dc3b22069fadaa26a1a635d966fcb30a4d54eb5c20f8219a2c1f0",
+      "disposition": "possible_duplicate",
+      "warnings": [
+        "ingredient_relations_deferred"
+      ],
+      "priceMinor": 2200
+    },
+    {
+      "number": 4519,
+      "fields": [
+        "CITICOLINE 500 MG 20 CAPSULES",
+        "سيتيكوليني",
+        "CITICOLINE",
+        "LIFE SAVER -INTERNATIONAL > AFRI PHARMA",
+        "SUPPORT NORMAL BRAIN FUNCTIONS",
+        "ORAL.SOLID",
+        "298.0"
+      ],
+      "fingerprint": "c952a09f8d1d0634a28b94bc163d9bdbbb313e4ea5e9f1e109e0681967d55391",
+      "identity": "3dc2a21207a27c102b811eb1abae0553c032a7af1d9ce86e37945eb16704c757",
+      "disposition": "possible_duplicate",
+      "warnings": [
+        "ingredient_relations_deferred"
+      ],
+      "priceMinor": 29800
+    },
+    {
+      "number": 20232,
+      "fields": [
+        "SEPTOLA LOZENGES 24 TAB HONEY AND LEMON",
+        "سيبتولا لوزينجيس هوني أند ليمون",
+        "VITAMIN C",
+        "EP PHARMA > MARVEL",
+        "DIETRY SUPPLEMENT",
+        "ORAL.SOLID",
+        "75.0"
+      ],
+      "fingerprint": "33d42c17d834347eb36ba7a6ccfcb61e4e04a8594f10bcf97410966d11c632cb",
+      "identity": "53608aa3eda72abd4ac06d9650b2e880a8b822123615f751ac20c5d60646bf09",
+      "disposition": "possible_duplicate",
+      "warnings": [
+        "ingredient_relations_deferred"
+      ],
+      "priceMinor": 7500
+    },
+    {
+      "number": 20233,
+      "fields": [
+        "SEPTOLA LOZENGES 24 TAB HONEY AND LEMON",
+        "سيبتولا لوزينجيس هوني أند ليمون",
+        "VITAMIN C",
+        "MARVEL PHARMA > EP PHARMA",
+        "DIETARY SUPPLEMENT",
+        "ORAL.SOLID",
+        "75.0"
+      ],
+      "fingerprint": "f859d16892db63b030eb40ebba64df23bce46d6eeedb755b94d079efc4633c0d",
+      "identity": "2ad4b61d3638f09b54fde624fc4c30540b7ba3f1781ae175fe7f698b8cb7efa7",
+      "disposition": "possible_duplicate",
+      "warnings": [
+        "ingredient_relations_deferred"
+      ],
+      "priceMinor": 7500
+    },
+    {
+      "number": 22201,
+      "fields": [
+        "TETRAVITON 3 DOUBLE AMP. (N/A)",
+        "تيترافيتون 3 دوبلي",
+        "VITAMIN B1+VITAMIN B2+VITAMIN B6+VITAMIN B12",
+        "KAHIRA",
+        "VITAMIN B",
+        "INJECTION",
+        "4.415"
+      ],
+      "fingerprint": "8ddcc13eceb2dfe705d49ba1468bb867d9d546f0aa06a5f18e6d639106c78768",
+      "identity": "3714801d8545d37e4b7064c26101a96a0c77237b8661bbcc16854f0ef124eee3",
+      "disposition": "ambiguous_price",
+      "warnings": [
+        "ingredient_relations_deferred"
+      ],
+      "priceMinor": null
+    }
+  ],
+  "dispositions": {
+    "imported": 25061,
+    "exact_duplicate_source": 4,
+    "possible_duplicate": 4,
+    "ambiguous_price": 1
+  },
+  "sourceUnchanged": true,
+  "branchUnchanged": true,
+  "schemaVersion": 3
+}

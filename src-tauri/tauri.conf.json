@@ -27,6 +27,10 @@
   },
   "bundle": {
     "active": false,
+    "resources": {
+      "../config/catalog-source.json": "config/catalog-source.json",
+      "../src/data/karem/egyptian-drugs.csv": "src/data/karem/egyptian-drugs.csv"
+    },
     "icon": [
       "icons/icon.png",
       "icons/icon.ico"
