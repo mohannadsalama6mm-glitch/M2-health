@@ -4,5 +4,27 @@
   "format": "csv",
   "encoding": "utf-8-sig",
   "delimiter": ",",
-  "role": "canonical raw Egyptian catalog source; controlled dry-run and confirmed import"
+  "role": "Active canonical Catalog source; controlled real import with conservative identity matching",
+  "import_policy": "conservative_catalog_v2",
+  "current_version": "v2",
+  "versions": [
+    {
+      "version": "v1",
+      "size_bytes": 3785303,
+      "sha256": "35867044249d327b81c8c87988d6328c802da39359dc768eb4e7f1e9528dee0c",
+      "data_rows": 25070,
+      "apply_allowed": false,
+      "trim_headers": false,
+      "status": "Historical Phase 2D import; original provenance remains authoritative"
+    },
+    {
+      "version": "v2",
+      "sha256": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+      "size_bytes": 26437838,
+      "data_rows": 25088,
+      "apply_allowed": true,
+      "trim_headers": true,
+      "status": "User-approved active source; skip malformed and ambiguous records"
+    }
+  ]
 }

@@ -7,6 +7,7 @@ pub struct Migration {
     pub sql: &'static str,
 }
 pub const MIGRATIONS: &[Migration] = &[
+    // Existing migration names remain authoritative, including catalog_source_actions at 007.
     Migration {
         version: 1,
         name: "branches",
@@ -16,6 +17,41 @@ pub const MIGRATIONS: &[Migration] = &[
         version: 2,
         name: "catalog_core",
         sql: include_str!("../../migrations/002_catalog_core.sql"),
+    },
+    Migration {
+        version: 3,
+        name: "catalog_import",
+        sql: include_str!("../../migrations/003_catalog_import.sql"),
+    },
+    Migration {
+        version: 4,
+        name: "inventory_core",
+        sql: include_str!("../../migrations/004_inventory_core.sql"),
+    },
+    Migration {
+        version: 5,
+        name: "inventory_workflows",
+        sql: include_str!("../../migrations/005_inventory_workflows.sql"),
+    },
+    Migration {
+        version: 6,
+        name: "stock_counts",
+        sql: include_str!("../../migrations/006_stock_counts.sql"),
+    },
+    Migration {
+        version: 7,
+        name: "catalog_source_actions",
+        sql: include_str!("../../migrations/007_catalog_source_actions.sql"),
+    },
+    Migration {
+        version: 8,
+        name: "inventory_alerts",
+        sql: include_str!("../../migrations/008_inventory_alerts.sql"),
+    },
+    Migration {
+        version: 9,
+        name: "sales",
+        sql: include_str!("../../migrations/009_sales.sql"),
     },
 ];
 

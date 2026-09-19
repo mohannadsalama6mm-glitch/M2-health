@@ -1,3 +1,4 @@
+import { installAlertsDouble } from "./inventory-alerts-double";
 import { test, expect } from "@playwright/test";
 import { installCatalogDouble } from "./catalog-double";
 import { installInventoryDouble } from "./inventory-double";
@@ -182,7 +183,9 @@ test("contacts management reports finance and system controls", async ({
     .getByRole("link", { name: "United Pharma Distribution Karim Adel" })
     .click();
   await expect(
-    page.getByRole("heading", { name: "United Pharma Distribution Karim Adel" }),
+    page.getByRole("heading", {
+      name: "United Pharma Distribution Karim Adel",
+    }),
   ).toBeVisible();
   await expect(page.getByText("Code", { exact: true })).toBeVisible();
   await page.goto("/customers/c1");
@@ -256,6 +259,7 @@ for (const [width, height] of [
     await page.setViewportSize({ width, height });
     await installCatalogDouble(page);
     await installInventoryDouble(page);
+    await installAlertsDouble(page, { catalog: false, preserveRecovery: true });
     await page.goto("/inventory/counts");
     await expect(page.locator(".sidebar .brand-superscript")).toBeVisible();
     const logo = await page.locator(".sidebar .logo svg").boundingBox();
@@ -275,19 +279,19 @@ for (const [width, height] of [
     await page
       .getByRole("link", { name: "Expiry management", exact: true })
       .click();
-    await page.getByRole("button", { name: "Expired", exact: true }).click();
-    await page
-      .getByRole("button", { name: "Write-off", exact: true })
-      .first()
-      .click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.getByLabel("Expiry window").selectOption("expired");
+    await expect(
+      page.getByRole("table", { name: "Expiry batches" }),
+    ).toContainText("DEV EXPIRY");
     expect(
       await page
-        .getByRole("dialog")
+        .locator("main")
         .evaluate((el) => el.scrollWidth <= el.clientWidth),
     ).toBe(true);
-    await page.screenshot({ path: `test-results/expiry-dialog-${width}.png` });
-    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("button", { name: "Write-off", exact: true }),
+    ).toHaveCount(0);
+    await page.screenshot({ path: `test-results/expiry-monitor-${width}.png` });
     await page
       .getByRole("button", { name: "Collapse sidebar", exact: true })
       .click();

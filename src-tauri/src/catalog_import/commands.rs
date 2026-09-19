@@ -36,7 +36,15 @@ fn summary(mut r: Report) -> Report {
         .filter(|r| {
             !matches!(
                 r.disposition.as_str(),
-                "ready" | "imported" | "already_imported"
+                "ready"
+                    | "imported"
+                    | "already_imported"
+                    | "ready_insert"
+                    | "ready_reuse"
+                    | "ready_update"
+                    | "inserted"
+                    | "reused"
+                    | "updated"
             )
         })
         .take(30)

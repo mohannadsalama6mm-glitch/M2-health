@@ -24,7 +24,9 @@ fn validate_note(value: &str) -> Result<(), AppError> {
 }
 fn validate_proportional_quantity(value: i64) -> Result<(), AppError> {
     if value <= 0 || value > MAX_SAFE_MINOR {
-        return Err(invalid("Quantity must be a positive count within the supported range."));
+        return Err(invalid(
+            "Quantity must be a positive count within the supported range.",
+        ));
     }
     Ok(())
 }
@@ -63,7 +65,10 @@ fn product_label(product: &Product) -> String {
 /// unit cost is the cost of the first FEFO-allocated lot, matching the package cost
 /// shown by the stock overview. Sale, items, batch allocation, payment and the sale
 /// movements commit atomically.
-pub fn complete_sale(db: &AppDb, input: &CompleteSaleInput) -> Result<CompleteSaleResult, AppError> {
+pub fn complete_sale(
+    db: &AppDb,
+    input: &CompleteSaleInput,
+) -> Result<CompleteSaleResult, AppError> {
     id(&input.branch_id)?;
     if input.lines.is_empty() {
         return Err(invalid("Add at least one product to the sale."));
@@ -77,7 +82,9 @@ pub fn complete_sale(db: &AppDb, input: &CompleteSaleInput) -> Result<CompleteSa
     }
     for value in [&input.discount_minor, &input.tax_minor, &input.paid_minor] {
         if !(0..=MAX_SAFE_MINOR).contains(value) {
-            return Err(invalid("Amounts must be non-negative integer minor units within the supported range."));
+            return Err(invalid(
+                "Amounts must be non-negative integer minor units within the supported range.",
+            ));
         }
     }
     if !["cash", "card", "other"].contains(&input.payment_method.as_str()) {
@@ -126,7 +133,9 @@ pub fn complete_sale(db: &AppDb, input: &CompleteSaleInput) -> Result<CompleteSa
         )?;
         let mut remaining = line.quantity;
         let mut allocation = Vec::new();
-        for (batch, qty) in batches::list_active_with_balance_on(&tx, &input.branch_id, &package.id)? {
+        for (batch, qty) in
+            batches::list_active_with_balance_on(&tx, &input.branch_id, &package.id)?
+        {
             if qty <= 0 || remaining <= 0 {
                 continue;
             }
@@ -265,7 +274,9 @@ pub fn return_sale(db: &AppDb, input: &ReturnSaleInput) -> Result<SaleReturn, Ap
         id(&item.sale_item_id)?;
         validate_proportional_quantity(item.quantity)?;
         if !(0..=MAX_SAFE_MINOR).contains(&item.refund_minor) {
-            return Err(invalid("Refund amounts must be non-negative integer minor units."));
+            return Err(invalid(
+                "Refund amounts must be non-negative integer minor units.",
+            ));
         }
     }
     let mut c = db.lock()?;
@@ -273,7 +284,10 @@ pub fn return_sale(db: &AppDb, input: &ReturnSaleInput) -> Result<SaleReturn, Ap
     let sale = sales::get(&tx, &input.sale_id)?;
     if sale.status != "completed" {
         tx.rollback()?;
-        return Err(AppError::new(ErrorCode::Conflict, "Only completed sales can be returned."));
+        return Err(AppError::new(
+            ErrorCode::Conflict,
+            "Only completed sales can be returned.",
+        ));
     }
     let returned = sales::returned_by_item_on(&tx, &sale.id)?;
     let mut granted: std::collections::HashMap<String, i64> = std::collections::HashMap::new();
@@ -297,7 +311,9 @@ pub fn return_sale(db: &AppDb, input: &ReturnSaleInput) -> Result<SaleReturn, Ap
         }
         if item.refund_minor > sale_item.selling_price_minor {
             tx.rollback()?;
-            return Err(invalid("The refund cannot exceed the original selling price."));
+            return Err(invalid(
+                "The refund cannot exceed the original selling price.",
+            ));
         }
         let line_refund = checked_minor(
             item.quantity.checked_mul(item.refund_minor),
@@ -307,10 +323,14 @@ pub fn return_sale(db: &AppDb, input: &ReturnSaleInput) -> Result<SaleReturn, Ap
             total_refund.checked_add(line_refund),
             "The refund total exceeds the supported range.",
         )?;
-        granted.entry(sale_item.id.clone()).and_modify(|v| *v += item.quantity).or_insert(item.quantity);
+        granted
+            .entry(sale_item.id.clone())
+            .and_modify(|v| *v += item.quantity)
+            .or_insert(item.quantity);
         prepared.push((sale_item, item.quantity, item.refund_minor));
     }
-    let returned_record = sales::insert_return_on(&tx, &sale.id, &sale.branch_id, reason, user, total_refund)?;
+    let returned_record =
+        sales::insert_return_on(&tx, &sale.id, &sale.branch_id, reason, user, total_refund)?;
     let mut items = Vec::new();
     for (sale_item, quantity, refund_minor) in prepared {
         let restock = original_lot_on(&tx, &sale, &sale_item)?;
@@ -364,7 +384,14 @@ fn general_lot_on(
     sale: &Sale,
     sale_item: &SaleItem,
 ) -> Result<(String, Option<i64>), AppError> {
-    let batch = batches::ensure_on(tx, &sale.branch_id, &sale_item.product_package_id, "GENERAL", "", None)?;
+    let batch = batches::ensure_on(
+        tx,
+        &sale.branch_id,
+        &sale_item.product_package_id,
+        "GENERAL",
+        "",
+        None,
+    )?;
     Ok((batch.id, batch.cost_price_minor))
 }
 
@@ -383,7 +410,10 @@ pub fn void_sale(db: &AppDb, input: &VoidSaleInput) -> Result<Sale, AppError> {
     let sale = sales::get(&tx, &input.sale_id)?;
     if sale.status != "completed" {
         tx.rollback()?;
-        return Err(AppError::new(ErrorCode::Conflict, "Only completed sales can be voided."));
+        return Err(AppError::new(
+            ErrorCode::Conflict,
+            "Only completed sales can be voided.",
+        ));
     }
     let has_returns: i64 = tx.query_row(
         "SELECT count(*) FROM sale_returns WHERE sale_id=?1",

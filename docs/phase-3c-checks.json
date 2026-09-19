@@ -1,0 +1,17 @@
+{
+  "npmLint": "pass",
+  "npmBuild": "pass",
+  "npmTest": { "passed": 70, "failed": 0, "newStockCountTests": 18 },
+  "cargoFmtCheck": "pass",
+  "cargoCheck": "pass",
+  "cargoTest": {
+    "passed": 217, "failed": 0,
+    "suites": { "catalog": 22, "catalog_import": 12, "foundation": 12, "inventory_prototype": 20, "inventory_core": 26, "inventory_documents": 39, "partners_prototype": 11, "purchases_prototype": 14, "recovery": 2, "sales_prototype": 16, "stock_count_sessions": 43 }
+  },
+  "native": { "launch": "pass", "controlledDevCount": "pass", "restart": "pass", "originalCompletionKeyRetry": "pass", "consoleErrors": 0, "rustPanics": 0 },
+  "devSmoke": { "sessionNumber": "CNT-20260914-0001", "sessionId": "c668e88d-94ed-49ed-bd55-841fe6402cbd", "movementId": "68395d6f-7776-4673-afd6-d13f8b4ffbf1", "before": 1, "physicalCount": 2, "correction": 1, "after": 2, "mainBranchStock": 8 },
+  "database": { "integrity": "ok", "foreignKeyViolations": 0, "activeVersions": [1,2,3,4,5,6], "priorBaselineTablesUnchanged": true, "priorLedgerRowsUnchanged": true, "csvUnchanged": true },
+  "warnings": ["Vite reports a main bundle larger than 500 kB."],
+  "status": "COMPLETE",
+  "phase3DStarted": false
+}

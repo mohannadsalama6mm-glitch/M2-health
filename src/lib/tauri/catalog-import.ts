@@ -1,5 +1,10 @@
 import { nativeRequest } from "./client";
 export interface ImportProfile {
+  importPolicy?: string | null;
+  quotingIssueRows?: number[];
+  sourceVersion?: string | null;
+  applyAllowed?: boolean;
+  malformedRows?: number[];
   path: string;
   hash: string;
   size: number;
@@ -17,6 +22,9 @@ export interface ImportRow {
   priceMinor: number | null;
 }
 export interface ImportReport {
+  reused?: number;
+  updated?: number;
+  failed?: number;
   id: string;
   mode: string;
   status: string;

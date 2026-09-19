@@ -1,3 +1,5 @@
+import { installDocumentsDouble } from "./inventory-documents-double";
+import { installAlertsDouble } from "./inventory-alerts-double";
 import { test, expect } from "@playwright/test";
 import { installCatalogDouble } from "./catalog-double";
 import { installInventoryDouble } from "./inventory-double";
@@ -12,20 +14,18 @@ test("overview lists packages with branch ledgers and summary", async ({
 }) => {
   await seed(page);
   await page.goto("/inventory");
-  await expect(
-    page.getByRole("heading", { name: "Inventory" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Inventory" })).toBeVisible();
   const grid = page.getByRole("table", { name: "Inventory" });
-  const panadol = grid
-    .getByRole("row")
-    .filter({ hasText: "Panadol 500 mg" });
+  const panadol = grid.getByRole("row").filter({ hasText: "Panadol 500 mg" });
   await expect(panadol).toContainText("46");
   await expect(panadol).toContainText("LOT-A");
   await expect(panadol).toContainText("Expiring");
   const amox = grid.getByRole("row").filter({ hasText: "Amoxicillin 500 mg" });
   await expect(amox).toContainText("5");
   await expect(amox).toContainText("Low stock");
-  await expect(page.getByText("Low stock", { exact: true }).last()).toBeVisible();
+  await expect(
+    page.getByText("Low stock", { exact: true }).last(),
+  ).toBeVisible();
   await expect(
     page.locator(".summary-strip").getByText("In stock", { exact: true }),
   ).toBeVisible();
@@ -42,12 +42,8 @@ test("adjust stock posts a movement and updates the overview", async ({
 }) => {
   await seed(page);
   await page.goto("/inventory");
-  await page
-    .getByRole("button", { name: "Adjust stock", exact: true })
-    .click();
-  await page
-    .getByLabel("Product / package")
-    .selectOption({ value: "pkg-1" });
+  await page.getByRole("button", { name: "Adjust stock", exact: true }).click();
+  await page.getByLabel("Product / package").selectOption({ value: "pkg-1" });
   await page.getByLabel("New stock quantity").fill("50");
   await page.getByLabel("Reason / reference").fill("Count review");
   await page.getByRole("button", { name: "Apply", exact: true }).click();
@@ -60,9 +56,7 @@ test("adjust stock posts a movement and updates the overview", async ({
       .getByRole("row")
       .filter({ hasText: "Panadol" }),
   ).toContainText("50");
-  await page
-    .getByRole("link", { name: "Movements", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Movements", exact: true }).click();
   const ledger = page.getByRole("table", { name: "Stock movements" });
   const adjustment = ledger
     .getByRole("row")
@@ -75,9 +69,7 @@ test("transfer moves stock between branches", async ({ page }) => {
   await seed(page);
   await page.goto("/inventory");
   await page.getByRole("button", { name: "Transfer", exact: true }).click();
-  await page
-    .getByLabel("Product / package")
-    .selectOption({ value: "pkg-1" });
+  await page.getByLabel("Product / package").selectOption({ value: "pkg-1" });
   await page.getByLabel("Transfer quantity").fill("3");
   await page
     .getByLabel("Destination branch")
@@ -102,10 +94,10 @@ test("reorder level can be edited per package", async ({ page }) => {
       name: "Set reorder level for Panadol 500 mg",
     })
     .click();
-  await expect(page.getByRole("heading", { name: "Reorder level" })).toBeVisible();
-  await page
-    .getByRole("spinbutton", { name: "Reorder level" })
-    .fill("20");
+  await expect(
+    page.getByRole("heading", { name: "Reorder level" }),
+  ).toBeVisible();
+  await page.getByRole("spinbutton", { name: "Reorder level" }).fill("20");
   await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.getByText("Reorder level updated.")).toBeVisible();
   await expect(
@@ -116,41 +108,52 @@ test("reorder level can be edited per package", async ({ page }) => {
   ).toContainText("20");
 });
 
-test("expiry write-off removes an expired batch from the ledger", async ({
+test("expiry alert navigates to explicit canonical write-off with immutable movement", async ({
   page,
 }) => {
-  await seed(page);
-  await page.goto("/inventory/expiry");
-  await expect(
-    page.getByRole("heading", { name: "Expiry management" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Expired", exact: true }).click();
-  const expired = page
-    .getByRole("table", { name: "Expiry batches" })
-    .getByRole("row")
-    .filter({ hasText: "LOT-D" });
-  await expect(expired).toContainText("Expired");
+  await installDocumentsDouble(page);
+  await installAlertsDouble(page, { catalog: false });
+  await page.goto("/inventory/alerts");
   await page
-    .getByRole("button", { name: "Write-off", exact: true })
-    .first()
+    .getByRole("link", { name: "Open expiry write-off workflow" })
     .click();
+  expect(
+    await page.evaluate(() =>
+      (
+        window as unknown as { documentCalls: { command: string }[] }
+      ).documentCalls.some((c) => c.command === "post_inventory_document"),
+    ),
+  ).toBe(false);
+  await page.evaluate(() => {
+    (window as unknown as { documentExpired: boolean }).documentExpired = true;
+  });
+  await expect(page.getByRole("heading", { name: "Damage / Expiry Write-Off", exact: true })).toBeVisible();
+  await page.getByLabel("Search packages").fill("Panadol");
+  await page.getByLabel("Product", { exact: true }).selectOption("p-1");
+  await page.getByLabel("Package", { exact: true }).selectOption("pkg-1");
+  await page.getByLabel("Batch", { exact: true }).selectOption("batch-1");
+  await page.getByLabel("Write-off type").selectOption("EXPIRY");
+  await page.getByLabel("Quantity", { exact: true }).fill("8");
+  await page.getByLabel("Line reason").fill("Explicit expired stock review");
+  await page.getByRole("button", { name: "Add line", exact: true }).click();
+  await page.getByRole("button", { name: "Save draft", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Write off batch" }),
-  ).toBeVisible();
+    page.getByRole("table", { name: "Document lines" }),
+  ).toContainText("8 → 0");
+  await page.getByRole("button", { name: "Mark ready" }).click();
   await page
-    .getByLabel("Reason", { exact: true })
-    .fill("Expired stock review");
-  await page
-    .getByRole("button", { name: "Write off", exact: true })
+    .getByRole("button", { name: "Post document", exact: true })
     .click();
-  await expect(
-    page.getByText("Stock written off and posted to the ledger."),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("table", { name: "Expiry batches" }).getByRole("row"),
-  ).toHaveCount(1);
+  await expect(page.getByRole("dialog")).toContainText(
+    "permanent stock movements",
+  );
+  await page.getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(page.getByText("Posted document is read-only")).toBeVisible();
+  const links = page.getByRole("table", { name: "Document movement links" });
+  await expect(links).toContainText("EXPIRY");
+  await expect(links).toContainText("-8");
+  await expect(page.getByRole("button", { name: "Save draft" })).toHaveCount(0);
 });
-
 test("count workflow creates saves completes and read-only review", async ({
   page,
 }) => {
@@ -159,9 +162,7 @@ test("count workflow creates saves completes and read-only review", async ({
   await page
     .getByRole("button", { name: "New count session", exact: true })
     .click();
-  await page
-    .getByLabel("Scope / note")
-    .fill("Year-end shelf audit");
+  await page.getByLabel("Scope / note").fill("Year-end shelf audit");
   await page
     .getByRole("button", { name: "Create session", exact: true })
     .click();
@@ -183,10 +184,7 @@ test("count workflow creates saves completes and read-only review", async ({
   await expect(dialog.getByText("read-only")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(
-    page
-      .getByRole("table", { name: "Count sessions" })
-      .getByRole("row")
-      .nth(1),
+    page.getByRole("table", { name: "Count sessions" }).getByRole("row").nth(1),
   ).toContainText("Completed");
 });
 
@@ -214,7 +212,7 @@ test("browser mode explains the desktop requirement on inventory screens", async
   await page.goto("/inventory/expiry");
   await expect(
     page.getByRole("heading", {
-      name: "Expiry management requires the desktop app",
+      name: "Desktop inventory monitoring",
     }),
   ).toBeVisible();
 });

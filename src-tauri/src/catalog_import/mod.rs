@@ -1,3 +1,4 @@
+pub mod active;
 pub mod commands;
 pub mod importer;
 pub mod planner;
@@ -12,6 +13,16 @@ pub fn json<T: Serialize>(v: &T) -> Result<String, AppError> {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
+    #[serde(default)]
+    pub import_policy: Option<String>,
+    #[serde(default)]
+    pub quoting_issue_rows: Vec<usize>,
+    #[serde(default)]
+    pub source_version: Option<String>,
+    #[serde(default = "legacy_apply_allowed")]
+    pub apply_allowed: bool,
+    #[serde(default)]
+    pub malformed_rows: Vec<usize>,
     pub path: String,
     pub hash: String,
     pub size: u64,
@@ -19,9 +30,16 @@ pub struct Profile {
     pub columns: Vec<String>,
     pub profiled_at: String,
 }
+fn legacy_apply_allowed() -> bool {
+    true
+}
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Row {
+    #[serde(default)]
+    pub product_id: Option<String>,
+    #[serde(default)]
+    pub package_id: Option<String>,
     pub number: usize,
     pub fields: Vec<String>,
     pub fingerprint: String,
@@ -33,6 +51,18 @@ pub struct Row {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Report {
+    #[serde(default)]
+    pub reused: usize,
+    #[serde(default)]
+    pub updated: usize,
+    #[serde(default)]
+    pub failed: usize,
+    #[serde(default)]
+    pub started_at: Option<String>,
+    #[serde(default)]
+    pub finished_at: Option<String>,
+    #[serde(default)]
+    pub backup_size: Option<u64>,
     pub id: String,
     pub mode: String,
     pub status: String,

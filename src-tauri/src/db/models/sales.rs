@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use super::inventory::StockMovement;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]

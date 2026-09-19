@@ -23,9 +23,15 @@ impl AppDb {
         })
     }
     pub fn in_memory() -> Result<Self, AppError> {
+        Self::in_memory_with_migrations(migrations::MIGRATIONS)
+    }
+    /// Isolated fixture databases only. File-backed startup always uses MIGRATIONS.
+    pub fn in_memory_with_migrations(
+        definitions: &[migrations::Migration],
+    ) -> Result<Self, AppError> {
         let mut connection = Connection::open_in_memory()?;
         Self::configure(&connection)?;
-        migrations::run(&mut connection)?;
+        migrations::apply(&mut connection, definitions)?;
         Ok(Self {
             connection: Mutex::new(connection),
         })

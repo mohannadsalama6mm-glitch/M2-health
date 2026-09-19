@@ -187,7 +187,7 @@ pub fn list(db: &AppDb, q: &CountQuery) -> Result<StockCountPage, AppError> {
     let mut c = db.lock()?;
     let tx = c.transaction()?;
     let total = tx.query_row(
-        &format!("SELECT count(*) FROM ({select}) {filter}"),
+        &format!("SELECT count(*) FROM ({select} {filter})"),
         params![
             q.branch_id,
             q.status,

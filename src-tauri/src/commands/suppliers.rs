@@ -1,9 +1,6 @@
 use crate::{
     commands::branches::DatabaseState,
-    db::{
-        models::suppliers::*,
-        repositories::suppliers,
-    },
+    db::{models::suppliers::*, repositories::suppliers},
     error::AppError,
 };
 use tauri::State;
@@ -25,10 +22,7 @@ pub fn list_suppliers(
     suppliers::list(state.db()?, &query)
 }
 #[tauri::command]
-pub fn get_supplier(
-    state: State<'_, DatabaseState>,
-    id: String,
-) -> Result<Supplier, AppError> {
+pub fn get_supplier(state: State<'_, DatabaseState>, id: String) -> Result<Supplier, AppError> {
     suppliers::get_supplier(state.db()?, &id)
 }
 #[tauri::command]

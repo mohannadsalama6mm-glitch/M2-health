@@ -1,0 +1,36 @@
+Phase 4 additions
+src-tauri/migrations/009_sales.sql
+src-tauri/src/sales/mod.rs
+src-tauri/src/sales/models.rs
+src-tauri/src/sales/returns.rs
+src-tauri/src/sales/commands.rs
+src-tauri/tests/canonical_sales.rs
+src/features/sales/CanonicalSales.tsx
+src/lib/tauri/canonical-sales.ts
+tests/canonical-sales-double.ts
+tests/canonical-sales.spec.ts
+scripts/phase4-baseline.py
+scripts/phase4-native-smoke.mjs
+scripts/verify_phase4.py
+docs/phase-4/*
+
+Phase 4 changes to existing files
+src-tauri/src/db/migrations.rs
+src-tauri/src/inventory/expiry.rs
+src-tauri/src/inventory/movements.rs
+src-tauri/src/lib.rs
+src-tauri/src/recovery.rs
+src-tauri/tests/catalog.rs
+src-tauri/tests/foundation.rs
+src-tauri/tests/recovery.rs
+src-tauri/tests/inventory_alerts.rs
+src-tauri/tests/inventory_core.rs
+src-tauri/tests/inventory_documents.rs
+src-tauri/tests/stock_count_sessions.rs
+src/app/AppShell.tsx
+src/app/RecoveryBoundary.tsx
+src/features/sales/sales.css
+src/lib/tauri/recovery.ts
+
+The workspace contains earlier uncommitted phases. Git status is not a Phase 4-only diff.
+Migrations 001–008, Catalog source configuration and CSV are hash-checked against before.json.

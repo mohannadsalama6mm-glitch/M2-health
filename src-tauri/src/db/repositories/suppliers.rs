@@ -1,14 +1,11 @@
 use crate::{
-    db::{
-        catalog_validation::*,
-        connection::AppDb,
-        models::suppliers::*,
-    },
+    db::{catalog_validation::*, connection::AppDb, models::suppliers::*},
     error::{AppError, ErrorCode},
 };
 use rusqlite::{params, Connection, OptionalExtension, Row, TransactionBehavior};
 
-const COLUMNS: &str = "id, code, name, phone, email, address, notes, is_active, created_at, updated_at";
+const COLUMNS: &str =
+    "id, code, name, phone, email, address, notes, is_active, created_at, updated_at";
 fn map(r: &Row<'_>) -> rusqlite::Result<Supplier> {
     Ok(Supplier {
         id: r.get(0)?,
@@ -23,7 +20,10 @@ fn map(r: &Row<'_>) -> rusqlite::Result<Supplier> {
         updated_at: r.get(9)?,
     })
 }
-fn validate_page(limit_input: Option<i64>, offset_input: Option<i64>) -> Result<(i64, i64), AppError> {
+fn validate_page(
+    limit_input: Option<i64>,
+    offset_input: Option<i64>,
+) -> Result<(i64, i64), AppError> {
     let limit = limit_input.unwrap_or(50);
     let offset = offset_input.unwrap_or(0);
     if !(1..=200).contains(&limit) || !(0..=MAX_SAFE_MINOR).contains(&offset) {
@@ -42,7 +42,13 @@ fn search_pattern(value: &str) -> (String, String) {
     );
     (search, pattern)
 }
-fn validate_fields(name: &str, phone: &str, email: &str, address: &str, notes: &str) -> Result<(), AppError> {
+fn validate_fields(
+    name: &str,
+    phone: &str,
+    email: &str,
+    address: &str,
+    notes: &str,
+) -> Result<(), AppError> {
     if name.trim().is_empty() || name.chars().count() > 180 {
         return Err(invalid("A supplier name of 1–180 characters is required."));
     }
@@ -77,7 +83,12 @@ pub(crate) fn code_exists(c: &Connection, code: &str, exclude_id: &str) -> Resul
 }
 fn unique_code_on(c: &Connection, base: &str) -> Result<String, AppError> {
     for _ in 0..12 {
-        let suffix: String = uuid::Uuid::new_v4().simple().to_string().chars().take(4).collect();
+        let suffix: String = uuid::Uuid::new_v4()
+            .simple()
+            .to_string()
+            .chars()
+            .take(4)
+            .collect();
         let code = format!("{base}-{suffix}");
         if !code_exists(c, &code, "")? {
             return Ok(code);
@@ -102,7 +113,13 @@ pub(crate) fn insert(
     get(c, &value)
 }
 fn validate_create(input: &CreateSupplierInput) -> Result<(), AppError> {
-    validate_fields(&input.name, &input.phone, &input.email, &input.address, &input.notes)
+    validate_fields(
+        &input.name,
+        &input.phone,
+        &input.email,
+        &input.address,
+        &input.notes,
+    )
 }
 pub fn create(db: &AppDb, input: &CreateSupplierInput) -> Result<Supplier, AppError> {
     validate_create(input)?;
@@ -137,7 +154,13 @@ pub fn get_supplier(db: &AppDb, value: &str) -> Result<Supplier, AppError> {
 }
 fn validate_update(input: &UpdateSupplierInput) -> Result<(), AppError> {
     id(&input.id)?;
-    validate_fields(&input.name, &input.phone, &input.email, &input.address, &input.notes)
+    validate_fields(
+        &input.name,
+        &input.phone,
+        &input.email,
+        &input.address,
+        &input.notes,
+    )
 }
 pub(crate) fn update_on(
     c: &Connection,
@@ -171,7 +194,11 @@ pub fn update(db: &AppDb, input: &UpdateSupplierInput) -> Result<Supplier, AppEr
     tx.commit()?;
     Ok(supplier)
 }
-pub(crate) fn set_active_on(c: &Connection, value: &str, active: bool) -> Result<Supplier, AppError> {
+pub(crate) fn set_active_on(
+    c: &Connection,
+    value: &str,
+    active: bool,
+) -> Result<Supplier, AppError> {
     c.execute(
         "UPDATE suppliers SET is_active=?1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),julianday(updated_at)+0.001/86400)) WHERE id=?2",
         params![active, value],

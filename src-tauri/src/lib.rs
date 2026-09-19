@@ -3,6 +3,8 @@ pub mod commands;
 pub mod db;
 pub mod error;
 pub mod inventory;
+pub mod recovery;
+pub mod sales;
 use commands::branches::DatabaseState;
 use db::{connection::AppDb, repositories::branches};
 use error::{AppError, ErrorCode};
@@ -27,6 +29,7 @@ fn initialize(app: &tauri::App) -> Result<AppDb, AppError> {
         "[M² Health] Schema ready; local branch {} ({})",
         branch.code, branch.id
     );
+    inventory::alerts::refresh_all(&db);
     Ok(db)
 }
 pub fn run() {
@@ -37,6 +40,51 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            sales::commands::search_pos_products,
+            sales::commands::get_pos_package_availability,
+            sales::commands::save_sale_draft,
+            sales::commands::hold_sale,
+            sales::commands::resume_sale,
+            sales::commands::preview_sale_totals,
+            sales::commands::post_sale,
+            sales::commands::list_canonical_sales,
+            sales::commands::get_canonical_sale,
+            sales::commands::preview_sale_return,
+            sales::commands::create_sale_return,
+            sales::commands::post_sale_return,
+            sales::commands::void_canonical_sale,
+            inventory::inspection::inspect_inventory_overview,
+            inventory::inspection::inspect_inventory_batches,
+            inventory::inspection::inspect_inventory_movements,
+            recovery::recovery_status,
+            inventory::alerts::commands::get_inventory_alert_settings,
+            inventory::alerts::commands::update_inventory_alert_settings,
+            inventory::alerts::commands::evaluate_inventory_alerts,
+            inventory::alerts::commands::list_inventory_alerts,
+            inventory::alerts::commands::get_inventory_alert,
+            inventory::alerts::commands::dismiss_inventory_alert,
+            inventory::alerts::commands::list_expiry_inventory,
+            inventory::alerts::commands::list_low_stock_inventory,
+            inventory::alerts::commands::get_fefo_inventory_batches,
+            inventory::counts::commands::create_count_session,
+            inventory::counts::commands::get_count_session,
+            inventory::counts::commands::list_count_sessions,
+            inventory::counts::commands::start_count_session,
+            inventory::counts::commands::record_count_entry,
+            inventory::counts::commands::discover_count_stock,
+            inventory::counts::commands::review_count_session,
+            inventory::counts::commands::resume_count_session,
+            inventory::counts::commands::cancel_count_session,
+            inventory::counts::commands::complete_count_session,
+            inventory::documents::commands::save_inventory_document,
+            inventory::documents::commands::get_inventory_document,
+            inventory::documents::commands::list_inventory_documents,
+            inventory::documents::commands::mark_inventory_document_ready,
+            inventory::documents::commands::cancel_inventory_document,
+            inventory::documents::commands::post_inventory_document,
+            inventory::documents::commands::reverse_inventory_document,
+            inventory::documents::commands::list_workflow_batches,
+            recovery::fefo_allocation,
             inventory::commands::create_inventory_batch,
             inventory::commands::record_opening_stock,
             inventory::commands::record_batch_opening_stock,
@@ -89,43 +137,6 @@ pub fn run() {
             commands::catalog::set_package_price,
             commands::catalog::get_current_package_price,
             commands::catalog::get_package_price_history,
-            commands::customers::create_customer,
-            commands::customers::list_customers,
-            commands::customers::get_customer,
-            commands::customers::update_customer,
-            commands::customers::set_customer_active,
-            commands::suppliers::create_supplier,
-            commands::suppliers::list_suppliers,
-            commands::suppliers::get_supplier,
-            commands::suppliers::update_supplier,
-            commands::suppliers::set_supplier_active,
-            commands::inventory::get_stock_overview,
-            commands::inventory::get_stock_summary,
-            commands::inventory::list_stock_movements,
-            commands::inventory::post_opening_stock,
-            commands::inventory::adjust_stock,
-            commands::inventory::write_off_stock,
-            commands::inventory::transfer_stock,
-            commands::inventory::list_stock_counts,
-            commands::inventory::get_stock_count,
-            commands::inventory::create_stock_count,
-            commands::inventory::save_count_item,
-            commands::inventory::complete_stock_count,
-            commands::inventory::list_expiry,
-            commands::inventory::list_low_stock,
-            commands::inventory::set_reorder_level,
-            commands::inventory::fefo_allocation,
-            commands::sales::complete_sale,
-            commands::sales::return_sale,
-            commands::sales::void_sale,
-            commands::sales::list_sales,
-            commands::sales::get_sale,
-            commands::sales::pos_search,
-            commands::purchases::complete_purchase,
-            commands::purchases::void_purchase,
-            commands::purchases::list_purchases,
-            commands::purchases::get_purchase,
-            commands::purchases::purchase_pos_search,
         ])
         .run(tauri::generate_context!());
     if let Err(error) = result {

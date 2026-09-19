@@ -1,10 +1,6 @@
 use crate::{
     commands::branches::DatabaseState,
-    db::{
-        models::purchases::*,
-        repositories::{purchases},
-        services,
-    },
+    db::{models::purchases::*, repositories::purchases, services},
     error::AppError,
 };
 use tauri::State;

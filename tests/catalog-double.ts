@@ -450,6 +450,10 @@ export function installCatalogDouble(page: Page) {
       __TAURI_INTERNALS__: {
         invoke: async (command: string, args: Record<string, unknown> = {}) => {
           switch (command) {
+            // Retained later-phase UI contracts run against their explicit IPC doubles.
+            // Production recovery_status is false; recovery.spec.ts covers that boundary.
+            case "recovery_status":
+              return { laterWorkflowsEnabled: true };
             case "ensure_default_branch":
               return branchResult;
             case "list_branches":

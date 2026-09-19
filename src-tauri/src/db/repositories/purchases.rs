@@ -1,9 +1,5 @@
 use crate::{
-    db::{
-        catalog_validation::*,
-        connection::AppDb,
-        models::purchases::*,
-    },
+    db::{catalog_validation::*, connection::AppDb, models::purchases::*},
     error::{AppError, ErrorCode},
 };
 use rusqlite::{params, Connection, OptionalExtension, Row};
@@ -48,7 +44,10 @@ fn map_item(r: &Row<'_>) -> rusqlite::Result<PurchaseItem> {
         position: r.get(8)?,
     })
 }
-fn validate_page(limit_input: Option<i64>, offset_input: Option<i64>) -> Result<(i64, i64), AppError> {
+fn validate_page(
+    limit_input: Option<i64>,
+    offset_input: Option<i64>,
+) -> Result<(i64, i64), AppError> {
     let limit = limit_input.unwrap_or(50);
     let offset = offset_input.unwrap_or(0);
     if !(1..=200).contains(&limit) || !(0..=MAX_SAFE_MINOR).contains(&offset) {
@@ -85,8 +84,11 @@ pub(crate) struct NewPurchase {
 /// formatted purchase number and monotonic completion timestamp are computed here.
 pub(crate) fn insert_purchase_on(c: &Connection, new: &NewPurchase) -> Result<Purchase, AppError> {
     let value = uuid::Uuid::new_v4().to_string();
-    let sequence: i64 =
-        c.query_row("SELECT COALESCE(MAX(sequence),0)+1 FROM purchases WHERE branch_id=?1", [&new.branch_id], |r| r.get(0))?;
+    let sequence: i64 = c.query_row(
+        "SELECT COALESCE(MAX(sequence),0)+1 FROM purchases WHERE branch_id=?1",
+        [&new.branch_id],
+        |r| r.get(0),
+    )?;
     let purchase_number = format!("{:05}", sequence);
     let now: String = c.query_row(
         "SELECT strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),coalesce(julianday((SELECT max(completed_at) FROM purchases))+0.001/86400,0)))",
@@ -100,11 +102,20 @@ pub(crate) fn insert_purchase_on(c: &Connection, new: &NewPurchase) -> Result<Pu
     get(c, &value)
 }
 pub(crate) fn get(c: &Connection, value: &str) -> Result<Purchase, AppError> {
-    c.query_row(&format!("SELECT {PURCHASE_COLUMNS} FROM purchases WHERE id=?1"), [value], map_purchase)
-        .optional()?
-        .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Purchase not found."))
+    c.query_row(
+        &format!("SELECT {PURCHASE_COLUMNS} FROM purchases WHERE id=?1"),
+        [value],
+        map_purchase,
+    )
+    .optional()?
+    .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Purchase not found."))
 }
-pub(crate) fn update_void_on(c: &Connection, value: &str, reason: &str, user: &str) -> Result<Purchase, AppError> {
+pub(crate) fn update_void_on(
+    c: &Connection,
+    value: &str,
+    reason: &str,
+    user: &str,
+) -> Result<Purchase, AppError> {
     c.execute(
         "UPDATE purchases SET status='void',void_reason=?1,voided_by=?2,voided_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),updated_at=strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),julianday(updated_at)+0.001/86400)) WHERE id=?3",
         params![reason, user, value],
@@ -152,7 +163,11 @@ pub(crate) fn insert_item_on(
         "INSERT INTO purchase_items(id,purchase_id,product_package_id,product_name,package_label,quantity,unit_cost_minor,line_total_minor,position) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)",
         params![value, purchase_id, package_id, product_name, package_label, quantity, unit_cost_minor, line_total_minor, position],
     )?;
-    Ok(c.query_row(&format!("SELECT {ITEM_COLUMNS} FROM purchase_items WHERE id=?1"), [value], map_item)?)
+    Ok(c.query_row(
+        &format!("SELECT {ITEM_COLUMNS} FROM purchase_items WHERE id=?1"),
+        [value],
+        map_item,
+    )?)
 }
 pub(crate) fn insert_item_batch_on(
     c: &Connection,
@@ -238,7 +253,9 @@ pub fn detail(db: &AppDb, value: &str) -> Result<PurchaseDetail, AppError> {
         None => None,
     };
     let items = {
-        let mut s = tx.prepare(&format!("SELECT {ITEM_COLUMNS} FROM purchase_items WHERE purchase_id=?1 ORDER BY position, id"))?;
+        let mut s = tx.prepare(&format!(
+            "SELECT {ITEM_COLUMNS} FROM purchase_items WHERE purchase_id=?1 ORDER BY position, id"
+        ))?;
         let rows = s.query_map([&purchase.id], map_item)?;
         let mut out = Vec::new();
         for row in rows {

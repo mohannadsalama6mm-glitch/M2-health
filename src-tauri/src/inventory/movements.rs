@@ -32,6 +32,15 @@ pub(crate) fn insert(
     kind: MovementType,
     transfer: Option<&str>,
 ) -> Result<InventoryMovement, AppError> {
+    insert_referenced(c, op, kind, transfer, None)
+}
+pub(crate) fn insert_referenced(
+    c: &Connection,
+    op: &StockOperation,
+    kind: MovementType,
+    transfer: Option<&str>,
+    reference: Option<(&str, &str)>,
+) -> Result<InventoryMovement, AppError> {
     id(&op.request_id)?;
     quantity(op.quantity)?;
     required(&op.reason)?;
@@ -40,6 +49,15 @@ pub(crate) fn insert(
     let batch = batches::get(c, &op.branch_id, &op.batch_id)?;
     if batch.product_package_id != op.product_package_id || !batch.is_active {
         return Err(invalid("Batch must be active and belong to this package."));
+    }
+    if kind == MovementType::Sale
+        && c.query_row(
+            "SELECT coalesce(?1 < date('now'),0)",
+            [&batch.expiry_date],
+            |r| r.get::<_, bool>(0),
+        )?
+    {
+        return Err(invalid("Expired batches cannot supply a sale."));
     }
     if kind == MovementType::Expiry {
         if let Some(expiry) = &batch.expiry_date {
@@ -50,7 +68,8 @@ pub(crate) fn insert(
         }
     }
     let delta = match kind {
-        MovementType::AdjustmentOut
+        MovementType::Sale
+        | MovementType::AdjustmentOut
         | MovementType::Damage
         | MovementType::Expiry
         | MovementType::TransferOut => -op.quantity,
@@ -62,7 +81,8 @@ pub(crate) fn insert(
             "Insufficient stock in this batch. Negative stock is not allowed.",
         ));
     }
-    c.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reason,created_by,transfer_id,reference_type,reference_id) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?9)",params![op.request_id,op.branch_id,op.product_package_id,op.batch_id,kind.as_str(),delta,op.reason,op.created_by,transfer,transfer.map(|_|"inventory_transfer")])?;
+    let reference = reference.or_else(|| transfer.map(|id| ("inventory_transfer", id)));
+    c.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reason,created_by,transfer_id,reference_type,reference_id) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)",params![op.request_id,op.branch_id,op.product_package_id,op.batch_id,kind.as_str(),delta,op.reason,op.created_by,transfer,reference.map(|r|r.0),reference.map(|r|r.1)])?;
     Ok(c.query_row(
         &format!("SELECT {COLUMNS} FROM inventory_movements WHERE id=?1"),
         [&op.request_id],
@@ -85,6 +105,36 @@ pub fn opening(db: &AppDb, input: &OpeningStock) -> Result<InventoryMovement, Ap
     let m = insert(&tx, &op, MovementType::Opening, None)?;
     tx.commit()?;
     Ok(m)
+}
+/// Only count completion calls this signed correction path, inside its IMMEDIATE transaction.
+/// Existing canonical ledger constraints and stock limits remain authoritative.
+pub(crate) fn count_correction(
+    c: &Connection,
+    branch: &str,
+    package: &str,
+    batch: &str,
+    delta: i64,
+    line: &str,
+    number: &str,
+    actor: Option<&str>,
+) -> Result<String, AppError> {
+    quantity(
+        delta
+            .checked_abs()
+            .ok_or_else(|| invalid("Invalid count correction."))?,
+    )?;
+    scope(c, branch, package, true)?;
+    let b = batches::get(c, branch, batch)?;
+    if b.product_package_id != package || !b.is_active {
+        return Err(invalid("Invalid batch or wrong branch/package."));
+    }
+    let live = balances::batch_on(c, branch, batch)?.quantity;
+    if live.checked_add(delta).is_none_or(|q| q < 0) {
+        return Err(invalid("Count correction cannot create negative stock."));
+    }
+    let id = uuid::Uuid::new_v4().to_string();
+    c.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reference_type,reference_id,reason,created_by) VALUES(?1,?2,?3,?4,'STOCK_COUNT_CORRECTION',?5,'stock_count_line',?6,?7,?8)",params![id,branch,package,batch,delta,line,format!("Stock count {number} reconciliation"),actor])?;
+    Ok(id)
 }
 pub fn opening_existing(db: &AppDb, op: &StockOperation) -> Result<InventoryMovement, AppError> {
     post(db, op, MovementType::Opening)

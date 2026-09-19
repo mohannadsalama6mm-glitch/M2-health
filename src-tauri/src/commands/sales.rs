@@ -1,10 +1,6 @@
 use crate::{
     commands::branches::DatabaseState,
-    db::{
-        models::sales::*,
-        repositories::{sales},
-        services,
-    },
+    db::{models::sales::*, repositories::sales, services},
     error::AppError,
 };
 use tauri::State;
@@ -26,24 +22,15 @@ pub fn return_sale(
     services::sales::return_sale(state.db()?, &input)
 }
 #[tauri::command]
-pub fn void_sale(
-    state: State<'_, DatabaseState>,
-    input: VoidSaleInput,
-) -> Result<Sale, AppError> {
+pub fn void_sale(state: State<'_, DatabaseState>, input: VoidSaleInput) -> Result<Sale, AppError> {
     services::sales::void_sale(state.db()?, &input)
 }
 #[tauri::command]
-pub fn list_sales(
-    state: State<'_, DatabaseState>,
-    query: SaleQuery,
-) -> Result<SalePage, AppError> {
+pub fn list_sales(state: State<'_, DatabaseState>, query: SaleQuery) -> Result<SalePage, AppError> {
     sales::list(state.db()?, &query)
 }
 #[tauri::command]
-pub fn get_sale(
-    state: State<'_, DatabaseState>,
-    id: String,
-) -> Result<SaleDetail, AppError> {
+pub fn get_sale(state: State<'_, DatabaseState>, id: String) -> Result<SaleDetail, AppError> {
     sales::detail(state.db()?, &id)
 }
 #[tauri::command]

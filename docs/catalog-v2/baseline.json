@@ -1,0 +1,186 @@
+{
+  "tables": {
+    "_schema_version": {
+      "count": 6,
+      "sha256": "eda7d9e44c472619becfe323d5f3363c0140860d4d7ddc1adbcae2abb42f0031"
+    },
+    "active_ingredients": {
+      "count": 1,
+      "sha256": "6ee669708f5ca794e945719635989b079d6afaca376e5161bdc650f34e9795c4"
+    },
+    "barcodes": {
+      "count": 1,
+      "sha256": "c0bd7e302442180cb8cb1bfe08ecd3458ba2d5e28d50c677bdbb3767deb14e56"
+    },
+    "branches": {
+      "count": 2,
+      "sha256": "e2d2be97906c4f6e4d3343433a3c2efa3f2aa724d07f75385f1c610a53e0be3a"
+    },
+    "catalog_import_rows": {
+      "count": 25061,
+      "sha256": "46fd7ab8b4305f85e3e4208a468f68b1d0550f691271227d1e76ed7de3830b57"
+    },
+    "catalog_import_runs": {
+      "count": 1,
+      "sha256": "4c1ea07048e106d8da9d9bbefd6079327548f332120f184a46635684d8e45689"
+    },
+    "categories": {
+      "count": 2446,
+      "sha256": "aeb7199fb6249a379bb2de0af866c8bad6bb6fdd4abd29905002b7ed6ae314f9"
+    },
+    "inventory_batches": {
+      "count": 3,
+      "sha256": "3d49b560e037578a76c1e74560be4532d77127aac7ad537b3a357e8ab47ddebf"
+    },
+    "inventory_document_lines": {
+      "count": 3,
+      "sha256": "5eea7e1fc5b4d8f94ddeb5283beb3bff38d30827f31c90ca75dfd1f4ee28ea91"
+    },
+    "inventory_document_movements": {
+      "count": 4,
+      "sha256": "2b4740d61979d1c1d47af9d2e00e504874ca9f887f65a2a188e5ef751dee5d1e"
+    },
+    "inventory_document_sequences": {
+      "count": 3,
+      "sha256": "ff8760d776d83e57824434211328e2a278a25149c8b340e955222ac6282322a8"
+    },
+    "inventory_documents": {
+      "count": 3,
+      "sha256": "544a0f92dc33a5e0e8f4a82b5b2cfdbd85e284359178c5285be426f7333eeac1"
+    },
+    "inventory_levels": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "inventory_movements": {
+      "count": 7,
+      "sha256": "34acbffcaa405b40dff74d03b954bd8fcc54da2f21081f2b7f63f952d7561d0a"
+    },
+    "inventory_post_requests": {
+      "count": 3,
+      "sha256": "b3d2da3f2904c266bea6c7436e8f4b9cdfaf8da5071604e52f77c3f0d2587683"
+    },
+    "inventory_transfers": {
+      "count": 1,
+      "sha256": "6b86cbe00e4811bd24a1f1284a2f20a5d26c965a1aa8efa8b8db552c0a5613a4"
+    },
+    "manufacturers": {
+      "count": 5545,
+      "sha256": "7528ae9a083e3645ff0687aaa8d6473f4eae41dc2006f6db49575514a6d86b31"
+    },
+    "product_active_ingredients": {
+      "count": 1,
+      "sha256": "2113d60d6ed181e1193c27f503838eac277efa1c289c7e62c29a693b0fe891d8"
+    },
+    "product_packages": {
+      "count": 25062,
+      "sha256": "9195cfb54b23c672965f47223d51b002addb988a92ac32f5e07e8005dc2d1981"
+    },
+    "product_price_history": {
+      "count": 25063,
+      "sha256": "ac137c2636c7e63f566801ac0306442f25cd7ab029f9a53a94c4e42bb36c1547"
+    },
+    "products": {
+      "count": 25062,
+      "sha256": "f968a4f8fc2a30c2092ec260d7d0a1424f7fee294a4b8d5fb02447578f3fa64a"
+    },
+    "routes": {
+      "count": 14,
+      "sha256": "edd3ff2c5853767c7c83c7c6704bb48386e441d5d0860c750882bf47096c72ef"
+    },
+    "stock_count_completion_requests": {
+      "count": 1,
+      "sha256": "dd4a779c99aa1572c27d2b0d661e6d3fc8cbdb0ff558cc0395fa0822c6f4bc60"
+    },
+    "stock_count_lines": {
+      "count": 1,
+      "sha256": "c1541aec90916133ab85e549bcf2a1040cbe3d9a949305b31826e144f40d8242"
+    },
+    "stock_count_results": {
+      "count": 1,
+      "sha256": "859c47a71decbc42253563500e2af5f99ff26b89e5576f0a05aac994cf46b3ec"
+    },
+    "stock_count_sequences": {
+      "count": 1,
+      "sha256": "5bf3f5f048299134fc1465c824d2de10ae5321fc5315d2840df84d9733a2d7a4"
+    },
+    "stock_count_sessions": {
+      "count": 1,
+      "sha256": "b84484ea502a87fc82d0efce07f4719a4fb83a1e6a192ad4dbdeebc3aa9007ba"
+    }
+  },
+  "schemaHash": "cf4cf563c360c703ba2ee058a0da03907cb60ddfd114e2046fea9057722636ba",
+  "versions": [
+    [
+      1,
+      "branches",
+      "2026-09-12T09:31:52.890Z"
+    ],
+    [
+      2,
+      "catalog_core",
+      "2026-09-12T10:06:57.913Z"
+    ],
+    [
+      3,
+      "catalog_import",
+      "2026-09-12T20:32:32.305Z"
+    ],
+    [
+      4,
+      "inventory_core",
+      "2026-09-13T07:52:18.434Z"
+    ],
+    [
+      5,
+      "inventory_workflows",
+      "2026-09-14T05:23:54.485Z"
+    ],
+    [
+      6,
+      "stock_counts",
+      "2026-09-14T06:14:46.861Z"
+    ]
+  ],
+  "branches": [
+    {
+      "id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "code": "DEV3B",
+      "name": "DEV Phase 3B Transfer Smoke",
+      "phone": "",
+      "address": "Controlled development smoke only",
+      "is_active": 1,
+      "created_at": "2026-09-14T05:28:05.157Z",
+      "updated_at": "2026-09-14T05:28:05.157Z"
+    },
+    {
+      "id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "code": "MAIN",
+      "name": "Main Pharmacy",
+      "phone": "",
+      "address": "",
+      "is_active": 1,
+      "created_at": "2026-09-12T09:31:52.894Z",
+      "updated_at": "2026-09-12T09:31:52.894Z"
+    }
+  ],
+  "stock": [
+    {
+      "branch_id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 2
+    },
+    {
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 8
+    }
+  ],
+  "integrity": [
+    [
+      "ok"
+    ]
+  ],
+  "foreignKeyErrors": [],
+  "sourceHash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41"
+}

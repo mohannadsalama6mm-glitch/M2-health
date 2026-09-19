@@ -1,3 +1,4 @@
+mod support;
 use m2_health_lib::db::{
     connection::AppDb,
     models::{
@@ -11,7 +12,7 @@ use m2_health_lib::db::{
 };
 
 fn db() -> AppDb {
-    AppDb::in_memory().unwrap()
+    support::prototype_db()
 }
 fn branch(db: &AppDb, code: &str, name: &str) -> Branch {
     branches::create_branch(
@@ -57,7 +58,15 @@ fn sellable(db: &AppDb, name: &str, label: &str, selling: i64, cost: Option<i64>
     .unwrap();
     pkg
 }
-fn open(db: &AppDb, branch_id: &str, package_id: &str, number: &str, expiry: &str, qty: i64, cost: Option<i64>) -> String {
+fn open(
+    db: &AppDb,
+    branch_id: &str,
+    package_id: &str,
+    number: &str,
+    expiry: &str,
+    qty: i64,
+    cost: Option<i64>,
+) -> String {
     stock_service::opening_stock(
         db,
         &OpeningStockInput {
@@ -119,7 +128,13 @@ fn complete_sale_posts_ledger_and_snapshots() {
     let pk2 = sellable(&db, "Augmentin", "10 tab", 2500, Some(1600));
     let b1 = open(&db, &b.id, &pk1, "BATCH1", "2027-01-01", 10, Some(800));
     let _b2 = open(&db, &b.id, &pk2, "BATCH2", "2027-02-01", 10, Some(1600));
-    let result = complete(&db, &b.id, vec![(pk1.clone(), 3), (pk2.clone(), 2)], 8600, 0);
+    let result = complete(
+        &db,
+        &b.id,
+        vec![(pk1.clone(), 3), (pk2.clone(), 2)],
+        8600,
+        0,
+    );
     let sale = &result.sale;
     assert_eq!(sale.sequence, 1);
     assert_eq!(sale.receipt_number, "00001");
@@ -134,7 +149,11 @@ fn complete_sale_posts_ledger_and_snapshots() {
     let detail = sales::detail(&db, &sale.id).unwrap();
     assert_eq!(detail.branch_name, "Main Pharmacy");
     assert_eq!(detail.items.len(), 2);
-    let pan = detail.items.iter().find(|i| i.product_package_id == pk1).unwrap();
+    let pan = detail
+        .items
+        .iter()
+        .find(|i| i.product_package_id == pk1)
+        .unwrap();
     assert_eq!(pan.quantity, 3);
     assert_eq!(pan.selling_price_minor, 1200);
     assert_eq!(pan.cost_price_minor, Some(800));
@@ -304,7 +323,11 @@ fn return_sale_restocks_original_lot_and_caps_quantity() {
     assert_eq!(ret.items[0].product_name, "Drug");
     assert_eq!(balance(&db, &batch), 8);
     let detail2 = sales::detail(&db, &result.sale.id).unwrap();
-    let pan = detail2.items.iter().find(|i| i.product_package_id == pk).unwrap();
+    let pan = detail2
+        .items
+        .iter()
+        .find(|i| i.product_package_id == pk)
+        .unwrap();
     assert_eq!(pan.returned_quantity, 2);
     assert_eq!(pan.returnable_quantity, 2);
     assert_eq!(detail2.returns.len(), 1);
@@ -351,11 +374,12 @@ fn return_sale_uses_general_lot_when_original_inactive() {
     assert_eq!(balance(&db, &lot1), 2);
     db.lock()
         .unwrap()
-        .execute("UPDATE inventory_batches SET is_active=0 WHERE id=?1", [&lot1])
+        .execute(
+            "UPDATE inventory_batches SET is_active=0 WHERE id=?1",
+            [&lot1],
+        )
         .unwrap();
-    let sale_item_id = sales::detail(&db, &result.sale.id)
-        .unwrap()
-        .items[0]
+    let sale_item_id = sales::detail(&db, &result.sale.id).unwrap().items[0]
         .id
         .clone();
     sale_service::return_sale(
@@ -392,7 +416,7 @@ fn void_sale_reverses_exact_batches() {
     let pk = sellable(&db, "Drug", "box", 1000, Some(0));
     let lot1 = open(&db, &b.id, &pk, "A", "2026-12-01", 2, Some(400));
     let lot2 = open(&db, &b.id, &pk, "B", "2027-12-01", 8, Some(600));
-let result = complete(&db, &b.id, vec![(pk.clone(), 3)], 3000, 0);
+    let result = complete(&db, &b.id, vec![(pk.clone(), 3)], 3000, 0);
     assert_eq!(balance(&db, &lot1), 0);
     assert_eq!(balance(&db, &lot2), 7);
     let sale_movements: i64 = db
@@ -439,9 +463,7 @@ fn void_sale_blocked_when_returns_exist() {
     let pk = sellable(&db, "Drug", "box", 1000, Some(0));
     open(&db, &b.id, &pk, "B1", "2027-01-01", 10, Some(500));
     let result = complete(&db, &b.id, vec![(pk.clone(), 2)], 2000, 0);
-    let sale_item_id = sales::detail(&db, &result.sale.id)
-        .unwrap()
-        .items[0]
+    let sale_item_id = sales::detail(&db, &result.sale.id).unwrap().items[0]
         .id
         .clone();
     sale_service::return_sale(
@@ -535,7 +557,10 @@ fn pos_search_matches_name_barcode_batch_and_flags_status() {
     )
     .unwrap();
     assert!(all.items.iter().any(|p| p.product_name.contains("Panadol")));
-    assert!(all.items.iter().any(|p| p.product_name.contains("Omeprazole")));
+    assert!(all
+        .items
+        .iter()
+        .any(|p| p.product_name.contains("Omeprazole")));
     let by_name = sales::pos_search(
         &db,
         &PosQuery {
@@ -623,9 +648,7 @@ fn return_sale_rejects_non_completed_sale() {
         },
     )
     .unwrap();
-    let sale_item_id = sales::detail(&db, &result.sale.id)
-        .unwrap()
-        .items[0]
+    let sale_item_id = sales::detail(&db, &result.sale.id).unwrap().items[0]
         .id
         .clone();
     let err = sale_service::return_sale(
@@ -737,4 +760,3 @@ fn list_sales_filters_by_branch() {
     let all = sales::list(&db, &SaleQuery::default()).unwrap();
     assert_eq!(all.total, 2);
 }
-

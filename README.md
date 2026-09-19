@@ -36,6 +36,8 @@ The application owns its viewport. Main content scrolls independently of the sid
 
 ## Current Catalog and import behavior
 
+**Active canonical source:** the user-approved current Egyptian Drug Catalog is configured for a controlled real import using conservative multi-field matching, verified backup, atomic writes and immutable source-row actions. This supersedes the earlier comparison-only policy. See the [active-source import policy](docs/catalog-active-source/POLICY.md) and [import results](docs/catalog-active-source/REPORT.md). Historical Phase 2D provenance remains unchanged, and no import runs automatically at startup.
+
 The desktop Catalog now uses real typed Tauri commands and local SQLite for list/search/filter/pagination, details, products, packages, lookups, barcodes and price history. **Products → Import Products** provides the controlled canonical Egyptian Catalog import with a read-only dry run, confirmation, online SQLite backup, transactional batches and persistent provenance. See [the import guide](docs/CATALOG-IMPORT.md) and [Phase 2D verification](docs/PHASE-2D-REPORT.md). The development import created 25,061 products, packages and initial prices; nine source rows were skipped. There is no automatic startup import.
 
 Phase 3A adds the real Inventory backend: branch/package/batch ownership, append-only movements, derived balances, opening/adjustments/write-offs, atomic transfers, reorder levels and expiry/FEFO queries. See [Inventory Core](docs/INVENTORY-CORE.md) and [Phase 3A verification](docs/PHASE-3A-REPORT.md). The existing Inventory UI remains a Phase 1 preview. One clearly labelled development batch retains a test balance of 8 after +10 opening and -2 adjustment.

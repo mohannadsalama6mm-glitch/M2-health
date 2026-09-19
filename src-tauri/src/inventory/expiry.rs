@@ -57,6 +57,17 @@ pub fn fefo(
 ) -> Result<Vec<ExpiryItem>, AppError> {
     let (l, o) = page(limit, offset)?;
     let c = db.lock()?;
-    scope(&c, branch, package, true)?;
-    query(&c, branch, Some(package), as_of, None, false, l, o)
+    fefo_on(&c, branch, package, as_of, l, o)
+}
+/// Shared with transactional sales posting: the exact canonical eligibility/order.
+pub(crate) fn fefo_on(
+    c: &Connection,
+    branch: &str,
+    package: &str,
+    as_of: &str,
+    limit: i64,
+    offset: i64,
+) -> Result<Vec<ExpiryItem>, AppError> {
+    scope(c, branch, package, true)?;
+    query(c, branch, Some(package), as_of, None, false, limit, offset)
 }

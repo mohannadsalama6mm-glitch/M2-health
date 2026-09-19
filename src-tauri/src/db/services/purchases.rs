@@ -30,7 +30,9 @@ fn validate_invoice_number(value: &str) -> Result<(), AppError> {
 }
 fn validate_proportional_quantity(value: i64) -> Result<(), AppError> {
     if value <= 0 || value > MAX_SAFE_MINOR {
-        return Err(invalid("Quantity must be a positive count within the supported range."));
+        return Err(invalid(
+            "Quantity must be a positive count within the supported range.",
+        ));
     }
     Ok(())
 }
@@ -69,7 +71,10 @@ fn product_label(product: &Product) -> String {
 /// line is booked into a per-position PURCHASE-N lot in the branch's FEFO pool.
 /// Purchase, items, batch allocation, payment and the purchase movements commit
 /// atomically.
-pub fn complete_purchase(db: &AppDb, input: &CompletePurchaseInput) -> Result<CompletePurchaseResult, AppError> {
+pub fn complete_purchase(
+    db: &AppDb,
+    input: &CompletePurchaseInput,
+) -> Result<CompletePurchaseResult, AppError> {
     id(&input.branch_id)?;
     if input.lines.is_empty() {
         return Err(invalid("Add at least one line to the purchase."));
@@ -84,12 +89,16 @@ pub fn complete_purchase(db: &AppDb, input: &CompletePurchaseInput) -> Result<Co
         id(&line.product_package_id)?;
         validate_proportional_quantity(line.quantity)?;
         if !(0..=MAX_SAFE_MINOR).contains(&line.unit_cost_minor) {
-            return Err(invalid("Unit costs must be non-negative integer minor units within the supported range."));
+            return Err(invalid(
+                "Unit costs must be non-negative integer minor units within the supported range.",
+            ));
         }
     }
     for value in [&input.discount_minor, &input.tax_minor, &input.paid_minor] {
         if !(0..=MAX_SAFE_MINOR).contains(value) {
-            return Err(invalid("Amounts must be non-negative integer minor units within the supported range."));
+            return Err(invalid(
+                "Amounts must be non-negative integer minor units within the supported range.",
+            ));
         }
     }
     if !["cash", "card", "other"].contains(&input.payment_method.as_str()) {
@@ -164,7 +173,12 @@ pub fn complete_purchase(db: &AppDb, input: &CompletePurchaseInput) -> Result<Co
         note: input.note.trim().to_string(),
     };
     let purchase = purchases::insert_purchase_on(&tx, &new_purchase)?;
-    purchases::insert_payment_on(&tx, &purchase.id, &new_purchase.payment_method, input.paid_minor)?;
+    purchases::insert_payment_on(
+        &tx,
+        &purchase.id,
+        &new_purchase.payment_method,
+        input.paid_minor,
+    )?;
     let mut movements = Vec::new();
     for (position, line) in prepared.iter().enumerate() {
         let batch = batches::ensure_on(
@@ -209,7 +223,10 @@ pub fn complete_purchase(db: &AppDb, input: &CompletePurchaseInput) -> Result<Co
         )?);
     }
     tx.commit()?;
-    Ok(CompletePurchaseResult { purchase, movements })
+    Ok(CompletePurchaseResult {
+        purchase,
+        movements,
+    })
 }
 
 /// Voids a completed purchase by reversing the lots it booked back out of stock.
@@ -226,7 +243,10 @@ pub fn void_purchase(db: &AppDb, input: &VoidPurchaseInput) -> Result<Purchase, 
     let purchase = purchases::get(&tx, &input.purchase_id)?;
     if purchase.status != "completed" {
         tx.rollback()?;
-        return Err(AppError::new(ErrorCode::Conflict, "Only completed purchases can be voided."));
+        return Err(AppError::new(
+            ErrorCode::Conflict,
+            "Only completed purchases can be voided.",
+        ));
     }
     let allocations = purchases::allocations_on(&tx, &purchase.id)?;
     for (package_id, batch_id, quantity, cost) in allocations {

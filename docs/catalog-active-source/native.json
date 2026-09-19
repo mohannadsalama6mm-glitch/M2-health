@@ -1,0 +1,2336 @@
+{
+  "errors": [],
+  "beforeCatalog": {
+    "items": [
+      {
+        "id": "1e49bfb5-878c-458b-bce0-5849485282bf",
+        "nameEn": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "nameAr": "1 2 3",
+        "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "manufacturerName": "HIKMA PHARMA",
+        "categoryName": "COLD PRODUCTS",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 1000,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "85f95bb9-9f06-4bd6-b7a5-56bb88de54cf",
+        "nameEn": "1 2 3 (ONE TWO THREE) EXTRA 20 F.C.TABS.",
+        "nameAr": "1 2 3 إكسترا",
+        "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "manufacturerName": "HIKMA PHARMA",
+        "categoryName": "COLD PRODUCTS",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 6400,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "67e7564b-5c6d-4a61-8ceb-4cedcc669224",
+        "nameEn": "1 2 3 (ONE TWO THREE) SUSP. 120 ML",
+        "nameAr": "1 2 3",
+        "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "manufacturerName": "HIKMA PHARMA",
+        "categoryName": "COLD PRODUCTS",
+        "routeName": "ORAL.LIQUID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 700,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "d28a3931-f09d-470c-9fbd-9e4a7376a2c9",
+        "nameEn": "2HC F.C.T 20 TABLETS",
+        "nameAr": "2هك ف.ك.ت",
+        "scientificName": "VITAMIN C 1 GM",
+        "manufacturerName": "ORGANIX > NOVACURE",
+        "categoryName": "VITAMIN C   ANTIOXIDANT",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 3700,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "b5a48b6b-86c4-435d-a126-b1c329e6b149",
+        "nameEn": "2M WHITES BEEGU MARIN SPRAY",
+        "nameAr": "2م وهيتيس بيجو مارين",
+        "scientificName": "SEA WATER+EUCALYPTUS+GLYCERIN+HYALURONIC ACID",
+        "manufacturerName": "NILL FACTORY COSMETICS > 2M WHITES PHARMA",
+        "categoryName": "SOOTHING & MOISTURIZING SPRAY",
+        "routeName": "UNKNOWN",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 3200,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "df83b0dc-f0c4-4f84-83b8-d033186bd8e9",
+        "nameEn": "3 FLY 1200 MG 20 TABS.",
+        "nameAr": "3 فلي",
+        "scientificName": "PALMITOYLETHANOLAMIDE(PEA)",
+        "manufacturerName": "COPAD > DRUG PHARMA EGYPT",
+        "categoryName": "NEUROPATHIC PAIN",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 2600,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "121d85a2-913d-4320-a739-dbe5a7944513",
+        "nameEn": "3 FLY 300 MG 20 TABS.",
+        "nameAr": "3 فلي",
+        "scientificName": "PALMITOYLETHANOLAMIDE(PEA)",
+        "manufacturerName": "COPAD > DRUG PHARMA EGYPT",
+        "categoryName": "NEUROPATHIC PAIN",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 3600,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "79a2afc9-c253-4bb8-baa9-bc4e12ca342f",
+        "nameEn": "3 FLY 400 MG 20 TABS",
+        "nameAr": "3 فلي",
+        "scientificName": "PALMITOYLETHANOLAMIDE",
+        "manufacturerName": "COPAD EGYPT > DRUG PHARMA EGYPT",
+        "categoryName": "MANAGEMENT OF NEUROPATHIC PAIN",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 6500,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "634cf74b-ead1-4a87-ab14-21dd37cf71c1",
+        "nameEn": "3 FLY 600 MG 20 TABS.",
+        "nameAr": "3 فلي",
+        "scientificName": "PALMITOYLETHANOLAMIDE(PEA)",
+        "manufacturerName": "COPAD > DRUG PHARMA EGYPT",
+        "categoryName": "TABLET FOR NEUROPATHIC PAIN",
+        "routeName": "ORAL.SOLID",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 3200,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      },
+      {
+        "id": "dfbe4de7-bb2d-4076-b3eb-27cd3afe13e6",
+        "nameEn": "4 WET INTIMATE GEL 100 ML",
+        "nameAr": "4 ويت إنتيماتي",
+        "scientificName": null,
+        "manufacturerName": "TURKUAZ MEDICAL CO. > BROTHER PHARMA",
+        "categoryName": "TOPICAL LUBRICANT",
+        "routeName": "TOPICAL",
+        "isActive": true,
+        "packageLabel": "Default Package",
+        "packSize": null,
+        "barcode": null,
+        "sellingPriceMinor": 4000,
+        "costPriceMinor": null,
+        "packageCount": 1,
+        "barcodeCount": 0,
+        "createdAt": "2026-09-12T20:33:32.848Z",
+        "updatedAt": "2026-09-12T20:33:32.848Z"
+      }
+    ],
+    "total": 25062,
+    "activeTotal": 25061,
+    "limit": 10,
+    "offset": 0
+  },
+  "plan": {
+    "reused": 0,
+    "updated": 0,
+    "failed": 0,
+    "startedAt": null,
+    "finishedAt": null,
+    "backupSize": null,
+    "id": "385b6f78-2785-40a9-a1a6-d52332bf17c5",
+    "mode": "dry_run",
+    "status": "validated",
+    "profile": {
+      "importPolicy": "conservative_catalog_v2",
+      "quotingIssueRows": [
+        1092,
+        2218,
+        2812,
+        3088,
+        3090,
+        3246,
+        3649,
+        3651,
+        3652,
+        5801,
+        5802,
+        5959,
+        5960,
+        6547,
+        6548,
+        7077,
+        7544,
+        9163,
+        9164,
+        9902,
+        13952,
+        13953,
+        16404,
+        16412,
+        16630,
+        16631,
+        16632,
+        16633,
+        16634,
+        16638,
+        16639,
+        16721,
+        16722,
+        16723,
+        16726,
+        16727,
+        16728,
+        16729,
+        17255,
+        17539,
+        18052,
+        18053,
+        18154,
+        18157,
+        18829,
+        20654,
+        21343,
+        21606,
+        21918,
+        21919,
+        22009,
+        23999,
+        24000,
+        24180,
+        24233,
+        24324,
+        24325
+      ],
+      "sourceVersion": "v2",
+      "applyAllowed": true,
+      "malformedRows": [
+        3088,
+        3089,
+        3090,
+        5801,
+        5802,
+        13952,
+        13953,
+        16404,
+        16405,
+        16406,
+        16407,
+        16408,
+        16409,
+        16410,
+        16411,
+        16412,
+        18052,
+        18053,
+        18154,
+        18155,
+        18156,
+        18157,
+        21918,
+        21919,
+        24324,
+        24325
+      ],
+      "path": "\\\\?\\D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+      "hash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+      "size": 26437838,
+      "totalRows": 25088,
+      "columns": [
+        "commercial_name_en",
+        "commercial_name_ar",
+        "scientific_name",
+        "manufacturer",
+        "drug_class",
+        "route",
+        "price_egp"
+      ],
+      "profiledAt": "1789390429631"
+    },
+    "counts": {
+      "ingredient_linking_deferred": 22716,
+      "missing_class": 96,
+      "missing_manufacturer": 70,
+      "missing_scientific_name": 2305,
+      "ready": 25012,
+      "ready_reuse": 25012,
+      "review_required": 72,
+      "skipped_ambiguous": 4,
+      "skipped_duplicate": 4,
+      "skipped_malformed": 26,
+      "skipped_price": 1,
+      "skipped_quoting": 41,
+      "unknown_route": 2595
+    },
+    "lookupCreated": {},
+    "lookupReused": {},
+    "imported": 0,
+    "processed": 0,
+    "durationMs": 0,
+    "rowsPerSecond": 0,
+    "reportPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\385b6f78-2785-40a9-a1a6-d52332bf17c5-dry-run.json",
+    "backupPath": null,
+    "error": null,
+    "rows": [
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 1092,
+        "fields": [
+          "AMYLOVER 60 ML SYRUP                                                                   ",
+          " أميلوفير                                                          ",
+          " ALPHA AMYLASE+LACTASE                                                                                                                                                                                                                                                                                                                                                                                        ",
+          " \"DAWA EGYPT INTERNATIONAL > GREEN NUTRITION \"\"AGZA PHARMA\"\"\"                                                                                    ",
+          " ANTI-INFLAMMATORY ENZYMES                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "     75.0"
+        ],
+        "fingerprint": "7ba9e2f2018781b0a5291c2a8ac6af777e1c59a72365ef312c1c003edb274e09",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2000,
+        "fields": [
+          "AVICHEST 5% SYRUP FOR ADULT 100ML                                                      ",
+          " أفيتشيست 5% أدولت                                                 ",
+          " CARBOCYSTEINE                                                                                                                                                                                                                                                                                                                                                                                                ",
+          " SANOFI                                                                                                                                          ",
+          " MUCOLYTIC                                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "      7.0"
+        ],
+        "fingerprint": "ab1456b9f4640d122bd6caf8477d67a76b915ba753c8c9f918f34da07d5315f3",
+        "identity": "2770111e38c7b719e5ee066190b9d0eb64c1be6c698c2b79b8aa0dfc899219b6",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 700
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2218,
+        "fields": [
+          "BAIMISS CREAM 40 GM                                                                    ",
+          " بايميسس                                                           ",
+          " SALICYLIC ACID+ GLYCOLIC ACID+SULPHER+ZINC OXIDE+ TEA TREE OIL+ RETINOL+NICOTINAMIDE+ BIOTIN+ ALANTOIN+ ALOE VERA+ TOCOPHEROL+DEAD SEA SALT+PANTHENOL+CHAMOMILE EXTRACT+ LIQUORICE EXTRACT.                                                                                                                                                                                                                  ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " SKIN CREAM FOR ACNE                                                                                                                                                                                                                                                                                                        ",
+          " TOPICAL    ",
+          "    125.0"
+        ],
+        "fingerprint": "87a00342491a3c00f93534dfe960868f6b123d73acffdcabf7a774d7099c679b",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2812,
+        "fields": [
+          "BIOXELENCE HEMATINIC 30 TABS                                                           ",
+          " بيوكسيلينسي هيماتينيك                                             ",
+          " \"BIOACTIVE IRON 28 MG (FERROUS BISGLYCINATE \"\"BIOACTIVE AMINO ACID CHELATED IRON\"\")+BIOACTIVE FOLATE 400 MCG (5-METHYLTETRAHYDROFOLATE)+BIOACTIVE VITAMIN B12 1000 MCG (METHYL B12)+VITAMIN B6 8 MG+VITAMIN C 60 MG\"                                                                                                                                                                                         ",
+          " MARVEL PHARMA GROUP > INNOVAROO CEUTICAL                                                                                                        ",
+          " IRON SUPPLEMENT                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    175.0"
+        ],
+        "fingerprint": "1c90043f4bde905652e6a6b4ecff19d229caaee93bca0918347bf20684969072",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3088,
+        "fields": [
+          "BRETTA WIN 75 GM GEL                                                                   ",
+          " بريتتا وين                                                        ",
+          " \"TOCOPHERYI ACETATE+EUCALYPTUS GLOBULUS OIL+EUGENIA OIL+THYMUS VULGARIS OIL+XANTHAN GUM+GLYCERIN+PROPYLENE GLYCOL+MENTHA PIPERITA OIL+DIAZOLIDINYL UREA+POTASSIUM SORBATE+PARAFFIN"
+        ],
+        "fingerprint": "8fec2cba0aca465a894002557a78c29736a0c67fe507f4571a2d0d737f5086b7",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3089,
+        "fields": [
+          "                                                                                                                                                             LIQUID+BETAINE+MENTHOL+PANTHENOL+CINNAMOMUM+CAMPHORA OIL+MAGNESIUM CHLORIDE+CURCUMAN"
+        ],
+        "fingerprint": "677e381d07e4f922cdb3576fa0c56f3faf3840fbd0a0d931b46498baf0e87a61",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3090,
+        "fields": [
+          "                                                                                                                                                             LONGA/GLYCYRHIZA URALENSIS) ROOT EXTRACT+LINOLEICACID+DOCOSAHEXAENOIC ACID\"                                                                                                                                                                                                                                                                                                                                  ",
+          " NILE COSMETICS > BRETTA FOR PHARMACEUTICAL COMPANY                                                                                              ",
+          " MASSAGE GEL                                                                                                                                                                                                                                                                                                                ",
+          " TOPICAL    ",
+          "     95.0"
+        ],
+        "fingerprint": "5bd68924bfb9654a6b1eb5ea56d49e2e1a1d773e316e47f76b8949464037a9e5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3246,
+        "fields": [
+          "BURNION GEL 50 GM                                                                      ",
+          " بورنيون                                                           ",
+          " CAFFEINE+ COCOA BUTTER+ SHEA BUTTER + MARINE COLLAGEN+  ELASTIN+ VITA A+ C+E+  CO ENZYME Q10+ ALMOND OIL+ CENTELLA ASIATIC+ L-CARNITINE.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR STRETCH MARK PREVENTION    CELLULITE REDUCTION    TIGHTENING WRINKLED SKIN                                                                                                                                                                                                                                         ",
+          " TOPICAL    ",
+          "     60.0"
+        ],
+        "fingerprint": "1284d460eba7bcefc11ef8dc519713764740f6aaac1cd0862bd181fc4d05d215",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3649,
+        "fields": [
+          "CARBONECOL 30 H.G. CAPS\r\n.                                                                                     ",
+          " كاربونيكول 30 ه.ج                                                 ",
+          " ACTIVATED CHARCOAL                                                                                                                                                                                                                                                                                                                                                                                           ",
+          " ORGANIX > VORTEX                                                                                                                                ",
+          " ANTIFLATULENT                                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "    150.0"
+        ],
+        "fingerprint": "15a550d6aef3915cb8a0e18faf3e390ce9fa336f191d512ee9bf83873c183d56",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3651,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 150 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    180.0"
+        ],
+        "fingerprint": "11a5fb1fb40be7905d47bb9f5007d24f69a8e19a9be6fef0948ab43604f23624",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3652,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 450 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    340.0"
+        ],
+        "fingerprint": "0612c81fefe504a468921d5dbaeef0c17ddb1b360d3a30900de9fc31ebba6b32",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4520,
+        "fields": [
+          "CITICOLINE 500 MG  20 CAPSULES                                                         ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " ORGANIX > KODAK                                                                                                                                 ",
+          " CEREBRAL CIRCULATORY INHANCER                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "     22.0"
+        ],
+        "fingerprint": "f447b97d04736afdd1c1d4bbdd3086866e41ed778ea738a8cfa426b9205b564a",
+        "identity": "a55b6991815dc3b22069fadaa26a1a635d966fcb30a4d54eb5c20f8219a2c1f0",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 2200
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4521,
+        "fields": [
+          "CITICOLINE 500 MG 20 CAPSULES                                                          ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " LIFE SAVER -INTERNATIONAL > AFRI PHARMA                                                                                                         ",
+          " SUPPORT NORMAL BRAIN FUNCTIONS                                                                                                                                                                                                                                                                                             ",
+          " ORAL.SOLID ",
+          "    298.0"
+        ],
+        "fingerprint": "cf3e65b5f0d2407d94134a4b74c74b9594d0c9ed6655f584ac9b47dec494d58c",
+        "identity": "3dc2a21207a27c102b811eb1abae0553c032a7af1d9ce86e37945eb16704c757",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 29800
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5801,
+        "fields": [
+          "DEPO LUTIN 30 CAPS.                                                                    ",
+          " ديبو لوتين                                                        ",
+          " \"VITAMIN C+VITAMIN E+"
+        ],
+        "fingerprint": "2be529926208d6c6cebeea922b181dcac337b634467ef7d095239c6763dbf879",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5802,
+        "fields": [
+          "                                                                                                                                                             ZINC+COPPER+LUTEIN+ZEAXANTHIN\"                                                                                                                                                                                                                                                                                                                                                                               ",
+          " COPAD > GMG OPHTHALMICS                                                                                                                         ",
+          " MULTIVITAMIN                                                                                                                                                                                                                                                                                                               ",
+          " ORAL.SOLID ",
+          "    230.0"
+        ],
+        "fingerprint": "0d5aa2e51cd56eb3daac7b8d2b606781bf26e09e01437ed1789d14a9d43795fd",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5959,
+        "fields": [
+          "DEVINIO CREAM 30 GM                                                                    ",
+          " ديفينيو                                                           ",
+          " CYCLOPENTASLIOXANE +POLYDIMETHYLSLIOXANE+ SILICON FLUID+ DEODORIZED ONION EXTRACT+TEA TREE OIL+ VIT E+ HONEY+ALMOND OIL+ WHEAT GERM OIL.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " CREAM FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                           ",
+          " TOPICAL    ",
+          "    225.0"
+        ],
+        "fingerprint": "98897428aabf7c6695c5b00b64f41a2303654e7c324feafff69688962c3cac04",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5960,
+        "fields": [
+          "DEVINIO GEL 30 GM                                                                      ",
+          " ديفينيو                                                           ",
+          " POLYDIMETHYLSLIOXANE+CYCLOPENTASILOXANE+DECAMETHYLTETRASILOXANE                                                                                                                                                                                                                                                                                                                                              ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                             ",
+          " TOPICAL    ",
+          "    289.0"
+        ],
+        "fingerprint": "f4650c6268b840def52b62fea7af21f0fa5e646ce9592d414eaf84a71c706ea6",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6547,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 10 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    103.0"
+        ],
+        "fingerprint": "143bae73c0bf39ffaca4269d1c0fd8f1c09cbb0f74ca33a7c13e3064e3c013bf",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6548,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 50 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    314.0"
+        ],
+        "fingerprint": "036c2d0c2ff320dda0948109102bd00bdbe0fd1f0db707405be2fe02f7c9e9f1",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7077,
+        "fields": [
+          "ELTROGLAND EXTRA 30 H.G. CAPS\r\n.                                                                                     ",
+          " إلتروجلاند إكسترا 30 ه.ج                                          ",
+          "                                                                                                                                                                                                                                                                                                                                                                                                              ",
+          "                                                                                                                                                 ",
+          "                                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    370.0"
+        ],
+        "fingerprint": "08b9e77014e5e14d25022a38dd2db3c1e7e7eb4e1a3104ca4c5b64f14297df73",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7544,
+        "fields": [
+          "ESPECYST-SPG 20 CAPSULES                                                               ",
+          " إسبيسيست-سبج                                                      ",
+          " ACETYLCYSTEINE+SELENIUM+VITAMIN B 6+VITAMIN B 12                                                                                                                                                                                                                                                                                                                                                             ",
+          " \"NILE PHARMACEUTICAL AND COSMETIC INDUSTRIES COMPANY \"\"NPCI\"\" > SPG PHARMA\"                                                                     ",
+          " MUCOLYTIC AND ANTI-OXIDANT                                                                                                                                                                                                                                                                                                 ",
+          " ORAL.SOLID ",
+          "    120.0"
+        ],
+        "fingerprint": "d15ffe9656443ed7f2cf1e432543bb808657746a393ac9e832b77c0e79b3a5d0",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9163,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 1 GM I.V. VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    658.0"
+        ],
+        "fingerprint": "8fa9ba6a0c945fdd6d44253c33797dfa09bf297f846e0858ad5adca5cf81ef6c",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9164,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 200MG I.V.VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    154.0"
+        ],
+        "fingerprint": "1b9e0f7d4605694f69f6b34241dff80e537bcbe44eee663c60bd0c0934ceeb68",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9902,
+        "fields": [
+          "HAEMODIALYSIS CONCENTRATED SOLUTION\r\n(LIQUID ACETATE CONCENTRATION)                                                        ",
+          " هايمودياليسيس كونسينتراتيد                                        ",
+          " CALCIUM CHLORIDE+MAGNESIUM CHLORIDE+POTASSIUM CHLORIDE+SODIUM ACETATE+SODIUM CHLORIDE                                                                                                                                                                                                                                                                                                                        ",
+          " EL MANSOURA FOR MEDICAL AND CHEMICAL INDUSTRIES                                                                                                 ",
+          " STERILE SOLUTION                                                                                                                                                                                                                                                                                                           ",
+          " UNKNOWN    ",
+          "     54.0"
+        ],
+        "fingerprint": "101963e29a1b360ab91180d9ac95141d71755518b03d4dbf3a03a65fb3d31bea",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 10343,
+        "fields": [
+          "HESSTA 50 MG CREAM                                                                     ",
+          " هيسستا                                                            ",
+          " BETA SITOSTEROL- BEESWAX- CALENDULA EX.- TRICLOSAN - ALPHA BISABOLOL - ALPHA PINENE                                                                                                                                                                                                                                                                                                                          ",
+          " COSMOPACK > MASTER PHARM                                                                                                                        ",
+          " HEALING AND MOISTURIZER CREAM                                                                                                                                                                                                                                                                                              ",
+          " TOPICAL    ",
+          "     80.0"
+        ],
+        "fingerprint": "ecc5875dfcddb326615c90864fc3b41b3cc7c3779735a9b53c643e66edbd25fb",
+        "identity": "8766229a43e9d3f88dc71cd1fc4b05b3af228349be271dca697b74b56c269dfc",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 8000
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13952,
+        "fields": [
+          "MERFO 30 PIECES                                                                        ",
+          " ميرفو 30 بيسيس                                                    ",
+          " \"FOLIC ACID+"
+        ],
+        "fingerprint": "943b27a08966ed659e8c70c358c4739fd7ab5c3f072fc93d1cf906cd715ca569",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13953,
+        "fields": [
+          "                                                                                                                                                             VITAMIN B12\"                                                                                                                                                                                                                                                                                                                                                                                                 ",
+          " ZAKURO > MERCY PHARMA                                                                                                                           ",
+          " SUPPLEMENT                                                                                                                                                                                                                                                                                                                 ",
+          " UNKNOWN    ",
+          "     45.0"
+        ],
+        "fingerprint": "5f29a51ef094cfed1618689917c6456150f80113b10b4a69adf21cf2394b1892",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16404,
+        "fields": [
+          "ORDEX  30 PIECES                                                                       ",
+          " أورديكس 30 بيسيس                                                  ",
+          " \"VIT A 3000 IU"
+        ],
+        "fingerprint": "10fb6f974153348bf813040fde62abe244df7776242cb8dce535ea5726d14083",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16405,
+        "fields": [
+          "                                                                                                                                                             VIT B1 40 MG +"
+        ],
+        "fingerprint": "186a56b9fbc355849a3ec0d6baee4d622832b18188a3e7884b7b46053adeb6b5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16406,
+        "fields": [
+          "                                                                                                                                                             VIT B6 60 MG"
+        ],
+        "fingerprint": "05ee0d179e2cca2831291882f9ccfbee2af7a08033192c7d580ef8d4fd1ada1b",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      }
+    ]
+  },
+  "applyAttempted": true,
+  "applyCommandCalls": 1,
+  "apply": {
+    "reused": 25012,
+    "updated": 0,
+    "failed": 0,
+    "startedAt": "2026-09-14T12:55:10.431Z",
+    "finishedAt": "2026-09-14T12:55:33.951Z",
+    "backupSize": 50814976,
+    "id": "385b6f78-2785-40a9-a1a6-d52332bf17c5",
+    "mode": "apply",
+    "status": "complete",
+    "profile": {
+      "importPolicy": "conservative_catalog_v2",
+      "quotingIssueRows": [
+        1092,
+        2218,
+        2812,
+        3088,
+        3090,
+        3246,
+        3649,
+        3651,
+        3652,
+        5801,
+        5802,
+        5959,
+        5960,
+        6547,
+        6548,
+        7077,
+        7544,
+        9163,
+        9164,
+        9902,
+        13952,
+        13953,
+        16404,
+        16412,
+        16630,
+        16631,
+        16632,
+        16633,
+        16634,
+        16638,
+        16639,
+        16721,
+        16722,
+        16723,
+        16726,
+        16727,
+        16728,
+        16729,
+        17255,
+        17539,
+        18052,
+        18053,
+        18154,
+        18157,
+        18829,
+        20654,
+        21343,
+        21606,
+        21918,
+        21919,
+        22009,
+        23999,
+        24000,
+        24180,
+        24233,
+        24324,
+        24325
+      ],
+      "sourceVersion": "v2",
+      "applyAllowed": true,
+      "malformedRows": [
+        3088,
+        3089,
+        3090,
+        5801,
+        5802,
+        13952,
+        13953,
+        16404,
+        16405,
+        16406,
+        16407,
+        16408,
+        16409,
+        16410,
+        16411,
+        16412,
+        18052,
+        18053,
+        18154,
+        18155,
+        18156,
+        18157,
+        21918,
+        21919,
+        24324,
+        24325
+      ],
+      "path": "\\\\?\\D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+      "hash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+      "size": 26437838,
+      "totalRows": 25088,
+      "columns": [
+        "commercial_name_en",
+        "commercial_name_ar",
+        "scientific_name",
+        "manufacturer",
+        "drug_class",
+        "route",
+        "price_egp"
+      ],
+      "profiledAt": "1789390429631"
+    },
+    "counts": {
+      "failed": 0,
+      "ingredient_linking_deferred": 22716,
+      "inserted": 0,
+      "missing_class": 96,
+      "missing_manufacturer": 70,
+      "missing_scientific_name": 2305,
+      "ready": 25012,
+      "ready_reuse": 25012,
+      "reused": 25012,
+      "review_required": 72,
+      "skipped_ambiguous": 4,
+      "skipped_duplicate": 4,
+      "skipped_malformed": 26,
+      "skipped_price": 1,
+      "skipped_quoting": 41,
+      "unknown_route": 2595,
+      "updated": 0
+    },
+    "lookupCreated": {},
+    "lookupReused": {},
+    "imported": 0,
+    "processed": 25088,
+    "durationMs": 51206,
+    "rowsPerSecond": 489.9357877908127,
+    "reportPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\385b6f78-2785-40a9-a1a6-d52332bf17c5-apply.json",
+    "backupPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\backups\\catalog-before-385b6f78-2785-40a9-a1a6-d52332bf17c5.sqlite3",
+    "error": null,
+    "rows": [
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 1092,
+        "fields": [
+          "AMYLOVER 60 ML SYRUP                                                                   ",
+          " أميلوفير                                                          ",
+          " ALPHA AMYLASE+LACTASE                                                                                                                                                                                                                                                                                                                                                                                        ",
+          " \"DAWA EGYPT INTERNATIONAL > GREEN NUTRITION \"\"AGZA PHARMA\"\"\"                                                                                    ",
+          " ANTI-INFLAMMATORY ENZYMES                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "     75.0"
+        ],
+        "fingerprint": "7ba9e2f2018781b0a5291c2a8ac6af777e1c59a72365ef312c1c003edb274e09",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2000,
+        "fields": [
+          "AVICHEST 5% SYRUP FOR ADULT 100ML                                                      ",
+          " أفيتشيست 5% أدولت                                                 ",
+          " CARBOCYSTEINE                                                                                                                                                                                                                                                                                                                                                                                                ",
+          " SANOFI                                                                                                                                          ",
+          " MUCOLYTIC                                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "      7.0"
+        ],
+        "fingerprint": "ab1456b9f4640d122bd6caf8477d67a76b915ba753c8c9f918f34da07d5315f3",
+        "identity": "2770111e38c7b719e5ee066190b9d0eb64c1be6c698c2b79b8aa0dfc899219b6",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 700
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2218,
+        "fields": [
+          "BAIMISS CREAM 40 GM                                                                    ",
+          " بايميسس                                                           ",
+          " SALICYLIC ACID+ GLYCOLIC ACID+SULPHER+ZINC OXIDE+ TEA TREE OIL+ RETINOL+NICOTINAMIDE+ BIOTIN+ ALANTOIN+ ALOE VERA+ TOCOPHEROL+DEAD SEA SALT+PANTHENOL+CHAMOMILE EXTRACT+ LIQUORICE EXTRACT.                                                                                                                                                                                                                  ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " SKIN CREAM FOR ACNE                                                                                                                                                                                                                                                                                                        ",
+          " TOPICAL    ",
+          "    125.0"
+        ],
+        "fingerprint": "87a00342491a3c00f93534dfe960868f6b123d73acffdcabf7a774d7099c679b",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2812,
+        "fields": [
+          "BIOXELENCE HEMATINIC 30 TABS                                                           ",
+          " بيوكسيلينسي هيماتينيك                                             ",
+          " \"BIOACTIVE IRON 28 MG (FERROUS BISGLYCINATE \"\"BIOACTIVE AMINO ACID CHELATED IRON\"\")+BIOACTIVE FOLATE 400 MCG (5-METHYLTETRAHYDROFOLATE)+BIOACTIVE VITAMIN B12 1000 MCG (METHYL B12)+VITAMIN B6 8 MG+VITAMIN C 60 MG\"                                                                                                                                                                                         ",
+          " MARVEL PHARMA GROUP > INNOVAROO CEUTICAL                                                                                                        ",
+          " IRON SUPPLEMENT                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    175.0"
+        ],
+        "fingerprint": "1c90043f4bde905652e6a6b4ecff19d229caaee93bca0918347bf20684969072",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3088,
+        "fields": [
+          "BRETTA WIN 75 GM GEL                                                                   ",
+          " بريتتا وين                                                        ",
+          " \"TOCOPHERYI ACETATE+EUCALYPTUS GLOBULUS OIL+EUGENIA OIL+THYMUS VULGARIS OIL+XANTHAN GUM+GLYCERIN+PROPYLENE GLYCOL+MENTHA PIPERITA OIL+DIAZOLIDINYL UREA+POTASSIUM SORBATE+PARAFFIN"
+        ],
+        "fingerprint": "8fec2cba0aca465a894002557a78c29736a0c67fe507f4571a2d0d737f5086b7",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3089,
+        "fields": [
+          "                                                                                                                                                             LIQUID+BETAINE+MENTHOL+PANTHENOL+CINNAMOMUM+CAMPHORA OIL+MAGNESIUM CHLORIDE+CURCUMAN"
+        ],
+        "fingerprint": "677e381d07e4f922cdb3576fa0c56f3faf3840fbd0a0d931b46498baf0e87a61",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3090,
+        "fields": [
+          "                                                                                                                                                             LONGA/GLYCYRHIZA URALENSIS) ROOT EXTRACT+LINOLEICACID+DOCOSAHEXAENOIC ACID\"                                                                                                                                                                                                                                                                                                                                  ",
+          " NILE COSMETICS > BRETTA FOR PHARMACEUTICAL COMPANY                                                                                              ",
+          " MASSAGE GEL                                                                                                                                                                                                                                                                                                                ",
+          " TOPICAL    ",
+          "     95.0"
+        ],
+        "fingerprint": "5bd68924bfb9654a6b1eb5ea56d49e2e1a1d773e316e47f76b8949464037a9e5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3246,
+        "fields": [
+          "BURNION GEL 50 GM                                                                      ",
+          " بورنيون                                                           ",
+          " CAFFEINE+ COCOA BUTTER+ SHEA BUTTER + MARINE COLLAGEN+  ELASTIN+ VITA A+ C+E+  CO ENZYME Q10+ ALMOND OIL+ CENTELLA ASIATIC+ L-CARNITINE.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR STRETCH MARK PREVENTION    CELLULITE REDUCTION    TIGHTENING WRINKLED SKIN                                                                                                                                                                                                                                         ",
+          " TOPICAL    ",
+          "     60.0"
+        ],
+        "fingerprint": "1284d460eba7bcefc11ef8dc519713764740f6aaac1cd0862bd181fc4d05d215",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3649,
+        "fields": [
+          "CARBONECOL 30 H.G. CAPS\r\n.                                                                                     ",
+          " كاربونيكول 30 ه.ج                                                 ",
+          " ACTIVATED CHARCOAL                                                                                                                                                                                                                                                                                                                                                                                           ",
+          " ORGANIX > VORTEX                                                                                                                                ",
+          " ANTIFLATULENT                                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "    150.0"
+        ],
+        "fingerprint": "15a550d6aef3915cb8a0e18faf3e390ce9fa336f191d512ee9bf83873c183d56",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3651,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 150 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    180.0"
+        ],
+        "fingerprint": "11a5fb1fb40be7905d47bb9f5007d24f69a8e19a9be6fef0948ab43604f23624",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3652,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 450 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    340.0"
+        ],
+        "fingerprint": "0612c81fefe504a468921d5dbaeef0c17ddb1b360d3a30900de9fc31ebba6b32",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4520,
+        "fields": [
+          "CITICOLINE 500 MG  20 CAPSULES                                                         ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " ORGANIX > KODAK                                                                                                                                 ",
+          " CEREBRAL CIRCULATORY INHANCER                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "     22.0"
+        ],
+        "fingerprint": "f447b97d04736afdd1c1d4bbdd3086866e41ed778ea738a8cfa426b9205b564a",
+        "identity": "a55b6991815dc3b22069fadaa26a1a635d966fcb30a4d54eb5c20f8219a2c1f0",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 2200
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4521,
+        "fields": [
+          "CITICOLINE 500 MG 20 CAPSULES                                                          ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " LIFE SAVER -INTERNATIONAL > AFRI PHARMA                                                                                                         ",
+          " SUPPORT NORMAL BRAIN FUNCTIONS                                                                                                                                                                                                                                                                                             ",
+          " ORAL.SOLID ",
+          "    298.0"
+        ],
+        "fingerprint": "cf3e65b5f0d2407d94134a4b74c74b9594d0c9ed6655f584ac9b47dec494d58c",
+        "identity": "3dc2a21207a27c102b811eb1abae0553c032a7af1d9ce86e37945eb16704c757",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 29800
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5801,
+        "fields": [
+          "DEPO LUTIN 30 CAPS.                                                                    ",
+          " ديبو لوتين                                                        ",
+          " \"VITAMIN C+VITAMIN E+"
+        ],
+        "fingerprint": "2be529926208d6c6cebeea922b181dcac337b634467ef7d095239c6763dbf879",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5802,
+        "fields": [
+          "                                                                                                                                                             ZINC+COPPER+LUTEIN+ZEAXANTHIN\"                                                                                                                                                                                                                                                                                                                                                                               ",
+          " COPAD > GMG OPHTHALMICS                                                                                                                         ",
+          " MULTIVITAMIN                                                                                                                                                                                                                                                                                                               ",
+          " ORAL.SOLID ",
+          "    230.0"
+        ],
+        "fingerprint": "0d5aa2e51cd56eb3daac7b8d2b606781bf26e09e01437ed1789d14a9d43795fd",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5959,
+        "fields": [
+          "DEVINIO CREAM 30 GM                                                                    ",
+          " ديفينيو                                                           ",
+          " CYCLOPENTASLIOXANE +POLYDIMETHYLSLIOXANE+ SILICON FLUID+ DEODORIZED ONION EXTRACT+TEA TREE OIL+ VIT E+ HONEY+ALMOND OIL+ WHEAT GERM OIL.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " CREAM FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                           ",
+          " TOPICAL    ",
+          "    225.0"
+        ],
+        "fingerprint": "98897428aabf7c6695c5b00b64f41a2303654e7c324feafff69688962c3cac04",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5960,
+        "fields": [
+          "DEVINIO GEL 30 GM                                                                      ",
+          " ديفينيو                                                           ",
+          " POLYDIMETHYLSLIOXANE+CYCLOPENTASILOXANE+DECAMETHYLTETRASILOXANE                                                                                                                                                                                                                                                                                                                                              ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                             ",
+          " TOPICAL    ",
+          "    289.0"
+        ],
+        "fingerprint": "f4650c6268b840def52b62fea7af21f0fa5e646ce9592d414eaf84a71c706ea6",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6547,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 10 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    103.0"
+        ],
+        "fingerprint": "143bae73c0bf39ffaca4269d1c0fd8f1c09cbb0f74ca33a7c13e3064e3c013bf",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6548,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 50 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    314.0"
+        ],
+        "fingerprint": "036c2d0c2ff320dda0948109102bd00bdbe0fd1f0db707405be2fe02f7c9e9f1",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7077,
+        "fields": [
+          "ELTROGLAND EXTRA 30 H.G. CAPS\r\n.                                                                                     ",
+          " إلتروجلاند إكسترا 30 ه.ج                                          ",
+          "                                                                                                                                                                                                                                                                                                                                                                                                              ",
+          "                                                                                                                                                 ",
+          "                                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    370.0"
+        ],
+        "fingerprint": "08b9e77014e5e14d25022a38dd2db3c1e7e7eb4e1a3104ca4c5b64f14297df73",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7544,
+        "fields": [
+          "ESPECYST-SPG 20 CAPSULES                                                               ",
+          " إسبيسيست-سبج                                                      ",
+          " ACETYLCYSTEINE+SELENIUM+VITAMIN B 6+VITAMIN B 12                                                                                                                                                                                                                                                                                                                                                             ",
+          " \"NILE PHARMACEUTICAL AND COSMETIC INDUSTRIES COMPANY \"\"NPCI\"\" > SPG PHARMA\"                                                                     ",
+          " MUCOLYTIC AND ANTI-OXIDANT                                                                                                                                                                                                                                                                                                 ",
+          " ORAL.SOLID ",
+          "    120.0"
+        ],
+        "fingerprint": "d15ffe9656443ed7f2cf1e432543bb808657746a393ac9e832b77c0e79b3a5d0",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9163,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 1 GM I.V. VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    658.0"
+        ],
+        "fingerprint": "8fa9ba6a0c945fdd6d44253c33797dfa09bf297f846e0858ad5adca5cf81ef6c",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9164,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 200MG I.V.VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    154.0"
+        ],
+        "fingerprint": "1b9e0f7d4605694f69f6b34241dff80e537bcbe44eee663c60bd0c0934ceeb68",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9902,
+        "fields": [
+          "HAEMODIALYSIS CONCENTRATED SOLUTION\r\n(LIQUID ACETATE CONCENTRATION)                                                        ",
+          " هايمودياليسيس كونسينتراتيد                                        ",
+          " CALCIUM CHLORIDE+MAGNESIUM CHLORIDE+POTASSIUM CHLORIDE+SODIUM ACETATE+SODIUM CHLORIDE                                                                                                                                                                                                                                                                                                                        ",
+          " EL MANSOURA FOR MEDICAL AND CHEMICAL INDUSTRIES                                                                                                 ",
+          " STERILE SOLUTION                                                                                                                                                                                                                                                                                                           ",
+          " UNKNOWN    ",
+          "     54.0"
+        ],
+        "fingerprint": "101963e29a1b360ab91180d9ac95141d71755518b03d4dbf3a03a65fb3d31bea",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 10343,
+        "fields": [
+          "HESSTA 50 MG CREAM                                                                     ",
+          " هيسستا                                                            ",
+          " BETA SITOSTEROL- BEESWAX- CALENDULA EX.- TRICLOSAN - ALPHA BISABOLOL - ALPHA PINENE                                                                                                                                                                                                                                                                                                                          ",
+          " COSMOPACK > MASTER PHARM                                                                                                                        ",
+          " HEALING AND MOISTURIZER CREAM                                                                                                                                                                                                                                                                                              ",
+          " TOPICAL    ",
+          "     80.0"
+        ],
+        "fingerprint": "ecc5875dfcddb326615c90864fc3b41b3cc7c3779735a9b53c643e66edbd25fb",
+        "identity": "8766229a43e9d3f88dc71cd1fc4b05b3af228349be271dca697b74b56c269dfc",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 8000
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13952,
+        "fields": [
+          "MERFO 30 PIECES                                                                        ",
+          " ميرفو 30 بيسيس                                                    ",
+          " \"FOLIC ACID+"
+        ],
+        "fingerprint": "943b27a08966ed659e8c70c358c4739fd7ab5c3f072fc93d1cf906cd715ca569",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13953,
+        "fields": [
+          "                                                                                                                                                             VITAMIN B12\"                                                                                                                                                                                                                                                                                                                                                                                                 ",
+          " ZAKURO > MERCY PHARMA                                                                                                                           ",
+          " SUPPLEMENT                                                                                                                                                                                                                                                                                                                 ",
+          " UNKNOWN    ",
+          "     45.0"
+        ],
+        "fingerprint": "5f29a51ef094cfed1618689917c6456150f80113b10b4a69adf21cf2394b1892",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16404,
+        "fields": [
+          "ORDEX  30 PIECES                                                                       ",
+          " أورديكس 30 بيسيس                                                  ",
+          " \"VIT A 3000 IU"
+        ],
+        "fingerprint": "10fb6f974153348bf813040fde62abe244df7776242cb8dce535ea5726d14083",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16405,
+        "fields": [
+          "                                                                                                                                                             VIT B1 40 MG +"
+        ],
+        "fingerprint": "186a56b9fbc355849a3ec0d6baee4d622832b18188a3e7884b7b46053adeb6b5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16406,
+        "fields": [
+          "                                                                                                                                                             VIT B6 60 MG"
+        ],
+        "fingerprint": "05ee0d179e2cca2831291882f9ccfbee2af7a08033192c7d580ef8d4fd1ada1b",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      }
+    ]
+  },
+  "idempotency": {
+    "reused": 0,
+    "updated": 0,
+    "failed": 0,
+    "startedAt": null,
+    "finishedAt": null,
+    "backupSize": null,
+    "id": "5b785409-6d92-4238-b251-1163ed430969",
+    "mode": "dry_run",
+    "status": "validated",
+    "profile": {
+      "importPolicy": "conservative_catalog_v2",
+      "quotingIssueRows": [
+        1092,
+        2218,
+        2812,
+        3088,
+        3090,
+        3246,
+        3649,
+        3651,
+        3652,
+        5801,
+        5802,
+        5959,
+        5960,
+        6547,
+        6548,
+        7077,
+        7544,
+        9163,
+        9164,
+        9902,
+        13952,
+        13953,
+        16404,
+        16412,
+        16630,
+        16631,
+        16632,
+        16633,
+        16634,
+        16638,
+        16639,
+        16721,
+        16722,
+        16723,
+        16726,
+        16727,
+        16728,
+        16729,
+        17255,
+        17539,
+        18052,
+        18053,
+        18154,
+        18157,
+        18829,
+        20654,
+        21343,
+        21606,
+        21918,
+        21919,
+        22009,
+        23999,
+        24000,
+        24180,
+        24233,
+        24324,
+        24325
+      ],
+      "sourceVersion": "v2",
+      "applyAllowed": true,
+      "malformedRows": [
+        3088,
+        3089,
+        3090,
+        5801,
+        5802,
+        13952,
+        13953,
+        16404,
+        16405,
+        16406,
+        16407,
+        16408,
+        16409,
+        16410,
+        16411,
+        16412,
+        18052,
+        18053,
+        18154,
+        18155,
+        18156,
+        18157,
+        21918,
+        21919,
+        24324,
+        24325
+      ],
+      "path": "\\\\?\\D:\\project\\M2 health\\src\\data\\karem\\egyptian-drugs.csv",
+      "hash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+      "size": 26437838,
+      "totalRows": 25088,
+      "columns": [
+        "commercial_name_en",
+        "commercial_name_ar",
+        "scientific_name",
+        "manufacturer",
+        "drug_class",
+        "route",
+        "price_egp"
+      ],
+      "profiledAt": "1789390541043"
+    },
+    "counts": {
+      "already_imported": 25012,
+      "ingredient_linking_deferred": 22716,
+      "missing_class": 96,
+      "missing_manufacturer": 70,
+      "missing_scientific_name": 2305,
+      "review_required": 72,
+      "skipped_ambiguous": 4,
+      "skipped_duplicate": 4,
+      "skipped_malformed": 26,
+      "skipped_price": 1,
+      "skipped_quoting": 41,
+      "unknown_route": 2595
+    },
+    "lookupCreated": {},
+    "lookupReused": {},
+    "imported": 0,
+    "processed": 0,
+    "durationMs": 0,
+    "rowsPerSecond": 0,
+    "reportPath": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\import-reports\\5b785409-6d92-4238-b251-1163ed430969-dry-run.json",
+    "backupPath": null,
+    "error": null,
+    "rows": [
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 1092,
+        "fields": [
+          "AMYLOVER 60 ML SYRUP                                                                   ",
+          " أميلوفير                                                          ",
+          " ALPHA AMYLASE+LACTASE                                                                                                                                                                                                                                                                                                                                                                                        ",
+          " \"DAWA EGYPT INTERNATIONAL > GREEN NUTRITION \"\"AGZA PHARMA\"\"\"                                                                                    ",
+          " ANTI-INFLAMMATORY ENZYMES                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "     75.0"
+        ],
+        "fingerprint": "7ba9e2f2018781b0a5291c2a8ac6af777e1c59a72365ef312c1c003edb274e09",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2000,
+        "fields": [
+          "AVICHEST 5% SYRUP FOR ADULT 100ML                                                      ",
+          " أفيتشيست 5% أدولت                                                 ",
+          " CARBOCYSTEINE                                                                                                                                                                                                                                                                                                                                                                                                ",
+          " SANOFI                                                                                                                                          ",
+          " MUCOLYTIC                                                                                                                                                                                                                                                                                                                  ",
+          " ORAL.LIQUID",
+          "      7.0"
+        ],
+        "fingerprint": "ab1456b9f4640d122bd6caf8477d67a76b915ba753c8c9f918f34da07d5315f3",
+        "identity": "2770111e38c7b719e5ee066190b9d0eb64c1be6c698c2b79b8aa0dfc899219b6",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 700
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2218,
+        "fields": [
+          "BAIMISS CREAM 40 GM                                                                    ",
+          " بايميسس                                                           ",
+          " SALICYLIC ACID+ GLYCOLIC ACID+SULPHER+ZINC OXIDE+ TEA TREE OIL+ RETINOL+NICOTINAMIDE+ BIOTIN+ ALANTOIN+ ALOE VERA+ TOCOPHEROL+DEAD SEA SALT+PANTHENOL+CHAMOMILE EXTRACT+ LIQUORICE EXTRACT.                                                                                                                                                                                                                  ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " SKIN CREAM FOR ACNE                                                                                                                                                                                                                                                                                                        ",
+          " TOPICAL    ",
+          "    125.0"
+        ],
+        "fingerprint": "87a00342491a3c00f93534dfe960868f6b123d73acffdcabf7a774d7099c679b",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 2812,
+        "fields": [
+          "BIOXELENCE HEMATINIC 30 TABS                                                           ",
+          " بيوكسيلينسي هيماتينيك                                             ",
+          " \"BIOACTIVE IRON 28 MG (FERROUS BISGLYCINATE \"\"BIOACTIVE AMINO ACID CHELATED IRON\"\")+BIOACTIVE FOLATE 400 MCG (5-METHYLTETRAHYDROFOLATE)+BIOACTIVE VITAMIN B12 1000 MCG (METHYL B12)+VITAMIN B6 8 MG+VITAMIN C 60 MG\"                                                                                                                                                                                         ",
+          " MARVEL PHARMA GROUP > INNOVAROO CEUTICAL                                                                                                        ",
+          " IRON SUPPLEMENT                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    175.0"
+        ],
+        "fingerprint": "1c90043f4bde905652e6a6b4ecff19d229caaee93bca0918347bf20684969072",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3088,
+        "fields": [
+          "BRETTA WIN 75 GM GEL                                                                   ",
+          " بريتتا وين                                                        ",
+          " \"TOCOPHERYI ACETATE+EUCALYPTUS GLOBULUS OIL+EUGENIA OIL+THYMUS VULGARIS OIL+XANTHAN GUM+GLYCERIN+PROPYLENE GLYCOL+MENTHA PIPERITA OIL+DIAZOLIDINYL UREA+POTASSIUM SORBATE+PARAFFIN"
+        ],
+        "fingerprint": "8fec2cba0aca465a894002557a78c29736a0c67fe507f4571a2d0d737f5086b7",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3089,
+        "fields": [
+          "                                                                                                                                                             LIQUID+BETAINE+MENTHOL+PANTHENOL+CINNAMOMUM+CAMPHORA OIL+MAGNESIUM CHLORIDE+CURCUMAN"
+        ],
+        "fingerprint": "677e381d07e4f922cdb3576fa0c56f3faf3840fbd0a0d931b46498baf0e87a61",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3090,
+        "fields": [
+          "                                                                                                                                                             LONGA/GLYCYRHIZA URALENSIS) ROOT EXTRACT+LINOLEICACID+DOCOSAHEXAENOIC ACID\"                                                                                                                                                                                                                                                                                                                                  ",
+          " NILE COSMETICS > BRETTA FOR PHARMACEUTICAL COMPANY                                                                                              ",
+          " MASSAGE GEL                                                                                                                                                                                                                                                                                                                ",
+          " TOPICAL    ",
+          "     95.0"
+        ],
+        "fingerprint": "5bd68924bfb9654a6b1eb5ea56d49e2e1a1d773e316e47f76b8949464037a9e5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3246,
+        "fields": [
+          "BURNION GEL 50 GM                                                                      ",
+          " بورنيون                                                           ",
+          " CAFFEINE+ COCOA BUTTER+ SHEA BUTTER + MARINE COLLAGEN+  ELASTIN+ VITA A+ C+E+  CO ENZYME Q10+ ALMOND OIL+ CENTELLA ASIATIC+ L-CARNITINE.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR STRETCH MARK PREVENTION    CELLULITE REDUCTION    TIGHTENING WRINKLED SKIN                                                                                                                                                                                                                                         ",
+          " TOPICAL    ",
+          "     60.0"
+        ],
+        "fingerprint": "1284d460eba7bcefc11ef8dc519713764740f6aaac1cd0862bd181fc4d05d215",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3649,
+        "fields": [
+          "CARBONECOL 30 H.G. CAPS\r\n.                                                                                     ",
+          " كاربونيكول 30 ه.ج                                                 ",
+          " ACTIVATED CHARCOAL                                                                                                                                                                                                                                                                                                                                                                                           ",
+          " ORGANIX > VORTEX                                                                                                                                ",
+          " ANTIFLATULENT                                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "    150.0"
+        ],
+        "fingerprint": "15a550d6aef3915cb8a0e18faf3e390ce9fa336f191d512ee9bf83873c183d56",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3651,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 150 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    180.0"
+        ],
+        "fingerprint": "11a5fb1fb40be7905d47bb9f5007d24f69a8e19a9be6fef0948ab43604f23624",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 3652,
+        "fields": [
+          "CARBOPLATIN \"EBEWE\" 450 MG VIAL                                                    ",
+          " \"كاربوبلاتين \"\"إبيوي\"\"\"                                           ",
+          " CARBOPLATIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " SANDOZ > NOVARTIS SCIENTIFIC OFFICE                                                                                                             ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    340.0"
+        ],
+        "fingerprint": "0612c81fefe504a468921d5dbaeef0c17ddb1b360d3a30900de9fc31ebba6b32",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4520,
+        "fields": [
+          "CITICOLINE 500 MG  20 CAPSULES                                                         ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " ORGANIX > KODAK                                                                                                                                 ",
+          " CEREBRAL CIRCULATORY INHANCER                                                                                                                                                                                                                                                                                              ",
+          " ORAL.SOLID ",
+          "     22.0"
+        ],
+        "fingerprint": "f447b97d04736afdd1c1d4bbdd3086866e41ed778ea738a8cfa426b9205b564a",
+        "identity": "a55b6991815dc3b22069fadaa26a1a635d966fcb30a4d54eb5c20f8219a2c1f0",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 2200
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 4521,
+        "fields": [
+          "CITICOLINE 500 MG 20 CAPSULES                                                          ",
+          " سيتيكوليني                                                        ",
+          " CITICOLINE                                                                                                                                                                                                                                                                                                                                                                                                   ",
+          " LIFE SAVER -INTERNATIONAL > AFRI PHARMA                                                                                                         ",
+          " SUPPORT NORMAL BRAIN FUNCTIONS                                                                                                                                                                                                                                                                                             ",
+          " ORAL.SOLID ",
+          "    298.0"
+        ],
+        "fingerprint": "cf3e65b5f0d2407d94134a4b74c74b9594d0c9ed6655f584ac9b47dec494d58c",
+        "identity": "3dc2a21207a27c102b811eb1abae0553c032a7af1d9ce86e37945eb16704c757",
+        "disposition": "skipped_ambiguous",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 29800
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5801,
+        "fields": [
+          "DEPO LUTIN 30 CAPS.                                                                    ",
+          " ديبو لوتين                                                        ",
+          " \"VITAMIN C+VITAMIN E+"
+        ],
+        "fingerprint": "2be529926208d6c6cebeea922b181dcac337b634467ef7d095239c6763dbf879",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5802,
+        "fields": [
+          "                                                                                                                                                             ZINC+COPPER+LUTEIN+ZEAXANTHIN\"                                                                                                                                                                                                                                                                                                                                                                               ",
+          " COPAD > GMG OPHTHALMICS                                                                                                                         ",
+          " MULTIVITAMIN                                                                                                                                                                                                                                                                                                               ",
+          " ORAL.SOLID ",
+          "    230.0"
+        ],
+        "fingerprint": "0d5aa2e51cd56eb3daac7b8d2b606781bf26e09e01437ed1789d14a9d43795fd",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5959,
+        "fields": [
+          "DEVINIO CREAM 30 GM                                                                    ",
+          " ديفينيو                                                           ",
+          " CYCLOPENTASLIOXANE +POLYDIMETHYLSLIOXANE+ SILICON FLUID+ DEODORIZED ONION EXTRACT+TEA TREE OIL+ VIT E+ HONEY+ALMOND OIL+ WHEAT GERM OIL.                                                                                                                                                                                                                                                                     ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " CREAM FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                           ",
+          " TOPICAL    ",
+          "    225.0"
+        ],
+        "fingerprint": "98897428aabf7c6695c5b00b64f41a2303654e7c324feafff69688962c3cac04",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 5960,
+        "fields": [
+          "DEVINIO GEL 30 GM                                                                      ",
+          " ديفينيو                                                           ",
+          " POLYDIMETHYLSLIOXANE+CYCLOPENTASILOXANE+DECAMETHYLTETRASILOXANE                                                                                                                                                                                                                                                                                                                                              ",
+          " \"EGYPTIAN COMPANY FOR COSMETICS \"\" ECC\"\" > AKADY PHARMA\"                                                                                        ",
+          " GEL FOR IMPROVING SCARES APPEARANCE & TEXTURES                                                                                                                                                                                                                                                                             ",
+          " TOPICAL    ",
+          "    289.0"
+        ],
+        "fingerprint": "f4650c6268b840def52b62fea7af21f0fa5e646ce9592d414eaf84a71c706ea6",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6547,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 10 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    103.0"
+        ],
+        "fingerprint": "143bae73c0bf39ffaca4269d1c0fd8f1c09cbb0f74ca33a7c13e3064e3c013bf",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 6548,
+        "fields": [
+          "DOXORUBICIN \"HEXAL\" 50 MG VIAL                                                     ",
+          " \"دوكسوروبيسين \"\"هيكسال\"\"\"                                         ",
+          " DOXORUBICIN                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " EBEWE > NOVARTIS PHARMA SANDOZ DIVISION                                                                                                         ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    314.0"
+        ],
+        "fingerprint": "036c2d0c2ff320dda0948109102bd00bdbe0fd1f0db707405be2fe02f7c9e9f1",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7077,
+        "fields": [
+          "ELTROGLAND EXTRA 30 H.G. CAPS\r\n.                                                                                     ",
+          " إلتروجلاند إكسترا 30 ه.ج                                          ",
+          "                                                                                                                                                                                                                                                                                                                                                                                                              ",
+          "                                                                                                                                                 ",
+          "                                                                                                                                                                                                                                                                                                                            ",
+          " ORAL.SOLID ",
+          "    370.0"
+        ],
+        "fingerprint": "08b9e77014e5e14d25022a38dd2db3c1e7e7eb4e1a3104ca4c5b64f14297df73",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 7544,
+        "fields": [
+          "ESPECYST-SPG 20 CAPSULES                                                               ",
+          " إسبيسيست-سبج                                                      ",
+          " ACETYLCYSTEINE+SELENIUM+VITAMIN B 6+VITAMIN B 12                                                                                                                                                                                                                                                                                                                                                             ",
+          " \"NILE PHARMACEUTICAL AND COSMETIC INDUSTRIES COMPANY \"\"NPCI\"\" > SPG PHARMA\"                                                                     ",
+          " MUCOLYTIC AND ANTI-OXIDANT                                                                                                                                                                                                                                                                                                 ",
+          " ORAL.SOLID ",
+          "    120.0"
+        ],
+        "fingerprint": "d15ffe9656443ed7f2cf1e432543bb808657746a393ac9e832b77c0e79b3a5d0",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9163,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 1 GM I.V. VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    658.0"
+        ],
+        "fingerprint": "8fa9ba6a0c945fdd6d44253c33797dfa09bf297f846e0858ad5adca5cf81ef6c",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9164,
+        "fields": [
+          "GEMCITABINE \"ACTAVIS\" 200MG I.V.VIAL(N/A)                                          ",
+          " \"جيمسيتابيني \"\"أكتافيس\"\"\"                                         ",
+          " GEMCITABINE                                                                                                                                                                                                                                                                                                                                                                                                  ",
+          " ACTAVIS > MULTIPHARMA                                                                                                                           ",
+          " ANTINEOPLASTIC                                                                                                                                                                                                                                                                                                             ",
+          " INJECTION  ",
+          "    154.0"
+        ],
+        "fingerprint": "1b9e0f7d4605694f69f6b34241dff80e537bcbe44eee663c60bd0c0934ceeb68",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 9902,
+        "fields": [
+          "HAEMODIALYSIS CONCENTRATED SOLUTION\r\n(LIQUID ACETATE CONCENTRATION)                                                        ",
+          " هايمودياليسيس كونسينتراتيد                                        ",
+          " CALCIUM CHLORIDE+MAGNESIUM CHLORIDE+POTASSIUM CHLORIDE+SODIUM ACETATE+SODIUM CHLORIDE                                                                                                                                                                                                                                                                                                                        ",
+          " EL MANSOURA FOR MEDICAL AND CHEMICAL INDUSTRIES                                                                                                 ",
+          " STERILE SOLUTION                                                                                                                                                                                                                                                                                                           ",
+          " UNKNOWN    ",
+          "     54.0"
+        ],
+        "fingerprint": "101963e29a1b360ab91180d9ac95141d71755518b03d4dbf3a03a65fb3d31bea",
+        "identity": "",
+        "disposition": "skipped_quoting",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 10343,
+        "fields": [
+          "HESSTA 50 MG CREAM                                                                     ",
+          " هيسستا                                                            ",
+          " BETA SITOSTEROL- BEESWAX- CALENDULA EX.- TRICLOSAN - ALPHA BISABOLOL - ALPHA PINENE                                                                                                                                                                                                                                                                                                                          ",
+          " COSMOPACK > MASTER PHARM                                                                                                                        ",
+          " HEALING AND MOISTURIZER CREAM                                                                                                                                                                                                                                                                                              ",
+          " TOPICAL    ",
+          "     80.0"
+        ],
+        "fingerprint": "ecc5875dfcddb326615c90864fc3b41b3cc7c3779735a9b53c643e66edbd25fb",
+        "identity": "8766229a43e9d3f88dc71cd1fc4b05b3af228349be271dca697b74b56c269dfc",
+        "disposition": "skipped_duplicate",
+        "warnings": [
+          "ingredient_linking_deferred"
+        ],
+        "priceMinor": 8000
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13952,
+        "fields": [
+          "MERFO 30 PIECES                                                                        ",
+          " ميرفو 30 بيسيس                                                    ",
+          " \"FOLIC ACID+"
+        ],
+        "fingerprint": "943b27a08966ed659e8c70c358c4739fd7ab5c3f072fc93d1cf906cd715ca569",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 13953,
+        "fields": [
+          "                                                                                                                                                             VITAMIN B12\"                                                                                                                                                                                                                                                                                                                                                                                                 ",
+          " ZAKURO > MERCY PHARMA                                                                                                                           ",
+          " SUPPLEMENT                                                                                                                                                                                                                                                                                                                 ",
+          " UNKNOWN    ",
+          "     45.0"
+        ],
+        "fingerprint": "5f29a51ef094cfed1618689917c6456150f80113b10b4a69adf21cf2394b1892",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16404,
+        "fields": [
+          "ORDEX  30 PIECES                                                                       ",
+          " أورديكس 30 بيسيس                                                  ",
+          " \"VIT A 3000 IU"
+        ],
+        "fingerprint": "10fb6f974153348bf813040fde62abe244df7776242cb8dce535ea5726d14083",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16405,
+        "fields": [
+          "                                                                                                                                                             VIT B1 40 MG +"
+        ],
+        "fingerprint": "186a56b9fbc355849a3ec0d6baee4d622832b18188a3e7884b7b46053adeb6b5",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      },
+      {
+        "productId": null,
+        "packageId": null,
+        "number": 16406,
+        "fields": [
+          "                                                                                                                                                             VIT B6 60 MG"
+        ],
+        "fingerprint": "05ee0d179e2cca2831291882f9ccfbee2af7a08033192c7d580ef8d4fd1ada1b",
+        "identity": "",
+        "disposition": "skipped_malformed",
+        "warnings": [],
+        "priceMinor": null
+      }
+    ]
+  },
+  "lastError": null,
+  "verify": {
+    "searches": {
+      "english": {
+        "query": "PANADOL",
+        "total": 13
+      },
+      "arabic": {
+        "query": "بانادول أكوتي هياد كولد",
+        "total": 1
+      },
+      "scientific": {
+        "query": "BROMPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "total": 2
+      },
+      "manufacturer": {
+        "query": "GLAXO SMITHKLINE",
+        "total": 233
+      },
+      "Manufacturer": {
+        "id": "6ef8f168-b67b-4412-a498-eb5b833d6d7a",
+        "total": 185
+      },
+      "Category": {
+        "id": "f15b7ed2-4aff-4822-a633-9626e52d341f",
+        "total": 143
+      },
+      "Route": {
+        "id": "6918ca07-2764-48eb-b88c-06b14cfd2feb",
+        "total": 10585
+      }
+    },
+    "pagination": true,
+    "productDetails": true,
+    "currentPriceMinor": 6200,
+    "total": 25062,
+    "mainStock": 8,
+    "devStock": 2,
+    "countStatus": "COMPLETED",
+    "documentsPreserved": true
+  },
+  "persistedRun": {
+    "id": "385b6f78-2785-40a9-a1a6-d52332bf17c5",
+    "reused": 25012,
+    "imported": 0,
+    "status": "complete"
+  },
+  "restart": {
+    "searches": {
+      "english": {
+        "query": "PANADOL",
+        "total": 13
+      },
+      "arabic": {
+        "query": "بانادول أكوتي هياد كولد",
+        "total": 1
+      },
+      "scientific": {
+        "query": "BROMPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+        "total": 2
+      },
+      "manufacturer": {
+        "query": "GLAXO SMITHKLINE",
+        "total": 233
+      },
+      "Manufacturer": {
+        "id": "6ef8f168-b67b-4412-a498-eb5b833d6d7a",
+        "total": 185
+      },
+      "Category": {
+        "id": "f15b7ed2-4aff-4822-a633-9626e52d341f",
+        "total": 143
+      },
+      "Route": {
+        "id": "6918ca07-2764-48eb-b88c-06b14cfd2feb",
+        "total": 10585
+      }
+    },
+    "pagination": true,
+    "productDetails": true,
+    "currentPriceMinor": 6200,
+    "total": 25062,
+    "mainStock": 8,
+    "devStock": 2,
+    "countStatus": "COMPLETED",
+    "documentsPreserved": true
+  }
+}

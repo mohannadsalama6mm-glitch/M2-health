@@ -1,0 +1,242 @@
+{
+  "integrity": "ok",
+  "foreignKeyErrors": [],
+  "schemaVersions": [
+    {
+      "version": 1,
+      "name": "branches",
+      "applied_at": "2026-09-12T09:31:52.890Z"
+    },
+    {
+      "version": 2,
+      "name": "catalog_core",
+      "applied_at": "2026-09-12T10:06:57.913Z"
+    },
+    {
+      "version": 3,
+      "name": "catalog_import",
+      "applied_at": "2026-09-12T20:32:32.305Z"
+    },
+    {
+      "version": 4,
+      "name": "inventory_core",
+      "applied_at": "2026-09-13T07:52:18.434Z"
+    },
+    {
+      "version": 5,
+      "name": "inventory_workflows",
+      "applied_at": "2026-09-14T05:23:54.485Z"
+    }
+  ],
+  "countsBefore": {
+    "branches": 1,
+    "products": 25062,
+    "product_packages": 25062,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 1,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 1,
+    "inventory_movements": 2,
+    "inventory_transfers": 0,
+    "inventory_levels": 0
+  },
+  "countsAfter": {
+    "branches": 2,
+    "products": 25062,
+    "product_packages": 25062,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "product_active_ingredients": 1,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 1,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 3,
+    "inventory_movements": 6,
+    "inventory_transfers": 1,
+    "inventory_levels": 0,
+    "inventory_documents": 3,
+    "inventory_document_lines": 3,
+    "inventory_document_movements": 4,
+    "inventory_post_requests": 3
+  },
+  "catalogAndImportPreserved": {
+    "products": true,
+    "product_packages": true,
+    "manufacturers": true,
+    "categories": true,
+    "routes": true,
+    "active_ingredients": true,
+    "product_active_ingredients": true,
+    "barcodes": true,
+    "product_price_history": true,
+    "catalog_import_runs": true,
+    "catalog_import_rows": true
+  },
+  "originalInventoryRowsPreserved": {
+    "batches": true,
+    "movements": true
+  },
+  "csvUnchanged": true,
+  "csvHash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+  "branches": [
+    {
+      "id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "code": "MAIN",
+      "name": "Main Pharmacy",
+      "phone": "",
+      "address": "",
+      "is_active": 1,
+      "created_at": "2026-09-12T09:31:52.894Z",
+      "updated_at": "2026-09-12T09:31:52.894Z"
+    },
+    {
+      "id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "code": "DEV3B",
+      "name": "DEV Phase 3B Transfer Smoke",
+      "phone": "",
+      "address": "Controlled development smoke only",
+      "is_active": 1,
+      "created_at": "2026-09-14T05:28:05.157Z",
+      "updated_at": "2026-09-14T05:28:05.157Z"
+    }
+  ],
+  "stockByPackage": [
+    {
+      "branch_id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 1
+    },
+    {
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 8
+    }
+  ],
+  "documents": [
+    {
+      "id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+      "document_number": "RCV-20260914-0001",
+      "kind": "RECEIPT",
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "destination_branch_id": null,
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3B RECEIPT 20260914",
+      "supplier_reference": null,
+      "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-14T05:27:31.678Z",
+      "updated_at": "2026-09-14T05:27:32.179Z",
+      "posted_at": "2026-09-14T05:27:32.179Z"
+    },
+    {
+      "id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+      "document_number": "ADJ-20260914-0001",
+      "kind": "ADJUSTMENT",
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "destination_branch_id": null,
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3B ADJUSTMENT 20260914",
+      "supplier_reference": null,
+      "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-14T05:27:51.791Z",
+      "updated_at": "2026-09-14T05:27:52.242Z",
+      "posted_at": "2026-09-14T05:27:52.242Z"
+    },
+    {
+      "id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+      "document_number": "TRF-20260914-0001",
+      "kind": "TRANSFER",
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "destination_branch_id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3B TRANSFER 20260914",
+      "supplier_reference": null,
+      "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-14T05:28:07.006Z",
+      "updated_at": "2026-09-14T05:28:07.546Z",
+      "posted_at": "2026-09-14T05:28:07.546Z"
+    }
+  ],
+  "documentMovements": [
+    {
+      "movement_id": "ccfb9945-a74e-4127-ba39-58dc56681aa5",
+      "document_id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+      "line_id": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+      "reverses_movement_id": null,
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "batch_id": "2b412be3-1a27-429b-9e42-b3e8281264df",
+      "movement_type": "PURCHASE_RECEIPT",
+      "quantity_delta": 2
+    },
+    {
+      "movement_id": "ca93723a-f7eb-4695-93b4-b910cd981966",
+      "document_id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+      "line_id": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+      "reverses_movement_id": null,
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "batch_id": "2b412be3-1a27-429b-9e42-b3e8281264df",
+      "movement_type": "ADJUSTMENT_OUT",
+      "quantity_delta": -1
+    },
+    {
+      "movement_id": "6039c60f-6a5e-4e54-a86e-5c5bae54d026",
+      "document_id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+      "line_id": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+      "reverses_movement_id": null,
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "batch_id": "2b412be3-1a27-429b-9e42-b3e8281264df",
+      "movement_type": "TRANSFER_OUT",
+      "quantity_delta": -1
+    },
+    {
+      "movement_id": "349d0e40-3ba5-4d95-9817-2f99b3735fcb",
+      "document_id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+      "line_id": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+      "reverses_movement_id": null,
+      "branch_id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "batch_id": "69729d53-918f-44f0-84bd-d7766e15c4ff",
+      "movement_type": "TRANSFER_IN",
+      "quantity_delta": 1
+    }
+  ],
+  "postingRequests": [
+    {
+      "request_id": "8b1f09fd-1665-47d9-9298-1ce8beb84fc4",
+      "payload": "post:{\"documentId\":\"a86ce844-d2ef-47f9-bf0b-b39fdcbbb650\",\"expectedRevision\":2,\"requestId\":\"8b1f09fd-1665-47d9-9298-1ce8beb84fc4\"}",
+      "result_document_id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+      "created_at": "2026-09-14T05:27:32.179Z"
+    },
+    {
+      "request_id": "3b3ff003-f56b-480e-bb7b-7a5232b28947",
+      "payload": "post:{\"documentId\":\"e95cc0f4-10b5-4f0a-bc33-151bca5b9239\",\"expectedRevision\":2,\"requestId\":\"3b3ff003-f56b-480e-bb7b-7a5232b28947\"}",
+      "result_document_id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+      "created_at": "2026-09-14T05:27:52.242Z"
+    },
+    {
+      "request_id": "18de9a2e-75d6-421d-aeec-3b023e34c822",
+      "payload": "post:{\"documentId\":\"7dbbf2dd-8216-41a5-9752-f388baaec171\",\"expectedRevision\":2,\"requestId\":\"18de9a2e-75d6-421d-aeec-3b023e34c822\"}",
+      "result_document_id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+      "created_at": "2026-09-14T05:28:07.546Z"
+    }
+  ]
+}

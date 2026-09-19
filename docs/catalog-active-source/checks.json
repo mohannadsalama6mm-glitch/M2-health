@@ -1,0 +1,18 @@
+{
+  "npmLint": "PASS",
+  "npmBuild": "PASS",
+  "npmTest": { "passed": 72, "failed": 0 },
+  "cargoFmtCheck": "PASS",
+  "cargoCheck": "PASS",
+  "cargoTest": { "passed": 229, "failed": 0 },
+  "nativeApplyCount": 1,
+  "nativeCatalogUi": "PASS",
+  "nativeRestart": "PASS",
+  "idempotency": { "alreadyImported": 25012, "newInserts": 0, "priceUpdates": 0 },
+  "sqliteIntegrity": "ok",
+  "foreignKeyViolations": 0,
+  "inventoryMovementsCreated": 0,
+  "mainStock": 8,
+  "devStock": 2,
+  "status": "COMPLETE"
+}

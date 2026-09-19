@@ -1,3 +1,4 @@
+import { InventoryWorkspace } from "../features/inventory/InventoryWorkspace";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { Dashboard } from "../features/dashboard/Dashboard";
 import { DesignSystem } from "../features/design-system/DesignSystem";
@@ -7,8 +8,10 @@ import { ProductDetails } from "../features/catalog/ProductDetails";
 import { ProductForm } from "../features/catalog/ProductForm";
 import { Sales, SaleDetails } from "../features/sales/Sales";
 import { Inventory, StockMovements } from "../features/inventory/Inventory";
+import { InventoryDocuments } from "../features/inventory/Documents";
+import { CountSessions } from "../features/inventory/CountSessions";
 import { StockCounts } from "../features/inventory/StockCounts";
-import { Expiry } from "../features/inventory/Expiry";
+import { InventoryAlerts } from "../features/inventory/InventoryAlerts";
 import {
   Purchases,
   PurchaseDetails,
@@ -29,6 +32,7 @@ import { Backup, Sync } from "../features/system/BackupSync";
 import { Settings } from "../features/system/Settings";
 import { EmptyState, LinkButton } from "../design-system";
 import { useDemo } from "./DemoContext";
+import { RecoveryBoundary } from "./RecoveryBoundary";
 function DashboardRoute() {
   const navigate = useNavigate();
   const { notify } = useDemo();
@@ -57,7 +61,7 @@ function DashboardRoute() {
 export function AppRoutes() {
   const { notify } = useDemo();
   return (
-    <Routes>
+    <RecoveryBoundary><Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<DashboardRoute />} />
       <Route path="/sales" element={<Sales />} />
@@ -67,10 +71,14 @@ export function AppRoutes() {
       <Route path="/catalog/new" element={<ProductForm key="new" />} />
       <Route path="/catalog/:id" element={<ProductDetails />} />
       <Route path="/catalog/:id/edit" element={<ProductForm />} />
-      <Route path="/inventory" element={<Inventory />} />
+      <Route path="/inventory" element={<Inventory />} /><Route path="/inventory/batches" element={<InventoryWorkspace mode="batches" />} /><Route path="/inventory/opening" element={<InventoryWorkspace mode="opening" />} /><Route path="/inventory/levels" element={<InventoryWorkspace mode="levels" />} />
+      <Route path="/inventory/documents" element={<InventoryDocuments />} />
+      <Route path="/inventory/documents/:id" element={<InventoryDocuments />} />
+      <Route path="/inventory/count-sessions" element={<CountSessions />} />
+      <Route path="/inventory/count-sessions/:id" element={<CountSessions />} />
       <Route path="/inventory/movements" element={<StockMovements />} />
       <Route path="/inventory/counts" element={<StockCounts />} />
-      <Route path="/inventory/expiry" element={<Expiry />} />
+      <Route path="/inventory/expiry" element={<InventoryAlerts mode="expiry" />} /><Route path="/inventory/alerts" element={<InventoryAlerts mode="alerts" />} /><Route path="/inventory/low-stock" element={<InventoryAlerts mode="low-stock" />} /><Route path="/inventory/fefo" element={<InventoryAlerts mode="fefo" />} />
       <Route path="/purchases" element={<Purchases />} />
       <Route path="/purchases/new" element={<PurchaseForm />} />
       <Route path="/purchases/:id" element={<PurchaseDetails />} />
@@ -113,6 +121,8 @@ export function AppRoutes() {
           />
         }
       />
-    </Routes>
+    </Routes></RecoveryBoundary>
   );
 }
+
+

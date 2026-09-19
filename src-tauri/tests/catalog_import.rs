@@ -38,6 +38,90 @@ fn count(db: &AppDb, table: &str) -> i64 {
         .query_row(&format!("SELECT count(*) FROM {table}"), [], |r| r.get(0))
         .unwrap()
 }
+fn versioned(d: &Path, trim_headers: bool) {
+    let bytes = fs::read(d.join("source.csv")).unwrap();
+    fs::write(
+        d.join("config/catalog-source.json"),
+        serde_json::to_vec(&serde_json::json!({
+            "id": "egyptian-drugs", "path": "source.csv", "format": "csv",
+            "encoding": "utf-8-sig", "delimiter": ",", "current_version": "v2",
+            "versions": [{"version": "v2", "sha256": source::hash(&bytes),
+                "size_bytes": bytes.len(), "data_rows": 1, "apply_allowed": false,
+                "trim_headers": trim_headers}]
+        }))
+        .unwrap(),
+    )
+    .unwrap();
+}
+#[test]
+fn versioned_source_verifies_bytes_and_preserves_raw_fields() {
+    let d = fixture(&[row(" One ", "1.00")]);
+    let original = fs::read_to_string(d.path().join("source.csv")).unwrap();
+    let (header, rest) = original.split_once('\n').unwrap();
+    let padded = header
+        .split(',')
+        .map(|h| format!(" {h} "))
+        .collect::<Vec<_>>()
+        .join(",");
+    fs::write(d.path().join("source.csv"), format!("{padded}\n{rest}")).unwrap();
+    versioned(d.path(), true);
+    let (profile, fields) = source::read(d.path()).unwrap();
+    assert_eq!(profile.source_version.as_deref(), Some("v2"));
+    assert!(!profile.apply_allowed);
+    assert_eq!(fields[0][0], " One ");
+    versioned(d.path(), false);
+    assert!(source::read(d.path()).is_err());
+    versioned(d.path(), true);
+    fs::write(d.path().join("source.csv"), format!("{padded}\n{rest}\n")).unwrap();
+    assert!(source::read(d.path()).is_err());
+}
+#[test]
+fn versioned_apply_rejects_even_a_forged_profile_before_any_writes() {
+    let d = fixture(&[row("One", "1")]);
+    versioned(d.path(), false);
+    let db = AppDb::in_memory().unwrap();
+    let before = planner::snapshot(&db.lock().unwrap()).unwrap();
+    let mut plan = planner::build(&db, d.path(), d.path()).unwrap();
+    plan.report.profile.as_mut().unwrap().apply_allowed = true;
+    assert!(importer::apply(&db, d.path(), d.path(), plan, |_| {}).is_err());
+    assert_eq!(before, planner::snapshot(&db.lock().unwrap()).unwrap());
+    assert_eq!(count(&db, "catalog_import_runs"), 0);
+    assert!(!d.path().join("backups").exists());
+}
+#[test]
+fn historical_profile_deserializes_without_changing_provenance() {
+    let d = fixture(&[row("One", "1")]);
+    let (profile, _) = source::read(d.path()).unwrap();
+    let mut legacy = serde_json::to_value(&profile).unwrap();
+    for key in ["sourceVersion", "applyAllowed", "malformedRows"] {
+        legacy.as_object_mut().unwrap().remove(key);
+    }
+    let restored: m2_health_lib::catalog_import::Profile = serde_json::from_value(legacy).unwrap();
+    assert!(restored.source_version.is_none());
+    assert_eq!(restored.hash, profile.hash);
+    assert_eq!(restored.path, profile.path);
+}
+#[test]
+fn approved_repository_v2_profiles_and_skips_unsafe_rows_without_writing() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let (profile, rows) = source::read(root).unwrap();
+    // Independently calculated by the full-file Python review, including malformed records.
+    assert_eq!(
+        source::hash(serde_json::to_string(&rows).unwrap().as_bytes()),
+        "e984db1bae206527dabdaced9bc92bc94fe91534226b23b84079f219e68f40da"
+    );
+    assert_eq!(profile.source_version.as_deref(), Some("v2"));
+    assert_eq!(profile.total_rows, 25088);
+    assert_eq!(profile.malformed_rows.len(), 26);
+    assert!(profile.apply_allowed);
+    let db = AppDb::in_memory().unwrap();
+    let out = tempfile::tempdir().unwrap();
+    let plan = planner::build(&db, root, out.path()).unwrap();
+    assert_eq!(plan.report.counts["skipped_malformed"], 26);
+    assert_eq!(plan.report.rows.len(), 25088);
+    assert_eq!(count(&db, "catalog_import_runs"), 0);
+    assert_eq!(count(&db, "products"), 0);
+}
 #[test]
 fn canonical_resolution_and_utf8_multiline_profile() {
     let mut r = row("Test", "22.50");

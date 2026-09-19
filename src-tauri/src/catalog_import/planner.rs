@@ -52,6 +52,12 @@ pub fn name_key(fields: &[String]) -> String {
 pub fn build(db: &AppDb, root: &Path, reports: &Path) -> Result<Plan, AppError> {
     let start = Instant::now();
     let (profile, fields) = source::read(root)?;
+    if profile.import_policy.as_deref() == Some(active::POLICY) {
+        return active::build(db, profile, fields, reports);
+    }
+    if !profile.malformed_rows.is_empty() {
+        return Err(invalid("The adopted source contains records without seven columns. Use the versioned review report; insert planning is blocked until the CSV parsing issues are resolved."));
+    }
     let c = db.lock()?;
     // One read transaction gives a consistent plan even with another process writing.
     c.execute_batch("BEGIN DEFERRED")?;
@@ -159,6 +165,8 @@ fn build_on(
             *counts.entry(w.clone()).or_default() += 1;
         }
         rows.push(Row {
+            product_id: None,
+            package_id: None,
             number: i + 1,
             fields: f,
             fingerprint,

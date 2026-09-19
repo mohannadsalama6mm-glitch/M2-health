@@ -1,0 +1,28 @@
+{
+  "npmLint": "PASS",
+  "npmBuild": "PASS",
+  "npmTest": { "passed": 40, "failed": 0 },
+  "cargoFmtCheck": "PASS",
+  "cargoCheck": "PASS",
+  "cargoTest": {
+    "passed": 135,
+    "failed": 0,
+    "ignored": 0,
+    "suites": {
+      "catalog": 22,
+      "catalog_import": 12,
+      "foundation": 12,
+      "inventory": 20,
+      "inventory_core": 26,
+      "partners": 11,
+      "purchases": 14,
+      "recovery": 2,
+      "sales": 16
+    }
+  },
+  "limits": [
+    "Later-phase contracts run against isolated prototype schemas or browser IPC doubles and do not enable those features.",
+    "The altered CSV was intentionally left unchanged; passing fixture-based import tests does not resolve that source blocker.",
+    "Frontend production build retains a non-fatal bundle-size warning."
+  ]
+}

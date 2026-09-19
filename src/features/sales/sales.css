@@ -151,3 +151,15 @@
 .checkout-total .receipt-total {
   line-height: 1.1;
 }
+.canonical-pos {
+  height: calc(100dvh - 340px);
+  min-height: 360px;
+  align-items: stretch;
+}
+.canonical-pos > * { min-width: 0; min-height: 0; }
+.canonical-pos > :first-child { overflow: auto; }
+.canonical-pos > :last-child { display: flex; flex-direction: column; gap: var(--space-2); }
+.canonical-pos > :last-child > fieldset { flex: 1; min-height: 0; min-width: 0; overflow: auto; border: 0; padding: 0; margin: 0; }
+.canonical-pos > :last-child > :not(fieldset) { flex-shrink: 0; }
+.canonical-pos input[type="number"] { min-width: 65px; }
+.canonical-pos [aria-label="Validated totals"] p { margin-block: var(--space-1); }

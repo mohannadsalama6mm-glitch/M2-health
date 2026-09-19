@@ -1,0 +1,1289 @@
+{
+  "errors": [],
+  "documents": [
+    {
+      "draft": {
+        "id": "36903bbe-f52c-450a-b226-4038278fe3b0",
+        "documentNumber": "WOF-20260915-0001",
+        "kind": "WRITE_OFF",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D EXPIRY",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.174Z",
+        "updatedAt": "2026-09-15T07:57:16.174Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "c9d84696-a5cb-42a7-acea-e475fdf18cd9",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+            "action": "EXPIRY",
+            "quantity": 1,
+            "reason": "DEV Phase3D EXPIRY",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "c9d84696-a5cb-42a7-acea-e475fdf18cd9",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": "2026-09-14"
+          }
+        ]
+      },
+      "request": {
+        "documentId": "36903bbe-f52c-450a-b226-4038278fe3b0",
+        "expectedRevision": 2,
+        "requestId": "6f1c25ce-b693-46ca-a9c8-a2d01c361e0a"
+      },
+      "posted": {
+        "id": "36903bbe-f52c-450a-b226-4038278fe3b0",
+        "documentNumber": "WOF-20260915-0001",
+        "kind": "WRITE_OFF",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D EXPIRY",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.174Z",
+        "updatedAt": "2026-09-15T07:57:16.230Z",
+        "postedAt": "2026-09-15T07:57:16.230Z",
+        "lines": [
+          {
+            "id": "c9d84696-a5cb-42a7-acea-e475fdf18cd9",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+            "action": "EXPIRY",
+            "quantity": 1,
+            "reason": "DEV Phase3D EXPIRY",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "3fb6e5ab-f8aa-4ac2-972b-30ae78644ad4",
+            "lineId": "c9d84696-a5cb-42a7-acea-e475fdf18cd9",
+            "reversesMovementId": null,
+            "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+            "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "EXPIRY",
+            "quantityDelta": -1
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "c9d84696-a5cb-42a7-acea-e475fdf18cd9",
+            "currentStock": 0,
+            "projectedStock": -1,
+            "expiryDate": "2026-09-14"
+          }
+        ]
+      }
+    },
+    {
+      "draft": {
+        "id": "84bd8481-e3a1-4a7e-a3ce-cd1a8b488386",
+        "documentNumber": "ADJ-20260915-0001",
+        "kind": "ADJUSTMENT",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D OUT",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.266Z",
+        "updatedAt": "2026-09-15T07:57:16.266Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "a1e7d6fb-1985-4f34-a61c-242aaabc29be",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          },
+          {
+            "id": "0406a9fc-bdac-4b6f-93b9-3fd061c51c59",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "1fe781f6-57a2-4f4f-813c-a1ed871c9b0d",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          },
+          {
+            "id": "446c0896-5761-4cde-8675-308d26f06b39",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ae83bf16-c388-42ce-99aa-84a0461077e8",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "a1e7d6fb-1985-4f34-a61c-242aaabc29be",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": "2026-09-25"
+          },
+          {
+            "lineId": "0406a9fc-bdac-4b6f-93b9-3fd061c51c59",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": "2027-01-13"
+          },
+          {
+            "lineId": "446c0896-5761-4cde-8675-308d26f06b39",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": null
+          }
+        ]
+      },
+      "request": {
+        "documentId": "84bd8481-e3a1-4a7e-a3ce-cd1a8b488386",
+        "expectedRevision": 2,
+        "requestId": "b2f520f0-c502-4d46-8176-78b53311ee6c"
+      },
+      "posted": {
+        "id": "84bd8481-e3a1-4a7e-a3ce-cd1a8b488386",
+        "documentNumber": "ADJ-20260915-0001",
+        "kind": "ADJUSTMENT",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D OUT",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.266Z",
+        "updatedAt": "2026-09-15T07:57:16.291Z",
+        "postedAt": "2026-09-15T07:57:16.291Z",
+        "lines": [
+          {
+            "id": "a1e7d6fb-1985-4f34-a61c-242aaabc29be",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          },
+          {
+            "id": "0406a9fc-bdac-4b6f-93b9-3fd061c51c59",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "1fe781f6-57a2-4f4f-813c-a1ed871c9b0d",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          },
+          {
+            "id": "446c0896-5761-4cde-8675-308d26f06b39",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ae83bf16-c388-42ce-99aa-84a0461077e8",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase3D OUT",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "fc8972f8-5c6f-4730-a03a-9b29300b18b1",
+            "lineId": "0406a9fc-bdac-4b6f-93b9-3fd061c51c59",
+            "reversesMovementId": null,
+            "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+            "batchId": "1fe781f6-57a2-4f4f-813c-a1ed871c9b0d",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "ADJUSTMENT_OUT",
+            "quantityDelta": -1
+          },
+          {
+            "movementId": "a2d7c28e-2599-434d-8106-0d3db0e4975f",
+            "lineId": "446c0896-5761-4cde-8675-308d26f06b39",
+            "reversesMovementId": null,
+            "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+            "batchId": "ae83bf16-c388-42ce-99aa-84a0461077e8",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "ADJUSTMENT_OUT",
+            "quantityDelta": -1
+          },
+          {
+            "movementId": "cd48cb61-16d4-4ec7-afd6-32f0799ad3c9",
+            "lineId": "a1e7d6fb-1985-4f34-a61c-242aaabc29be",
+            "reversesMovementId": null,
+            "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "ADJUSTMENT_OUT",
+            "quantityDelta": -1
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "a1e7d6fb-1985-4f34-a61c-242aaabc29be",
+            "currentStock": 0,
+            "projectedStock": -1,
+            "expiryDate": "2026-09-25"
+          },
+          {
+            "lineId": "0406a9fc-bdac-4b6f-93b9-3fd061c51c59",
+            "currentStock": 0,
+            "projectedStock": -1,
+            "expiryDate": "2027-01-13"
+          },
+          {
+            "lineId": "446c0896-5761-4cde-8675-308d26f06b39",
+            "currentStock": 0,
+            "projectedStock": -1,
+            "expiryDate": null
+          }
+        ]
+      }
+    },
+    {
+      "draft": {
+        "id": "3aaeaab9-9c06-49e7-a0a1-c6f9e259e8bd",
+        "documentNumber": "ADJ-20260915-0002",
+        "kind": "ADJUSTMENT",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D IN",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.790Z",
+        "updatedAt": "2026-09-15T07:57:16.790Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "7ab0cc6d-9fef-423b-934a-db66824c3ca7",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "action": "IN",
+            "quantity": 5,
+            "reason": "DEV Phase3D IN",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "7ab0cc6d-9fef-423b-934a-db66824c3ca7",
+            "currentStock": 0,
+            "projectedStock": 5,
+            "expiryDate": "2026-09-25"
+          }
+        ]
+      },
+      "request": {
+        "documentId": "3aaeaab9-9c06-49e7-a0a1-c6f9e259e8bd",
+        "expectedRevision": 2,
+        "requestId": "0fcaf357-8a1b-471c-aac3-a4b79319331e"
+      },
+      "posted": {
+        "id": "3aaeaab9-9c06-49e7-a0a1-c6f9e259e8bd",
+        "documentNumber": "ADJ-20260915-0002",
+        "kind": "ADJUSTMENT",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3D IN",
+        "supplierReference": null,
+        "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-15T07:57:16.790Z",
+        "updatedAt": "2026-09-15T07:57:16.806Z",
+        "postedAt": "2026-09-15T07:57:16.806Z",
+        "lines": [
+          {
+            "id": "7ab0cc6d-9fef-423b-934a-db66824c3ca7",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "action": "IN",
+            "quantity": 5,
+            "reason": "DEV Phase3D IN",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "e11c8387-de49-4775-b661-72cfba356cb8",
+            "lineId": "7ab0cc6d-9fef-423b-934a-db66824c3ca7",
+            "reversesMovementId": null,
+            "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+            "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "ADJUSTMENT_IN",
+            "quantityDelta": 5
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "7ab0cc6d-9fef-423b-934a-db66824c3ca7",
+            "currentStock": 5,
+            "projectedStock": 10,
+            "expiryDate": "2026-09-25"
+          }
+        ]
+      }
+    }
+  ],
+  "branch": {
+    "id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "code": "DEV3D",
+    "name": "DEV Phase 3D Alerts",
+    "phone": "",
+    "address": "Controlled development smoke only",
+    "isActive": true,
+    "createdAt": "2026-09-15T07:56:56.082Z",
+    "updatedAt": "2026-09-15T07:56:56.082Z"
+  },
+  "nearRequest": {
+    "requestId": "e2a49582-6f95-4055-9629-c10239c034ba",
+    "batch": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "lotNumber": "DEV-PHASE3D-NEAR",
+      "expiryDate": "2026-09-25",
+      "costPriceMinor": 100
+    },
+    "quantity": 1,
+    "reason": "DEV Phase3D near expiry monitoring",
+    "createdBy": null
+  },
+  "near": {
+    "id": "e2a49582-6f95-4055-9629-c10239c034ba",
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+    "movementType": "OPENING",
+    "quantityDelta": 1,
+    "referenceType": null,
+    "referenceId": null,
+    "reason": "DEV Phase3D near expiry monitoring",
+    "createdBy": null,
+    "transferId": null,
+    "createdAt": "2026-09-15T07:56:56.102Z"
+  },
+  "expiredRequest": {
+    "requestId": "d5f6902d-25c7-4286-948d-3c6684a3f79d",
+    "batch": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "lotNumber": "DEV-PHASE3D-EXPIRED",
+      "expiryDate": "2026-09-14",
+      "costPriceMinor": 100
+    },
+    "quantity": 1,
+    "reason": "DEV Phase3D expired expiry monitoring",
+    "createdBy": null
+  },
+  "expired": {
+    "id": "d5f6902d-25c7-4286-948d-3c6684a3f79d",
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+    "movementType": "OPENING",
+    "quantityDelta": 1,
+    "referenceType": null,
+    "referenceId": null,
+    "reason": "DEV Phase3D expired expiry monitoring",
+    "createdBy": null,
+    "transferId": null,
+    "createdAt": "2026-09-15T07:56:56.110Z"
+  },
+  "laterRequest": {
+    "requestId": "c9e5cb23-2ebf-4095-af32-347aebc40795",
+    "batch": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "lotNumber": "DEV-PHASE3D-LATER",
+      "expiryDate": "2027-01-13",
+      "costPriceMinor": 100
+    },
+    "quantity": 1,
+    "reason": "DEV Phase3D later expiry monitoring",
+    "createdBy": null
+  },
+  "later": {
+    "id": "c9e5cb23-2ebf-4095-af32-347aebc40795",
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": "1fe781f6-57a2-4f4f-813c-a1ed871c9b0d",
+    "movementType": "OPENING",
+    "quantityDelta": 1,
+    "referenceType": null,
+    "referenceId": null,
+    "reason": "DEV Phase3D later expiry monitoring",
+    "createdBy": null,
+    "transferId": null,
+    "createdAt": "2026-09-15T07:56:56.133Z"
+  },
+  "unknownRequest": {
+    "requestId": "060a69bf-0109-41b9-b25a-5d6a53d60ca8",
+    "batch": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "lotNumber": "DEV-PHASE3D-UNKNOWN",
+      "expiryDate": null,
+      "costPriceMinor": 100
+    },
+    "quantity": 1,
+    "reason": "DEV Phase3D unknown expiry monitoring",
+    "createdBy": null
+  },
+  "unknown": {
+    "id": "060a69bf-0109-41b9-b25a-5d6a53d60ca8",
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "batchId": "ae83bf16-c388-42ce-99aa-84a0461077e8",
+    "movementType": "OPENING",
+    "quantityDelta": 1,
+    "referenceType": null,
+    "referenceId": null,
+    "reason": "DEV Phase3D unknown expiry monitoring",
+    "createdBy": null,
+    "transferId": null,
+    "createdAt": "2026-09-15T07:56:56.144Z"
+  },
+  "beforeLevel": {
+    "items": [
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.153Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.153Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.153Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.153Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 2,
+    "businessDate": "2026-09-15"
+  },
+  "level": {
+    "id": "595e6e9a-6a47-472a-a059-ea09a1424d99",
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "reorderLevel": 4,
+    "minimumStock": 0,
+    "maximumStock": 10,
+    "createdAt": "2026-09-15T07:56:56.173Z",
+    "updatedAt": "2026-09-15T07:56:56.173Z"
+  },
+  "initial": {
+    "items": [
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.845Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.845Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "LOW_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "MEDIUM",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 4,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.845Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.845Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.845Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.845Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 3,
+    "businessDate": "2026-09-15"
+  },
+  "settings": {
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "expiryWarningDays": 75,
+    "criticalExpiryDays": 20,
+    "expiryEnabled": true,
+    "lowStockEnabled": false
+  },
+  "repeated": {
+    "items": [
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.987Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.987Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "LOW_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "MEDIUM",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 4,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.987Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.987Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:56.987Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:56:56.987Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 3,
+    "businessDate": "2026-09-15"
+  },
+  "fefo": [
+    {
+      "batch": {
+        "id": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "lotNumber": "DEV-PHASE3D-NEAR",
+        "expiryDate": "2026-09-25",
+        "receivedAt": null,
+        "costPriceMinor": 100,
+        "supplierReference": null,
+        "isActive": true,
+        "createdAt": "2026-09-15T07:56:56.102Z",
+        "updatedAt": "2026-09-15T07:56:56.102Z"
+      },
+      "quantity": 1
+    },
+    {
+      "batch": {
+        "id": "1fe781f6-57a2-4f4f-813c-a1ed871c9b0d",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "lotNumber": "DEV-PHASE3D-LATER",
+        "expiryDate": "2027-01-13",
+        "receivedAt": null,
+        "costPriceMinor": 100,
+        "supplierReference": null,
+        "isActive": true,
+        "createdAt": "2026-09-15T07:56:56.133Z",
+        "updatedAt": "2026-09-15T07:56:56.133Z"
+      },
+      "quantity": 1
+    },
+    {
+      "batch": {
+        "id": "ae83bf16-c388-42ce-99aa-84a0461077e8",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "lotNumber": "DEV-PHASE3D-UNKNOWN",
+        "expiryDate": null,
+        "receivedAt": null,
+        "costPriceMinor": 100,
+        "supplierReference": null,
+        "isActive": true,
+        "createdAt": "2026-09-15T07:56:56.144Z",
+        "updatedAt": "2026-09-15T07:56:56.144Z"
+      },
+      "quantity": 1
+    }
+  ],
+  "mainFefo": [
+    {
+      "batch": {
+        "id": "5f5c70bd-40c9-461f-9345-326bc1feeda3",
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "lotNumber": "PHASE3A-DEV-SMOKE-20260913",
+        "expiryDate": null,
+        "receivedAt": null,
+        "costPriceMinor": null,
+        "supplierReference": "Controlled Phase 3A development verification only",
+        "isActive": true,
+        "createdAt": "2026-09-13T07:53:06.676Z",
+        "updatedAt": "2026-09-13T07:53:06.676Z"
+      },
+      "quantity": 8
+    }
+  ],
+  "seedStock": 4,
+  "seedPassed": true,
+  "afterExpiry": {
+    "items": [
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:57:16.243Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "LOW_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "MEDIUM",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 3,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:57:16.243Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:58.594Z",
+        "resolvedAt": "2026-09-15T07:57:16.243Z",
+        "updatedAt": "2026-09-15T07:57:16.243Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 3,
+    "businessDate": "2026-09-15"
+  },
+  "atZero": {
+    "items": [
+      {
+        "id": "03954331-740e-42b3-be85-37d38579e2b9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "OUT_OF_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "CRITICAL",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:OUT_OF_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 0,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:57:16.300Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.300Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:57:16.300Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "resolvedAt": "2026-09-15T07:57:16.300Z",
+        "updatedAt": "2026-09-15T07:57:16.300Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "LOW_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "MEDIUM",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 3,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "resolvedAt": "2026-09-15T07:57:16.300Z",
+        "updatedAt": "2026-09-15T07:57:16.300Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:58.594Z",
+        "resolvedAt": "2026-09-15T07:57:16.243Z",
+        "updatedAt": "2026-09-15T07:57:16.243Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 4,
+    "businessDate": "2026-09-15"
+  },
+  "zeroFefo": [],
+  "zeroExpired": {
+    "items": [],
+    "total": 0,
+    "businessDate": "2026-09-15"
+  },
+  "final": {
+    "items": [
+      {
+        "id": "03954331-740e-42b3-be85-37d38579e2b9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "OUT_OF_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:OUT_OF_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 0,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:57:16.300Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.759Z",
+        "resolvedAt": "2026-09-15T07:57:16.814Z",
+        "updatedAt": "2026-09-15T07:57:16.814Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRING",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 5
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.814Z",
+        "resolvedAt": null,
+        "updatedAt": "2026-09-15T07:57:16.814Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "LOW_STOCK",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": null,
+        "severity": "MEDIUM",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "details": {
+          "quantity": 3,
+          "reorderLevel": 4
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "resolvedAt": "2026-09-15T07:57:16.300Z",
+        "updatedAt": "2026-09-15T07:57:16.300Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      },
+      {
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "alertType": "BATCH_EXPIRED",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "lastDetectedAt": "2026-09-15T07:56:58.594Z",
+        "resolvedAt": "2026-09-15T07:57:16.243Z",
+        "updatedAt": "2026-09-15T07:57:16.243Z",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "packageLabel": "Default Package"
+      }
+    ],
+    "total": 4,
+    "businessDate": "2026-09-15"
+  },
+  "histories": [
+    {
+      "alert": {
+        "alertType": "OUT_OF_STOCK",
+        "batchId": null,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "details": {
+          "quantity": 0,
+          "reorderLevel": 4
+        },
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:OUT_OF_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "firstDetectedAt": "2026-09-15T07:57:16.300Z",
+        "id": "03954331-740e-42b3-be85-37d38579e2b9",
+        "lastDetectedAt": "2026-09-15T07:57:16.759Z",
+        "packageLabel": "Default Package",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "resolvedAt": "2026-09-15T07:57:16.814Z",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "updatedAt": "2026-09-15T07:57:16.814Z"
+      },
+      "history": [
+        {
+          "details": {
+            "quantity": 0,
+            "reorderLevel": 4
+          },
+          "occurredAt": "2026-09-15T07:57:16.300Z",
+          "severity": "CRITICAL",
+          "status": "ACTIVE"
+        },
+        {
+          "details": {
+            "quantity": 0,
+            "reorderLevel": 4
+          },
+          "occurredAt": "2026-09-15T07:57:16.814Z",
+          "severity": "CRITICAL",
+          "status": "RESOLVED"
+        }
+      ]
+    },
+    {
+      "alert": {
+        "alertType": "BATCH_EXPIRING",
+        "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": 10,
+          "expiryDate": "2026-09-25",
+          "quantity": 5
+        },
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2",
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+        "lastDetectedAt": "2026-09-15T07:57:16.814Z",
+        "packageLabel": "Default Package",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "resolvedAt": null,
+        "severity": "HIGH",
+        "status": "ACTIVE",
+        "updatedAt": "2026-09-15T07:57:16.814Z"
+      },
+      "history": [
+        {
+          "details": {
+            "businessDate": "2026-09-15",
+            "daysRemaining": 10,
+            "expiryDate": "2026-09-25",
+            "quantity": 1
+          },
+          "occurredAt": "2026-09-15T07:56:56.153Z",
+          "severity": "HIGH",
+          "status": "ACTIVE"
+        },
+        {
+          "details": {
+            "businessDate": "2026-09-15",
+            "daysRemaining": 10,
+            "expiryDate": "2026-09-25",
+            "quantity": 1
+          },
+          "occurredAt": "2026-09-15T07:57:16.300Z",
+          "severity": "HIGH",
+          "status": "RESOLVED"
+        },
+        {
+          "details": {
+            "businessDate": "2026-09-15",
+            "daysRemaining": 10,
+            "expiryDate": "2026-09-25",
+            "quantity": 5
+          },
+          "occurredAt": "2026-09-15T07:57:16.814Z",
+          "severity": "HIGH",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "alert": {
+        "alertType": "LOW_STOCK",
+        "batchId": null,
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "details": {
+          "quantity": 3,
+          "reorderLevel": 4
+        },
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "firstDetectedAt": "2026-09-15T07:56:56.603Z",
+        "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+        "lastDetectedAt": "2026-09-15T07:57:16.243Z",
+        "packageLabel": "Default Package",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "resolvedAt": "2026-09-15T07:57:16.300Z",
+        "severity": "MEDIUM",
+        "status": "RESOLVED",
+        "updatedAt": "2026-09-15T07:57:16.300Z"
+      },
+      "history": [
+        {
+          "details": {
+            "quantity": 4,
+            "reorderLevel": 4
+          },
+          "occurredAt": "2026-09-15T07:56:56.603Z",
+          "severity": "MEDIUM",
+          "status": "ACTIVE"
+        },
+        {
+          "details": {
+            "quantity": 3,
+            "reorderLevel": 4
+          },
+          "occurredAt": "2026-09-15T07:57:16.243Z",
+          "severity": "MEDIUM",
+          "status": "ACTIVE"
+        },
+        {
+          "details": {
+            "quantity": 3,
+            "reorderLevel": 4
+          },
+          "occurredAt": "2026-09-15T07:57:16.300Z",
+          "severity": "MEDIUM",
+          "status": "RESOLVED"
+        }
+      ]
+    },
+    {
+      "alert": {
+        "alertType": "BATCH_EXPIRED",
+        "batchId": "b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+        "details": {
+          "businessDate": "2026-09-15",
+          "daysRemaining": -1,
+          "expiryDate": "2026-09-14",
+          "quantity": 1
+        },
+        "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d",
+        "firstDetectedAt": "2026-09-15T07:56:56.153Z",
+        "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+        "lastDetectedAt": "2026-09-15T07:56:58.594Z",
+        "packageLabel": "Default Package",
+        "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "resolvedAt": "2026-09-15T07:57:16.243Z",
+        "severity": "CRITICAL",
+        "status": "RESOLVED",
+        "updatedAt": "2026-09-15T07:57:16.243Z"
+      },
+      "history": [
+        {
+          "details": {
+            "businessDate": "2026-09-15",
+            "daysRemaining": -1,
+            "expiryDate": "2026-09-14",
+            "quantity": 1
+          },
+          "occurredAt": "2026-09-15T07:56:56.153Z",
+          "severity": "CRITICAL",
+          "status": "ACTIVE"
+        },
+        {
+          "details": {
+            "businessDate": "2026-09-15",
+            "daysRemaining": -1,
+            "expiryDate": "2026-09-14",
+            "quantity": 1
+          },
+          "occurredAt": "2026-09-15T07:57:16.243Z",
+          "severity": "CRITICAL",
+          "status": "RESOLVED"
+        }
+      ]
+    }
+  ],
+  "mainSettings": {
+    "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+    "expiryWarningDays": 90,
+    "criticalExpiryDays": 30,
+    "expiryEnabled": true,
+    "lowStockEnabled": true
+  },
+  "finalStock": 5,
+  "resolvePassed": true,
+  "restart": {
+    "settingsPersist": true,
+    "idsAndStatusesPersist": true,
+    "historyPersist": true,
+    "noDuplicates": true,
+    "stock": 5,
+    "mainStock": 8,
+    "oldDevStock": 2,
+    "catalogVisible": true
+  }
+}

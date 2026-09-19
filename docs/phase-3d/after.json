@@ -1,0 +1,280 @@
+{
+  "integrity": "ok",
+  "foreignKeyErrors": [],
+  "versions": [
+    [
+      1,
+      "branches",
+      "2026-09-12T09:31:52.890Z"
+    ],
+    [
+      2,
+      "catalog_core",
+      "2026-09-12T10:06:57.913Z"
+    ],
+    [
+      3,
+      "catalog_import",
+      "2026-09-12T20:32:32.305Z"
+    ],
+    [
+      4,
+      "inventory_core",
+      "2026-09-13T07:52:18.434Z"
+    ],
+    [
+      5,
+      "inventory_workflows",
+      "2026-09-14T05:23:54.485Z"
+    ],
+    [
+      6,
+      "stock_counts",
+      "2026-09-14T06:14:46.861Z"
+    ],
+    [
+      7,
+      "catalog_source_actions",
+      "2026-09-14T12:53:21.286Z"
+    ],
+    [
+      8,
+      "inventory_alerts",
+      "2026-09-15T07:55:33.281Z"
+    ]
+  ],
+  "priorRowsPreserved": {
+    "_schema_version": true,
+    "branches": true,
+    "manufacturers": true,
+    "categories": true,
+    "routes": true,
+    "active_ingredients": true,
+    "products": true,
+    "product_active_ingredients": true,
+    "product_packages": true,
+    "barcodes": true,
+    "product_price_history": true,
+    "catalog_import_runs": true,
+    "catalog_import_rows": true,
+    "inventory_batches": true,
+    "inventory_transfers": true,
+    "inventory_movements": true,
+    "inventory_levels": true,
+    "inventory_documents": true,
+    "inventory_document_lines": true,
+    "inventory_document_movements": true,
+    "inventory_post_requests": true,
+    "stock_count_sequences": true,
+    "stock_count_sessions": true,
+    "stock_count_lines": true,
+    "stock_count_results": true,
+    "stock_count_completion_requests": true,
+    "catalog_source_runs": true,
+    "catalog_source_rows": true
+  },
+  "unchangedTables": {
+    "_schema_version": false,
+    "branches": false,
+    "manufacturers": true,
+    "categories": true,
+    "routes": true,
+    "active_ingredients": true,
+    "products": true,
+    "product_active_ingredients": true,
+    "product_packages": true,
+    "barcodes": true,
+    "product_price_history": true,
+    "catalog_import_runs": true,
+    "catalog_import_rows": true,
+    "inventory_batches": false,
+    "inventory_transfers": true,
+    "inventory_movements": false,
+    "inventory_levels": false,
+    "inventory_document_sequences": false,
+    "inventory_documents": false,
+    "inventory_document_lines": false,
+    "inventory_document_movements": false,
+    "inventory_post_requests": false,
+    "stock_count_sequences": true,
+    "stock_count_sessions": true,
+    "stock_count_lines": true,
+    "stock_count_results": true,
+    "stock_count_completion_requests": true,
+    "catalog_source_runs": true,
+    "catalog_source_rows": true
+  },
+  "documentCountersAdvanceOnlyForSmoke": true,
+  "sourceHash": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+  "configHash": "c84361272efc3890978b5802cec5766ac3ae0a3110c7d6bd88affabf3c6a9c87",
+  "csvAndConfigUnchanged": true,
+  "countsBefore": {
+    "_schema_version": 7,
+    "branches": 2,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "products": 25062,
+    "product_active_ingredients": 1,
+    "product_packages": 25062,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 2,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 3,
+    "inventory_transfers": 1,
+    "inventory_movements": 7,
+    "inventory_levels": 0,
+    "inventory_document_sequences": 3,
+    "inventory_documents": 3,
+    "inventory_document_lines": 3,
+    "inventory_document_movements": 4,
+    "inventory_post_requests": 3,
+    "stock_count_sequences": 1,
+    "stock_count_sessions": 1,
+    "stock_count_lines": 1,
+    "stock_count_results": 1,
+    "stock_count_completion_requests": 1,
+    "catalog_source_runs": 1,
+    "catalog_source_rows": 25088
+  },
+  "countsAfter": {
+    "_schema_version": 8,
+    "branches": 3,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "products": 25062,
+    "product_active_ingredients": 1,
+    "product_packages": 25062,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 2,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 7,
+    "inventory_transfers": 1,
+    "inventory_movements": 16,
+    "inventory_levels": 1,
+    "inventory_document_sequences": 5,
+    "inventory_documents": 6,
+    "inventory_document_lines": 8,
+    "inventory_document_movements": 9,
+    "inventory_post_requests": 6,
+    "stock_count_sequences": 1,
+    "stock_count_sessions": 1,
+    "stock_count_lines": 1,
+    "stock_count_results": 1,
+    "stock_count_completion_requests": 1,
+    "catalog_source_runs": 1,
+    "catalog_source_rows": 25088,
+    "inventory_alert_settings": 3,
+    "inventory_alerts": 4,
+    "inventory_alert_history": 10
+  },
+  "stockByPackage": [
+    {
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 5
+    },
+    {
+      "branch_id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 2
+    },
+    {
+      "branch_id": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+      "product_package_id": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+      "quantity": 8
+    }
+  ],
+  "alerts": [
+    {
+      "id": "03954331-740e-42b3-be85-37d38579e2b9",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "alert_type": "OUT_OF_STOCK",
+      "status": "RESOLVED",
+      "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:OUT_OF_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af"
+    },
+    {
+      "id": "42ab5304-496b-4341-a4bd-0322979cf6c3",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "alert_type": "BATCH_EXPIRING",
+      "status": "ACTIVE",
+      "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRING:ef006804-7633-463a-a7ba-53ca276ca4c2"
+    },
+    {
+      "id": "534d2ba3-4a70-440d-a12c-26eb86f09e7f",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "alert_type": "LOW_STOCK",
+      "status": "RESOLVED",
+      "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:LOW_STOCK:40bad73e-196c-4a7e-81e7-b6dfb90e64af"
+    },
+    {
+      "id": "99d33de8-cd20-4ca9-b2f9-68294298cbd9",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "alert_type": "BATCH_EXPIRED",
+      "status": "RESOLVED",
+      "fingerprint": "0fc16eaf-cefa-4576-8201-9b03541036f8:BATCH_EXPIRED:b7923113-5df0-4601-8c9e-291bfcafe15d"
+    }
+  ],
+  "newDocuments": [
+    {
+      "id": "36903bbe-f52c-450a-b226-4038278fe3b0",
+      "document_number": "WOF-20260915-0001",
+      "kind": "WRITE_OFF",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "destination_branch_id": null,
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3D EXPIRY",
+      "supplier_reference": null,
+      "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-15T07:57:16.174Z",
+      "updated_at": "2026-09-15T07:57:16.230Z",
+      "posted_at": "2026-09-15T07:57:16.230Z"
+    },
+    {
+      "id": "84bd8481-e3a1-4a7e-a3ce-cd1a8b488386",
+      "document_number": "ADJ-20260915-0001",
+      "kind": "ADJUSTMENT",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "destination_branch_id": null,
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3D OUT",
+      "supplier_reference": null,
+      "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-15T07:57:16.266Z",
+      "updated_at": "2026-09-15T07:57:16.291Z",
+      "posted_at": "2026-09-15T07:57:16.291Z"
+    },
+    {
+      "id": "3aaeaab9-9c06-49e7-a0a1-c6f9e259e8bd",
+      "document_number": "ADJ-20260915-0002",
+      "kind": "ADJUSTMENT",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "destination_branch_id": null,
+      "status": "POSTED",
+      "revision": 3,
+      "reference_text": "DEV PHASE3D IN",
+      "supplier_reference": null,
+      "notes": "Controlled advisory alert smoke. Intentional immutable DEV history.",
+      "created_by": null,
+      "reversal_of": null,
+      "reversal_reason": null,
+      "created_at": "2026-09-15T07:57:16.790Z",
+      "updated_at": "2026-09-15T07:57:16.806Z",
+      "posted_at": "2026-09-15T07:57:16.806Z"
+    }
+  ],
+  "nativeRestartPassed": true
+}

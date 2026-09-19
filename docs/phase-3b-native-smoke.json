@@ -1,0 +1,479 @@
+{
+  "stages": {
+    "receipt": {
+      "draft": {
+        "id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+        "documentNumber": "RCV-20260914-0001",
+        "kind": "RECEIPT",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B RECEIPT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:31.678Z",
+        "updatedAt": "2026-09-14T05:27:31.678Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": null,
+            "action": "RECEIVE",
+            "quantity": 2,
+            "reason": "DEV Phase 3B receipt smoke",
+            "lotNumber": "DEV-PHASE3B-20260914",
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "currentStock": 0,
+            "projectedStock": 2,
+            "expiryDate": null
+          }
+        ]
+      },
+      "draftStock": 8,
+      "ready": {
+        "id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+        "documentNumber": "RCV-20260914-0001",
+        "kind": "RECEIPT",
+        "status": "READY",
+        "revision": 2,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B RECEIPT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:31.678Z",
+        "updatedAt": "2026-09-14T05:27:31.945Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": null,
+            "action": "RECEIVE",
+            "quantity": 2,
+            "reason": "DEV Phase 3B receipt smoke",
+            "lotNumber": "DEV-PHASE3B-20260914",
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "currentStock": 0,
+            "projectedStock": 2,
+            "expiryDate": null
+          }
+        ]
+      },
+      "posted": {
+        "id": "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+        "documentNumber": "RCV-20260914-0001",
+        "kind": "RECEIPT",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B RECEIPT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:31.678Z",
+        "updatedAt": "2026-09-14T05:27:32.179Z",
+        "postedAt": "2026-09-14T05:27:32.179Z",
+        "lines": [
+          {
+            "id": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": null,
+            "action": "RECEIVE",
+            "quantity": 2,
+            "reason": "DEV Phase 3B receipt smoke",
+            "lotNumber": "DEV-PHASE3B-20260914",
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "ccfb9945-a74e-4127-ba39-58dc56681aa5",
+            "lineId": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "reversesMovementId": null,
+            "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "PURCHASE_RECEIPT",
+            "quantityDelta": 2
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "ae274b2e-573d-4ce2-a228-2eba5ea19a23",
+            "currentStock": 0,
+            "projectedStock": 2,
+            "expiryDate": null
+          }
+        ]
+      },
+      "postedStock": 10
+    },
+    "adjustment": {
+      "draft": {
+        "id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+        "documentNumber": "ADJ-20260914-0001",
+        "kind": "ADJUSTMENT",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B ADJUSTMENT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:51.791Z",
+        "updatedAt": "2026-09-14T05:27:51.791Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase 3B adjustment smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "currentStock": 2,
+            "projectedStock": 1,
+            "expiryDate": null
+          }
+        ]
+      },
+      "draftStock": 10,
+      "ready": {
+        "id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+        "documentNumber": "ADJ-20260914-0001",
+        "kind": "ADJUSTMENT",
+        "status": "READY",
+        "revision": 2,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B ADJUSTMENT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:51.791Z",
+        "updatedAt": "2026-09-14T05:27:52.030Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase 3B adjustment smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "currentStock": 2,
+            "projectedStock": 1,
+            "expiryDate": null
+          }
+        ]
+      },
+      "posted": {
+        "id": "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+        "documentNumber": "ADJ-20260914-0001",
+        "kind": "ADJUSTMENT",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": null,
+        "referenceText": "DEV PHASE3B ADJUSTMENT 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:27:51.791Z",
+        "updatedAt": "2026-09-14T05:27:52.242Z",
+        "postedAt": "2026-09-14T05:27:52.242Z",
+        "lines": [
+          {
+            "id": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "OUT",
+            "quantity": 1,
+            "reason": "DEV Phase 3B adjustment smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "ca93723a-f7eb-4695-93b4-b910cd981966",
+            "lineId": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "reversesMovementId": null,
+            "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "ADJUSTMENT_OUT",
+            "quantityDelta": -1
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "802220fd-5cdb-443b-a9ee-0a7c9d02e8b1",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": null
+          }
+        ]
+      },
+      "postedStock": 9
+    },
+    "transfer": {
+      "draft": {
+        "id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+        "documentNumber": "TRF-20260914-0001",
+        "kind": "TRANSFER",
+        "status": "DRAFT",
+        "revision": 1,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": "461dd52b-1136-409b-a019-9f5429b4ed09",
+        "referenceText": "DEV PHASE3B TRANSFER 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:28:07.006Z",
+        "updatedAt": "2026-09-14T05:28:07.006Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "TRANSFER",
+            "quantity": 1,
+            "reason": "DEV Phase 3B transfer smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": null
+          }
+        ]
+      },
+      "draftStock": 9,
+      "ready": {
+        "id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+        "documentNumber": "TRF-20260914-0001",
+        "kind": "TRANSFER",
+        "status": "READY",
+        "revision": 2,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": "461dd52b-1136-409b-a019-9f5429b4ed09",
+        "referenceText": "DEV PHASE3B TRANSFER 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:28:07.006Z",
+        "updatedAt": "2026-09-14T05:28:07.290Z",
+        "postedAt": null,
+        "lines": [
+          {
+            "id": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "TRANSFER",
+            "quantity": 1,
+            "reason": "DEV Phase 3B transfer smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [],
+        "preview": [
+          {
+            "lineId": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "currentStock": 1,
+            "projectedStock": 0,
+            "expiryDate": null
+          }
+        ]
+      },
+      "posted": {
+        "id": "7dbbf2dd-8216-41a5-9752-f388baaec171",
+        "documentNumber": "TRF-20260914-0001",
+        "kind": "TRANSFER",
+        "status": "POSTED",
+        "revision": 3,
+        "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+        "destinationBranchId": "461dd52b-1136-409b-a019-9f5429b4ed09",
+        "referenceText": "DEV PHASE3B TRANSFER 20260914",
+        "supplierReference": null,
+        "notes": "Controlled Phase 3B development smoke; intentional immutable history.",
+        "createdBy": null,
+        "reversalOf": null,
+        "reversalReason": null,
+        "createdAt": "2026-09-14T05:28:07.006Z",
+        "updatedAt": "2026-09-14T05:28:07.546Z",
+        "postedAt": "2026-09-14T05:28:07.546Z",
+        "lines": [
+          {
+            "id": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "action": "TRANSFER",
+            "quantity": 1,
+            "reason": "DEV Phase 3B transfer smoke",
+            "lotNumber": null,
+            "expiryDate": null,
+            "costPriceMinor": null,
+            "supplierReference": null,
+            "productLabel": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+            "packageLabel": "Default Package"
+          }
+        ],
+        "movements": [
+          {
+            "movementId": "6039c60f-6a5e-4e54-a86e-5c5bae54d026",
+            "lineId": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "reversesMovementId": null,
+            "branchId": "f319a917-95d0-47bf-b007-ab76b7c044ae",
+            "batchId": "2b412be3-1a27-429b-9e42-b3e8281264df",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "TRANSFER_OUT",
+            "quantityDelta": -1
+          },
+          {
+            "movementId": "349d0e40-3ba5-4d95-9817-2f99b3735fcb",
+            "lineId": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "reversesMovementId": null,
+            "branchId": "461dd52b-1136-409b-a019-9f5429b4ed09",
+            "batchId": "69729d53-918f-44f0-84bd-d7766e15c4ff",
+            "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+            "movementType": "TRANSFER_IN",
+            "quantityDelta": 1
+          }
+        ],
+        "preview": [
+          {
+            "lineId": "76e2d4d4-9760-4ed8-a1d5-2cb0c566df0b",
+            "currentStock": 0,
+            "projectedStock": -1,
+            "expiryDate": null
+          }
+        ]
+      },
+      "postedStock": 8,
+      "destinationStock": 1
+    }
+  },
+  "errors": [],
+  "initialStock": 8,
+  "capabilities": {
+    "laterWorkflowsEnabled": false,
+    "inventoryWorkflowsEnabled": true
+  },
+  "failure": {
+    "stage": "receipt",
+    "message": "Error: page.evaluate: get_package_stock not allowed. Plugin not found",
+    "url": "http://localhost:1420/inventory/documents",
+    "main": "Workflow availability could not be verified\n\nThe desktop service could not complete this request. Please retry."
+  },
+  "devBranch": {
+    "id": "461dd52b-1136-409b-a019-9f5429b4ed09",
+    "code": "DEV3B",
+    "name": "DEV Phase 3B Transfer Smoke",
+    "phone": "",
+    "address": "Controlled development smoke only",
+    "isActive": true,
+    "createdAt": "2026-09-14T05:28:05.157Z",
+    "updatedAt": "2026-09-14T05:28:05.157Z"
+  },
+  "restart": {
+    "documents": [
+      "a86ce844-d2ef-47f9-bf0b-b39fdcbbb650",
+      "e95cc0f4-10b5-4f0a-bc33-151bca5b9239",
+      "7dbbf2dd-8216-41a5-9752-f388baaec171"
+    ],
+    "mainStock": 8,
+    "destinationStock": 1,
+    "catalogActiveCount": 25061
+  }
+}

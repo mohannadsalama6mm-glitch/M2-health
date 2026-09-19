@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-13T21:17:19.210Z",
+  "runtime": "Tauri WebView2 via local CDP",
+  "dashboardOpened": true,
+  "catalogOpened": true,
+  "catalogActiveResults": 25061,
+  "catalogSearch": {
+    "query": "Panadol",
+    "results": 13
+  },
+  "inventoryOpened": true,
+  "inventoryTable": "Verified inventory balances\nPackage ID\tCurrent stock\n40bad73e-196c-4a7e-81e7-b6dfb90e64af\t8",
+  "consoleErrors": [],
+  "postedTransactions": 0
+}

@@ -1,9 +1,6 @@
 use crate::{
     commands::branches::DatabaseState,
-    db::{
-        models::customers::*,
-        repositories::customers,
-    },
+    db::{models::customers::*, repositories::customers},
     error::AppError,
 };
 use tauri::State;
@@ -25,10 +22,7 @@ pub fn list_customers(
     customers::list(state.db()?, &query)
 }
 #[tauri::command]
-pub fn get_customer(
-    state: State<'_, DatabaseState>,
-    id: String,
-) -> Result<Customer, AppError> {
+pub fn get_customer(state: State<'_, DatabaseState>, id: String) -> Result<Customer, AppError> {
     customers::get_customer(state.db()?, &id)
 }
 #[tauri::command]

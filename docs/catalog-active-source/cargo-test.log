@@ -1,0 +1,322 @@
+   Compiling m2-health v0.3.0 (D:\project\M2 health\src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.16s
+     Running unittests src\lib.rs (target\debug\deps\m2_health_lib-dadb46d3d2edabfa.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\m2_health-6e7c892bf8ea3419.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\catalog.rs (target\debug\deps\catalog-922637c70d5cf064.exe)
+
+running 22 tests
+test conservative_normalization_does_not_merge_arabic_spelling_or_scientific_punctuation ... ok
+test actual_migration_002_rolls_back_on_conflicting_schema ... ok
+test composite_input_validates_defaults_prices_and_units ... ok
+test append_prices_preserve_values_and_close_intervals ... ok
+test create_full_failures_roll_back_the_whole_product ... ok
+test bilingual_nullable_identity_and_foreign_keys ... ok
+test create_full_atomically_persists_all_related_rows ... ok
+test active_total_counts_only_active_products ... ok
+test barcodes_cannot_cross_products_or_duplicate_within_one ... ok
+test detail_aggregates_explicit_relations_and_multiple_ingredients ... ok
+test lookup_deactivation_retains_records_and_timestamps ... ok
+test money_parser_is_exact_and_rejects_uncertain_source_values ... ok
+test direct_database_constraints_enforce_integer_money_and_relations ... ok
+test list_enriches_rows_and_enforces_sort_whitelist ... ok
+test lookups_preserve_display_and_reject_case_space_duplicates ... ok
+test inactive_product_package_and_search_behavior ... ok
+test packages_barcodes_and_default_constraints ... ok
+test update_full_rejects_foreign_packages_and_appends_prices ... ok
+test concurrent_price_changes_leave_one_current_and_complete_history ... ok
+test price_insert_failure_rolls_back_closure ... ok
+test upgrade_v1_to_v2_preserves_branch_and_reruns ... ok
+test representative_csv_rows_fit_without_import_or_medical_parsing ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+     Running tests\catalog_active_source.rs (target\debug\deps\catalog_active_source-18a16fc216d25c91.exe)
+
+running 8 tests
+test stale_catalog_plan_is_refused_before_mutation ... ok
+test scientific_and_arabic_values_are_preserved_and_missing_lookups_stay_null ... ok
+test failure_rolls_back_products_prices_actions_and_preserves_failed_run ... ok
+test malformed_and_padded_quotes_do_not_fail_safe_rows ... ok
+test source_duplicate_conflicts_and_invalid_prices_are_skipped ... ok
+test name_only_collision_never_merges_or_inserts_a_second_identity ... ok
+test real_catalog_insert_reuse_and_readonly_idempotency_record_versioned_actions ... ok
+test changed_price_appends_history_preserves_original_amount_and_cost ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests\catalog_import.rs (target\debug\deps\catalog_import-e7437e8c5ae4f0a6.exe)
+
+running 16 tests
+test canonical_resolution_and_utf8_multiline_profile ... ok
+test dry_run_dispositions_and_no_database_writes ... ok
+test historical_profile_deserializes_without_changing_provenance ... ok
+test changed_source_and_catalog_refuse_stale_plan ... ok
+test existing_identity_and_name_conflicts_are_reviewed_and_lookup_ids_reused ... ok
+test money_is_exact_and_conservative ... ok
+test invalid_required_data_is_skipped_and_all_rows_have_dispositions ... ok
+test migration_three_preserves_v2_catalog ... ok
+test structural_errors_and_escape_are_fatal ... ok
+test apply_mapping_backup_reports_and_repeat_idempotency ... ok
+test versioned_source_verifies_bytes_and_preserves_raw_fields ... ok
+test another_connection_write_stops_between_batches_without_corruption ... ok
+test versioned_apply_rejects_even_a_forged_profile_before_any_writes ... ok
+test failed_batch_rolls_back_and_retry_preserves_committed_batches ... ok
+test twenty_five_thousand_row_scale_smoke ... ok
+test approved_repository_v2_profiles_and_skips_unsafe_rows_without_writing has been running for over 60 seconds
+test approved_repository_v2_profiles_and_skips_unsafe_rows_without_writing ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 61.17s
+
+     Running tests\foundation.rs (target\debug\deps\foundation-60484e791b2f76b9.exe)
+
+running 12 tests
+test fresh_failed_migration_rolls_back_metadata_creation ... ok
+test invalid_database_file_is_not_recreated ... ok
+test fresh_database_initializes_schema_and_pragmas ... ok
+test create_list_get_and_safe_errors ... ok
+test foreign_keys_are_enforced ... ok
+test active_branch_is_preferred_without_reactivating_inactive_records ... ok
+test migrations_are_repeatable_and_leave_seven_versions ... ok
+test migration_failure_rolls_back_schema_and_metadata_without_losing_data ... ok
+test default_is_idempotent_and_respects_existing_branches ... ok
+test newer_schema_is_refused_without_reset ... ok
+test file_database_reopens_with_wal_and_stable_branch ... ok
+test simultaneous_default_calls_create_only_one_record ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests\inventory.rs (target\debug\deps\inventory-2b219409415f4960.exe)
+
+running 20 tests
+test adjustment_increase_and_decrease_preserve_history ... ok
+test empty_count_completes_without_corrections ... ok
+test duplicate_lot_is_reused_not_duplicated ... ok
+test cross_branch_adjustment_is_rejected ... ok
+test count_snapshot_only_covers_branch_scope ... ok
+test adjust_increase_without_batch_targets_general_lot ... ok
+test empty_inventory_reports_empty_everywhere ... ok
+test fefo_orders_earliest_expiry_first_and_no_expiry_last ... ok
+test opening_stock_creates_batch_and_movement_and_derives_balance ... ok
+test branch_inventory_is_isolated_and_persists_independently ... ok
+test expiry_detection_and_windows ... ok
+test movements_are_never_overwritten_and_replay_balances ... ok
+test reorder_default_and_override_drive_low_stock ... ok
+test stock_count_snapshot_counting_and_completion_posts_corrections ... ok
+test transfer_validation_blocks_same_branch_and_oversell ... ok
+test write_off_damage_and_expired_post_ledger_entries ... ok
+test write_off_insufficient_fails_without_partial_records ... ok
+test overview_statuses_and_filters ... ok
+test transfer_out_in_preserves_lot_and_cost ... ok
+test restart_persists_inventory_state ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests\inventory_core.rs (target\debug\deps\inventory_core-916f15e54950f97d.exe)
+
+running 26 tests
+test future_movement_types_are_typed_but_not_generic_ipc_operations ... ok
+test migration_four_failure_rolls_back_pending_inventory_schema ... ok
+test branches_and_batches_cannot_be_crossed ... ok
+test batch_preserves_nullable_fields_and_cost_without_unsafe_lot_uniqueness ... ok
+test fefo_uses_receipt_time_for_equal_expiry ... ok
+test inactive_scope_cannot_post_but_existing_balances_remain_visible ... ok
+test adjustments_damage_and_compensation_are_append_only ... ok
+test expiry_and_fefo_sort_known_dates_before_unknown_and_exclude_expired ... ok
+test no_negative_stock_is_enforced_per_batch_not_just_package ... ok
+test opening_batch_rolls_back_if_movement_fails ... ok
+test query_pages_are_bounded_and_balances_use_indexes ... ok
+test opening_stock_and_multiple_batches_derive_balances ... ok
+test recovered_allocation_excludes_expired_and_exhausted_stock_and_caps_coverage ... ok
+test migration_from_v3_preserves_catalog_branch_and_import_metadata ... ok
+test reorder_upsert_and_low_stock_include_zero_at_threshold ... ok
+test required_reason_integer_quantity_and_cost_validation ... ok
+test repeated_request_and_opening_are_rejected ... ok
+test competing_connections_cannot_overspend_the_same_batch ... ok
+test sqlite_composite_fk_rejects_batch_in_another_branch ... ok
+test sqlite_rejects_invalid_type_sign_foreign_keys_and_unpaired_transfer ... ok
+test safe_integer_balance_cap_is_enforced_across_batches ... ok
+test unknown_expiry_write_off_requires_an_explicit_reason ... ok
+test transfer_second_leg_failure_rolls_back_all_writes ... ok
+test transfer_header_cannot_commit_without_its_pair ... ok
+test zero_inventory_is_not_seeded_from_catalog ... ok
+test transfer_pair_is_atomic_preserves_cost_and_audit_reference ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests\inventory_documents.rs (target\debug\deps\inventory_documents-9d98f4a0b9e8a78c.exe)
+
+running 39 tests
+test cancelled_draft_cannot_post ... ok
+test different_post_key_cannot_post_twice ... ok
+test damage_posts_negative_damage ... ok
+test cancelled_ready_cannot_post ... ok
+test adjustment_out_previews_and_posts ... ok
+test all_posted_movements_reference_document ... ok
+test adjustment_in_uses_canonical_batch ... ok
+test duplicate_batch_lines_cannot_overspend ... ok
+test draft_receipt_is_persistent_and_has_no_stock_effect ... ok
+test insufficient_stock_blocks_ready ... ok
+test expired_batch_write_off_posts_expiry ... ok
+test competing_posts_cannot_overspend ... ok
+test expiry_requires_known_expired_date ... ok
+test future_expiry_is_rejected ... ok
+test late_line_failure_rolls_back_all_receipt_batches_and_movements ... ok
+test migration_005_rolls_back_partial_schema ... ok
+test migration_005_creates_only_document_structures ... ok
+test list_uses_branch_kind_status_date_and_db_pagination ... ok
+test ready_document_is_frozen ... ok
+test numbers_are_unique_and_readable ... ok
+test posted_header_lines_links_and_requests_are_immutable ... ok
+test post_retry_returns_original_without_duplicates ... ok
+test reasons_and_action_types_are_required ... ok
+test receipt_posts_canonical_movement_and_nullable_batch ... ok
+test receipt_ready_changes_no_stock ... ok
+test receiving_reuses_only_explicit_compatible_batch ... ok
+test reused_key_with_other_document_is_rejected ... ok
+test reversal_compensates_and_links_original_movements ... ok
+test ready_transfer_and_damage_recheck_stock_at_posting ... ok
+test restart_preserves_documents_and_post_keys ... ok
+test reversal_retry_is_idempotent_and_second_reversal_rejected ... ok
+test reversal_negative_stock_rejected_without_partial_records ... ok
+test stale_save_and_ready_rejected ... ok
+test transfer_posts_both_sides_with_line_traceability ... ok
+test transfer_draft_has_no_effect ... ok
+test transfer_second_leg_failure_rolls_back_document_transaction ... ok
+test upgrade_v4_preserves_catalog_and_inventory ... ok
+test transfer_reversal_restores_exact_original_batches ... ok
+test wrong_branch_batch_rejected ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+
+     Running tests\partners.rs (target\debug\deps\partners-ca7124755928928f.exe)
+
+running 11 tests
+test customer_deactivation_and_reactivation ... ok
+test customer_update_preserves_code_and_pages ... ok
+test partners_namespaces_are_independent ... ok
+test customer_validation_rejects_empty_name_and_long_fields ... ok
+test customer_non_ascii_names_fall_back_to_prefix ... ok
+test customer_list_search_and_active_filter ... ok
+test customer_create_generates_code_and_lookups ... ok
+test customer_codes_are_unique_for_same_name ... ok
+test supplier_validation_and_code_fallback ... ok
+test supplier_create_generates_code_and_lookups ... ok
+test supplier_search_update_and_active_filter ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests\purchases.rs (target\debug\deps\purchases-1b2a0dae23bd066b.exe)
+
+running 14 tests
+test complete_purchase_rejects_inactive_product ... ok
+test complete_purchase_rejects_empty_lines_and_low_payment ... ok
+test discount_and_tax_are_enforced_purchase ... ok
+test complete_purchase_with_supplier ... ok
+test complete_purchase_rejects_invalid_supplier_id ... ok
+test complete_purchase_increases_stock_balance ... ok
+test complete_purchase_posts_ledger_and_snapshots ... ok
+test list_purchases_filters_by_branch ... ok
+test purchase_pos_search_returns_cost_price_and_name ... ok
+test purchase_number_increments_per_branch ... ok
+test void_purchase_rejects_empty_reason ... ok
+test list_purchases_void_filter_and_search ... ok
+test void_purchase_rejects_non_completed ... ok
+test void_purchase_reverses_stock_and_movements ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests\recovery.rs (target\debug\deps\recovery-11f5fd0a18b19063.exe)
+
+running 2 tests
+test future_extension_of_v7_applies_once_and_unknown_version_is_refused ... ok
+test canonical_v4_reopens_without_reapplying_or_creating_prototype_tables ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests\sales.rs (target\debug\deps\sales-78b70e469ddada9d.exe)
+
+running 16 tests
+test complete_sale_rejects_insufficient_stock_and_rolls_back ... ok
+test discount_and_tax_are_enforced ... ok
+test fefo_allocates_earliest_expiry_first ... ok
+test complete_sale_rejects_empty_cart_and_missing_price ... ok
+test detail_retains_catalog_snapshots_after_price_change ... ok
+test complete_sale_posts_ledger_and_snapshots ... ok
+test list_sales_filters_by_branch ... ok
+test pos_search_matches_name_barcode_batch_and_flags_status ... ok
+test return_sale_rejects_non_completed_sale ... ok
+test sale_rejects_unknown_customer_id ... ok
+test return_sale_restocks_original_lot_and_caps_quantity ... ok
+test sale_can_be_linked_to_a_customer ... ok
+test void_sale_blocked_when_returns_exist ... ok
+test return_sale_uses_general_lot_when_original_inactive ... ok
+test receipt_number_increments_per_branch ... ok
+test void_sale_reverses_exact_batches ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests\stock_count_sessions.rs (target\debug\deps\stock_count_sessions-257de77937de84e7.exe)
+
+running 43 tests
+test cancel_in_progress_has_no_movements ... ok
+test cancel_review_has_no_movements ... ok
+test completed_cannot_return_to_entry_or_review ... ok
+test completed_audit_baseline_does_not_follow_later_stock ... ok
+test cancel_draft_has_no_movements ... ok
+test changed_completion_payload_and_second_key_rejected ... ok
+test cancelled_lines_and_session_are_immutable ... ok
+test completed_session_lines_and_results_are_immutable ... ok
+test create_is_draft_and_has_no_stock_effect ... ok
+test correction_traces_to_session_and_line ... ok
+test durable_completion_retry_does_not_repost ... ok
+test excluded_line_requires_recorded_reason ... ok
+test discovered_batch_has_zero_expected_and_no_fake_quantity ... ok
+test explicit_zero_is_counted ... ok
+test incoming_intervention_reconciles_live_thirteen_to_physical_eleven ... ok
+test discovered_stock_is_reconciled_on_completion ... ok
+test fixed_snapshot_survives_incoming_and_reload ... ok
+test migration_006_failure_rolls_back_every_partial_table ... ok
+test incoming_thirteen_reconciles_to_nine_with_minus_four ... ok
+test negative_and_unsafe_quantities_rejected ... ok
+test migration_006_has_single_canonical_ledger ... ok
+test concurrent_workstations_cannot_silently_overwrite_entry ... ok
+test positive_entry_does_not_post ... ok
+test negative_variance_posts_minus_three ... ok
+test positive_variance_posts_plus_two ... ok
+test net_zero_intervening_movements_are_detected ... ok
+test readable_numbers_are_unique ... ok
+test outgoing_intervention_reconciles_live_seven_to_physical_eight ... ok
+test sessions_and_lines_use_bounded_pagination ... ok
+test snapshot_branch_isolation ... ok
+test review_and_resume_preserve_snapshot ... ok
+test review_can_expose_uncounted_but_completion_rejects ... ok
+test start_captures_expected_ten_and_null_count ... ok
+test restart_preserves_results_and_completion_keys ... ok
+test stock_change_after_confirmation_preview_requires_refresh ... ok
+test stale_session_revision_is_rejected ... ok
+test wrong_branch_discovery_rejected ... ok
+test upgrade_005_preserves_catalog_inventory_and_documents ... ok
+test stale_line_revision_is_rejected ... ok
+test whole_completion_rolls_back_when_second_correction_fails ... ok
+test target_zero_never_goes_negative ... ok
+test zero_stock_batches_are_in_snapshot ... ok
+test zero_variance_creates_no_movement ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.91s
+
+   Doc-tests m2_health_lib
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

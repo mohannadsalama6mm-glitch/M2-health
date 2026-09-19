@@ -1,9 +1,5 @@
 use crate::{
-    db::{
-        catalog_validation::*,
-        connection::AppDb,
-        models::sales::*,
-    },
+    db::{catalog_validation::*, connection::AppDb, models::sales::*},
     error::{AppError, ErrorCode},
 };
 use rusqlite::{params, Connection, OptionalExtension, Row};
@@ -51,7 +47,10 @@ fn map_item(r: &Row<'_>) -> rusqlite::Result<SaleItem> {
         position: r.get(10)?,
     })
 }
-fn validate_page(limit_input: Option<i64>, offset_input: Option<i64>) -> Result<(i64, i64), AppError> {
+fn validate_page(
+    limit_input: Option<i64>,
+    offset_input: Option<i64>,
+) -> Result<(i64, i64), AppError> {
     let limit = limit_input.unwrap_or(50);
     let offset = offset_input.unwrap_or(0);
     if !(1..=200).contains(&limit) || !(0..=MAX_SAFE_MINOR).contains(&offset) {
@@ -89,8 +88,11 @@ pub(crate) struct NewSale {
 /// formatted receipt number and monotonic completion timestamp are computed here.
 pub(crate) fn insert_sale_on(c: &Connection, new: &NewSale) -> Result<Sale, AppError> {
     let value = uuid::Uuid::new_v4().to_string();
-    let sequence: i64 =
-        c.query_row("SELECT COALESCE(MAX(sequence),0)+1 FROM sales WHERE branch_id=?1", [&new.branch_id], |r| r.get(0))?;
+    let sequence: i64 = c.query_row(
+        "SELECT COALESCE(MAX(sequence),0)+1 FROM sales WHERE branch_id=?1",
+        [&new.branch_id],
+        |r| r.get(0),
+    )?;
     let receipt_number = format!("{:05}", sequence);
     let now: String = c.query_row(
         "SELECT strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),coalesce(julianday((SELECT max(completed_at) FROM sales))+0.001/86400,0)))",
@@ -104,16 +106,29 @@ pub(crate) fn insert_sale_on(c: &Connection, new: &NewSale) -> Result<Sale, AppE
     get(c, &value)
 }
 pub(crate) fn get(c: &Connection, value: &str) -> Result<Sale, AppError> {
-    c.query_row(&format!("SELECT {SALE_COLUMNS} FROM sales WHERE id=?1"), [value], map_sale)
-        .optional()?
-        .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Sale not found."))
+    c.query_row(
+        &format!("SELECT {SALE_COLUMNS} FROM sales WHERE id=?1"),
+        [value],
+        map_sale,
+    )
+    .optional()?
+    .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Sale not found."))
 }
 pub(crate) fn item_on(c: &Connection, value: &str) -> Result<SaleItem, AppError> {
-    c.query_row(&format!("SELECT {ITEM_COLUMNS} FROM sale_items WHERE id=?1"), [value], map_item)
-        .optional()?
-        .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Sale item not found."))
+    c.query_row(
+        &format!("SELECT {ITEM_COLUMNS} FROM sale_items WHERE id=?1"),
+        [value],
+        map_item,
+    )
+    .optional()?
+    .ok_or_else(|| AppError::new(ErrorCode::NotFound, "Sale item not found."))
 }
-pub(crate) fn update_void_on(c: &Connection, value: &str, reason: &str, user: &str) -> Result<Sale, AppError> {
+pub(crate) fn update_void_on(
+    c: &Connection,
+    value: &str,
+    reason: &str,
+    user: &str,
+) -> Result<Sale, AppError> {
     c.execute(
         "UPDATE sales SET status='void',void_reason=?1,voided_by=?2,voided_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),updated_at=strftime('%Y-%m-%dT%H:%M:%fZ',max(julianday('now'),julianday(updated_at)+0.001/86400)) WHERE id=?3",
         params![reason, user, value],
@@ -163,7 +178,11 @@ pub(crate) fn insert_item_on(
         "INSERT INTO sale_items(id,sale_id,product_package_id,product_name,package_label,quantity,selling_price_minor,cost_price_minor,line_total_minor,line_cost_minor,position) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)",
         params![value, sale_id, package_id, product_name, package_label, quantity, selling_price_minor, cost_price_minor, line_total_minor, line_cost_minor, position],
     )?;
-    Ok(c.query_row(&format!("SELECT {ITEM_COLUMNS} FROM sale_items WHERE id=?1"), [value], map_item)?)
+    Ok(c.query_row(
+        &format!("SELECT {ITEM_COLUMNS} FROM sale_items WHERE id=?1"),
+        [value],
+        map_item,
+    )?)
 }
 pub(crate) fn insert_item_batch_on(
     c: &Connection,
@@ -181,7 +200,10 @@ pub(crate) fn insert_item_batch_on(
     Ok(())
 }
 /// The FEFO allocation recorded for one sale, keyed by sale item id.
-pub(crate) fn allocations_on(c: &Connection, sale_id: &str) -> Result<Vec<(String, SaleBatchAllocation)>, AppError> {
+pub(crate) fn allocations_on(
+    c: &Connection,
+    sale_id: &str,
+) -> Result<Vec<(String, SaleBatchAllocation)>, AppError> {
     let mut s = c.prepare(
         "SELECT sib.sale_item_id, sib.batch_id, b.batch_number, b.expiry_date, sib.quantity, sib.cost_price_minor FROM sale_item_batches sib JOIN inventory_batches b ON b.id=sib.batch_id WHERE sib.sale_id=?1 ORDER BY sib.sale_item_id, sib.id",
     )?;
@@ -200,14 +222,22 @@ pub(crate) fn allocations_on(c: &Connection, sale_id: &str) -> Result<Vec<(Strin
     Ok(rows.collect::<Result<Vec<_>, _>>()?)
 }
 /// Already-returned quantity per sale item of a sale.
-pub(crate) fn returned_by_item_on(c: &Connection, sale_id: &str) -> Result<std::collections::HashMap<String, i64>, AppError> {
+pub(crate) fn returned_by_item_on(
+    c: &Connection,
+    sale_id: &str,
+) -> Result<std::collections::HashMap<String, i64>, AppError> {
     let mut s = c.prepare(
         "SELECT sri.sale_item_id, COALESCE(SUM(sri.quantity),0) FROM sale_return_items sri JOIN sale_returns sr ON sr.id=sri.sale_return_id WHERE sr.sale_id=?1 GROUP BY sri.sale_item_id",
     )?;
-    let rows = s.query_map([sale_id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)?)))?;
+    let rows = s.query_map([sale_id], |r| {
+        Ok((r.get::<_, String>(0)?, r.get::<_, i64>(1)?))
+    })?;
     Ok(rows.collect::<Result<Vec<_>, _>>()?.into_iter().collect())
 }
-pub(crate) fn first_allocated_batch_on(c: &Connection, sale_item_id: &str) -> Result<Option<String>, AppError> {
+pub(crate) fn first_allocated_batch_on(
+    c: &Connection,
+    sale_item_id: &str,
+) -> Result<Option<String>, AppError> {
     Ok(c.query_row(
         "SELECT batch_id FROM sale_item_batches WHERE sale_item_id=?1 ORDER BY id LIMIT 1",
         [sale_item_id],
@@ -326,7 +356,9 @@ pub fn detail(db: &AppDb, sale_id: &str) -> Result<SaleDetail, AppError> {
     let allocations = allocations_on(&tx, &sale.id)?;
     let returned = returned_by_item_on(&tx, &sale.id)?;
     let items = {
-        let mut s = tx.prepare(&format!("SELECT {ITEM_COLUMNS} FROM sale_items WHERE sale_id=?1 ORDER BY position, id"))?;
+        let mut s = tx.prepare(&format!(
+            "SELECT {ITEM_COLUMNS} FROM sale_items WHERE sale_id=?1 ORDER BY position, id"
+        ))?;
         let rows = s.query_map([&sale.id], map_item)?;
         let mut out = Vec::new();
         for row in rows {

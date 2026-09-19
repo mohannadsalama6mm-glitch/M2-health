@@ -6,6 +6,18 @@ use crate::db::{
 use models::*;
 use rusqlite::{params, TransactionBehavior};
 pub fn transfer(db: &AppDb, input: &TransferStock) -> Result<TransferResult, AppError> {
+    let mut c = db.lock()?;
+    let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let result = transfer_on(&tx, input, None)?;
+    tx.commit()?;
+    Ok(result)
+}
+/// Uses the caller's transaction so all lines of a document commit together.
+pub(crate) fn transfer_on(
+    tx: &rusqlite::Connection,
+    input: &TransferStock,
+    document: Option<&str>,
+) -> Result<TransferResult, AppError> {
     id(&input.request_id)?;
     quantity(input.quantity)?;
     required(&input.reason)?;
@@ -13,8 +25,6 @@ pub fn transfer(db: &AppDb, input: &TransferStock) -> Result<TransferResult, App
     if input.source_branch_id == input.destination_branch_id {
         return Err(invalid("Transfer requires different branches."));
     }
-    let mut c = db.lock()?;
-    let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
     scope(
         &tx,
         &input.source_branch_id,
@@ -59,14 +69,23 @@ pub fn transfer(db: &AppDb, input: &TransferStock) -> Result<TransferResult, App
         reason: input.reason.clone(),
         created_by: input.created_by.clone(),
     };
-    let out_movement =
-        movements::insert(&tx, &op, MovementType::TransferOut, Some(&input.request_id))?;
+    let out_movement = movements::insert_referenced(
+        tx,
+        &op,
+        MovementType::TransferOut,
+        Some(&input.request_id),
+        document.map(|id| ("inventory_document", id)),
+    )?;
     op.request_id = incoming;
     op.branch_id = input.destination_branch_id.clone();
     op.batch_id = destination.id.clone();
-    let in_movement =
-        movements::insert(&tx, &op, MovementType::TransferIn, Some(&input.request_id))?;
-    tx.commit()?;
+    let in_movement = movements::insert_referenced(
+        tx,
+        &op,
+        MovementType::TransferIn,
+        Some(&input.request_id),
+        document.map(|id| ("inventory_document", id)),
+    )?;
     Ok(TransferResult {
         id: input.request_id.clone(),
         source_batch_id: input.source_batch_id.clone(),

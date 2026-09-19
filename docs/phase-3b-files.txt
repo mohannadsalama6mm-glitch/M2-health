@@ -1,0 +1,36 @@
+Phase 3B implementation and continuation files (existing recovery changes remain separate)
+
+src-tauri/migrations/005_inventory_workflows.sql
+src-tauri/src/db/migrations.rs
+src-tauri/src/inventory/documents/commands.rs
+src-tauri/src/inventory/documents/mod.rs
+src-tauri/src/inventory/documents/models.rs
+src-tauri/src/inventory/documents/repository.rs
+src-tauri/src/inventory/mod.rs
+src-tauri/src/inventory/movements.rs
+src-tauri/src/inventory/transfers.rs
+src-tauri/src/lib.rs
+src-tauri/src/recovery.rs
+src-tauri/tests/inventory_documents.rs
+src-tauri/tests/catalog.rs
+src-tauri/tests/foundation.rs
+src-tauri/tests/inventory_core.rs
+src-tauri/tests/recovery.rs
+src/app/AppRoutes.tsx
+src/app/RecoveryBoundary.tsx
+src/features/inventory/Documents.tsx
+src/lib/tauri/inventory-documents.ts
+src/lib/tauri/recovery.ts
+tests/inventory-documents-double.ts
+tests/inventory-documents.spec.ts
+scripts/phase3b-native-smoke.mjs
+scripts/verify_inventory_documents.py
+docs/migration-proposals/README.md
+docs/phase-3b-before.json
+docs/phase-3b-after.json
+docs/phase-3b-checks.json
+docs/phase-3b-native-smoke.json
+docs/phase-3b-native-documents.png
+docs/phase-3b-files.txt
+
+Unchanged: canonical migrations 001–004; Catalog/import records; original Phase 3A batch and two movements; altered CSV.

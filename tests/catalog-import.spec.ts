@@ -51,6 +51,9 @@ test("large catalog pagination keeps bounded controls and requests the selected 
 async function setup(page: Page, mode = "success") {
   await page.addInitScript((mode) => {
     const profile = {
+      importPolicy: mode === "active" ? "conservative_catalog_v2" : null,
+      sourceVersion: mode === "v2" ? "v2" : null,
+      applyAllowed: mode !== "v2",
       path: "canonical/source.csv",
       hash: "abc123",
       size: 1000,
@@ -132,7 +135,9 @@ async function setup(page: Page, mode = "success") {
               ...report,
               mode: "apply",
               status: applying && polls < 3 ? "applying" : "complete",
-              imported: polls < 3 ? 8 : 17,
+              imported: mode === "active" ? 0 : polls < 3 ? 8 : 17,
+              reused: mode === "active" ? 17 : 0,
+              updated: 0,
               processed: polls < 3 ? 8 : 20,
               backupPath: "backup.sqlite3",
               durationMs: 2000,
@@ -193,6 +198,29 @@ test("dry run error never enables apply", async ({ page }) => {
     page.getByRole("button", { name: "Apply Import", exact: true }),
   ).toBeDisabled();
 });
+test("canonical v2 remains comparison-only even when an insert plan has ready rows", async ({
+  page,
+}) => {
+  await setup(page, "v2");
+  await expect(
+    page.getByText("Canonical Source v2", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Comparison only", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Dry Run", exact: true }).click();
+  await expect(
+    page.getByText("Import state: validated", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Apply Import", exact: true }),
+  ).toBeDisabled();
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { __importCalls: number }).__importCalls,
+    ),
+  ).toBe(0);
+});
 test("apply error consumes the UI plan and requires a new dry run", async ({
   page,
 }) => {
@@ -209,4 +237,25 @@ test("apply error consumes the UI plan and requires a new dry run", async ({
   await expect(
     page.getByRole("button", { name: "Dry Run", exact: true }),
   ).toBeEnabled();
+});
+test("active source import reports reused products without claiming mass inserts", async ({
+  page,
+}) => {
+  await setup(page, "active");
+  await expect(
+    page.getByText("Active Catalog source", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Dry Run", exact: true }).click();
+  await page.getByRole("button", { name: "Apply Import", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(
+    page.getByText("17 existing products reused; 0 prices updated.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("0 products, packages and initial prices committed.", {
+      exact: false,
+    }),
+  ).toBeVisible();
 });

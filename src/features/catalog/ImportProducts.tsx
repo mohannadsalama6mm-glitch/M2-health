@@ -19,6 +19,14 @@ import {
   type ImportReport,
 } from "../../lib/tauri/catalog-import";
 const labels: Record<string, string> = {
+  ready_insert: "New products",
+  ready_reuse: "Existing products",
+  ready_update: "Price updates",
+  skipped_malformed: "Malformed records",
+  skipped_quoting: "Quoting issues",
+  skipped_ambiguous: "Ambiguous identities",
+  skipped_duplicate: "Repeated source records",
+  skipped_price: "Invalid or ambiguous prices",
   ready: "Ready",
   exact_duplicate_source: "Exact duplicates",
   possible_duplicate: "Possible duplicates",
@@ -101,7 +109,11 @@ export function ImportProducts() {
       const r = await dryRunCatalogImport();
       setReport(r);
       setProfile(r.profile);
-      setCanApply(r.status === "validated" && (r.counts.ready ?? 0) > 0);
+      setCanApply(
+        r.profile?.applyAllowed !== false &&
+          r.status === "validated" &&
+          (r.counts.ready ?? 0) > 0,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Dry run failed.");
     } finally {
@@ -143,6 +155,28 @@ export function ImportProducts() {
           )}
           <Card>
             <h2>Egyptian Drug Catalog</h2>
+            {profile?.importPolicy === "conservative_catalog_v2" &&
+              profile.applyAllowed && (
+                <Alert title="Active Catalog source" tone="info">
+                  Valid rows are matched across all Catalog identity fields.
+                  Existing products are reused; changed prices append history.
+                  Malformed and ambiguous records are skipped.
+                </Alert>
+              )}
+            {profile?.sourceVersion && (
+              <p>Canonical Source {profile.sourceVersion}</p>
+            )}
+            {profile?.applyAllowed === false && (
+              <Alert title="Comparison only" tone="warning">
+                Canonical v2 is adopted. Apply is disabled pending review of the
+                versioned update plan.
+                {profile.malformedRows?.length
+                  ? ` ${profile.malformedRows.length} records have an invalid column count.`
+                  : ""}
+                The dry run below checks insert eligibility; it does not approve
+                updates to existing products.
+              </Alert>
+            )}
             {profile ? (
               <div className="stack">
                 <p>
@@ -191,7 +225,7 @@ export function ImportProducts() {
                 {report.status === "applying" && (
                   <>
                     {" "}
-                    · {report.processed.toLocaleString()} imported of{" "}
+                    · {report.processed.toLocaleString()} processed of{" "}
                     {(report.counts.ready ?? 0).toLocaleString()} ready
                     <progress
                       aria-label="Import progress"
@@ -223,6 +257,8 @@ export function ImportProducts() {
                 >
                   {report.imported.toLocaleString()} products, packages and
                   initial prices committed.{" "}
+                  {report.profile?.importPolicy === "conservative_catalog_v2" &&
+                    `${(report.reused ?? 0).toLocaleString()} existing products reused; ${(report.updated ?? 0).toLocaleString()} prices updated. `}
                   {report.durationMs > 0 &&
                     `${(report.durationMs / 1000).toFixed(1)} seconds.`}
                 </Alert>

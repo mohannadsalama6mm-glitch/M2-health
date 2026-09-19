@@ -1,0 +1,30 @@
+{
+  "path": "C:\\Users\\Mohannad\\AppData\\Local\\com.m2health.pharmacy\\backups\\before-phase-3a-d4f88591-2d11-4a34-8e71-f06cd44e54a9.sqlite3",
+  "timestamp": "2026-09-13T18:16:57.541289+00:00",
+  "bytes": 50622464,
+  "sha256": "1284f5a4abe2ca0c52919e483781f7768bec6c011b6e6b02f26ae5a5233de569",
+  "integrity": [
+    [
+      "ok"
+    ]
+  ],
+  "foreignKeys": [],
+  "migrations": [
+    [
+      1,
+      "branches"
+    ],
+    [
+      2,
+      "catalog_core"
+    ],
+    [
+      3,
+      "catalog_import"
+    ],
+    [
+      4,
+      "inventory_core"
+    ]
+  ]
+}

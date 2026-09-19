@@ -1,0 +1,49 @@
+ D src-tauri/migrations/003_inventory.sql
+ D src-tauri/migrations/004_sales.sql
+ D src-tauri/migrations/005_inventory_workflows.sql
+ D src-tauri/migrations/005_partners_purchases.sql
+ M src-tauri/src/commands/customers.rs
+ M src-tauri/src/commands/inventory.rs
+ M src-tauri/src/commands/purchases.rs
+ M src-tauri/src/commands/sales.rs
+ M src-tauri/src/commands/suppliers.rs
+ M src-tauri/src/db/connection.rs
+ M src-tauri/src/db/migrations.rs
+ M src-tauri/src/db/models/purchases.rs
+ M src-tauri/src/db/models/sales.rs
+ M src-tauri/src/db/repositories/counts.rs
+ M src-tauri/src/db/repositories/customers.rs
+ M src-tauri/src/db/repositories/mod.rs
+ M src-tauri/src/db/repositories/purchases.rs
+ M src-tauri/src/db/repositories/sales.rs
+ M src-tauri/src/db/repositories/suppliers.rs
+ M src-tauri/src/db/services/purchases.rs
+ M src-tauri/src/db/services/sales.rs
+ M src-tauri/src/lib.rs
+ M src-tauri/tests/catalog.rs
+ M src-tauri/tests/foundation.rs
+ M src-tauri/tests/inventory.rs
+ M src-tauri/tests/partners.rs
+ M src-tauri/tests/purchases.rs
+ M src-tauri/tests/sales.rs
+ M src/app/AppRoutes.tsx
+ M tests/catalog-double.ts
+?? docs/migration-proposals/README.md
+?? docs/migration-proposals/inventory_workflows.sql
+?? docs/migration-proposals/obsolete_inventory.sql
+?? docs/migration-proposals/partners_purchases.sql
+?? docs/migration-proposals/sales.sql
+?? docs/recovery-after.json
+?? docs/recovery-backup.json
+?? docs/recovery-before.json
+?? docs/recovery-checks.json
+?? docs/recovery-comparison.json
+?? docs/recovery-native-inventory.png
+?? docs/recovery-native-smoke.json
+?? src-tauri/src/recovery.rs
+?? src-tauri/tests/inventory_core.rs
+?? src-tauri/tests/recovery.rs
+?? src-tauri/tests/support/mod.rs
+?? src/app/RecoveryBoundary.tsx
+?? src/lib/tauri/recovery.ts
+?? tests/recovery.spec.ts

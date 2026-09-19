@@ -13,7 +13,7 @@ pub mod product_packages;
 pub mod products;
 pub mod purchases;
 pub mod routes;
-pub mod suppliers;
 pub mod sales;
 pub mod settings;
 pub mod stocks;
+pub mod suppliers;

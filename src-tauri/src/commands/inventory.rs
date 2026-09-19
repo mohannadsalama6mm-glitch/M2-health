@@ -25,7 +25,6 @@ pub fn get_stock_summary(
 ) -> Result<StockSummary, AppError> {
     stocks::summary(state.db()?, &branch_id)
 }
-#[tauri::command]
 pub fn list_stock_movements(
     state: State<'_, DatabaseState>,
     query: MovementQuery,
@@ -102,7 +101,6 @@ pub fn list_expiry(
 ) -> Result<ExpiryPage, AppError> {
     stocks::expiry(state.db()?, &query)
 }
-#[tauri::command]
 pub fn list_low_stock(
     state: State<'_, DatabaseState>,
     query: LowStockQuery,
@@ -116,7 +114,6 @@ pub fn set_reorder_level(
 ) -> Result<InventorySetting, AppError> {
     services::settings::set_reorder(state.db()?, &input)
 }
-#[tauri::command]
 pub fn fefo_allocation(
     state: State<'_, DatabaseState>,
     branch_id: String,

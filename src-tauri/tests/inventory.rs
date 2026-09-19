@@ -1,3 +1,4 @@
+mod support;
 use m2_health_lib::db::{
     connection::AppDb,
     models::{
@@ -10,7 +11,7 @@ use m2_health_lib::db::{
 };
 
 fn db() -> AppDb {
-    AppDb::in_memory().unwrap()
+    support::prototype_db()
 }
 fn branch(db: &AppDb, code: &str, name: &str) -> m2_health_lib::db::models::branch::Branch {
     branches::create_branch(
@@ -953,20 +954,47 @@ fn restart_persists_inventory_state() {
         branch_id = b.id.clone();
         let pk = package(&db, "Panadol", "20 tablets");
         package_id = pk.clone();
-        open(&db, &branch_id, &pk, "PN-10", "2027-08-31", 42);
+        m2_health_lib::inventory::movements::opening(
+            &db,
+            &m2_health_lib::inventory::models::OpeningStock {
+                batch: m2_health_lib::inventory::models::CreateBatch {
+                    branch_id: branch_id.clone(),
+                    product_package_id: pk,
+                    lot_number: Some("PN-10".into()),
+                    expiry_date: Some("2027-08-31".into()),
+                    ..Default::default()
+                },
+                request_id: uuid::Uuid::new_v4().to_string(),
+                quantity: 42,
+                reason: "Restart verification".into(),
+                created_by: None,
+            },
+        )
+        .unwrap();
     }
     let db = AppDb::open(&path).unwrap();
-    let allocated = stocks::fefo_allocation(&db, &branch_id, &package_id, None).unwrap();
-    assert_eq!(allocated[0].available, 42);
-    let page = stocks::overview(
+    let allocated = m2_health_lib::inventory::expiry::fefo(
         &db,
-        &StockOverviewQuery {
+        &branch_id,
+        &package_id,
+        "2026-01-01",
+        None,
+        None,
+    )
+    .unwrap();
+    assert_eq!(allocated[0].quantity, 42);
+    let page = m2_health_lib::inventory::balances::list(
+        &db,
+        &m2_health_lib::inventory::models::InventoryQuery {
             branch_id,
-            ..Default::default()
+            product_package_id: None,
+            batch_id: None,
+            limit: None,
+            offset: None,
         },
     )
     .unwrap();
-    assert_eq!(page.items[0].quantity, 42);
+    assert_eq!(page[0].quantity, 42);
 }
 
 #[test]

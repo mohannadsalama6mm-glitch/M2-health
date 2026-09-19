@@ -1,7 +1,11 @@
+pub mod alerts;
 pub mod balances;
 pub mod batches;
 pub mod commands;
+pub mod counts;
+pub mod documents;
 pub mod expiry;
+pub mod inspection;
 pub mod levels;
 pub mod models;
 pub mod movements;

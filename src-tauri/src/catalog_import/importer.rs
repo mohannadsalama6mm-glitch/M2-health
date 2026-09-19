@@ -59,6 +59,12 @@ pub fn apply(
 ) -> Result<Report, AppError> {
     let start = Instant::now();
     let (fresh, _) = source::read(root)?;
+    if !fresh.apply_allowed {
+        return Err(invalid("Canonical Source v2 is approved for comparison only. Applying updates requires a separately approved update policy."));
+    }
+    if fresh.import_policy.as_deref() == Some(active::POLICY) {
+        return active::apply(db, root, output, plan, progress);
+    }
     if plan
         .report
         .profile
