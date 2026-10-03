@@ -1,0 +1,33 @@
+{
+  "automatedPassed": true,
+  "npmLint": "PASS",
+  "npmBuild": "PASS",
+  "frontendTests": {
+    "passed": 138,
+    "failed": 0,
+    "runnerNote": "All 138 cases reported PASS. The prior runner delayed exit after reporting the final case; no project-owned stale process remains."
+  },
+  "cargoFmtCheck": "PASS",
+  "cargoCheck": "PASS",
+  "cargoTests": {
+    "passed": 340,
+    "failed": 0,
+    "canonicalSales": 54,
+    "existing": 286
+  },
+  "dedicatedFrontendTests": {
+    "passed": 28,
+    "failed": 0
+  },
+  "nativeSmoke": "PASS",
+  "nativeRestarts": 2,
+  "nativePageOrConsoleErrors": 0,
+  "databaseIntegrity": "ok",
+  "foreignKeyViolations": 0,
+  "schemaVersion": 9,
+  "finalStock": {
+    "Main": 8,
+    "DEV": 2,
+    "DEV3D": 6
+  }
+}

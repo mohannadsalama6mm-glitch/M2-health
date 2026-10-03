@@ -30,8 +30,14 @@ for t in ['inventory_movements','inventory_alert_history']:
 for row in old.execute("SELECT type,name,tbl_name,sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"):
  assert c.execute('SELECT type,name,tbl_name,sql FROM sqlite_master WHERE name=?',(row[1],)).fetchone()==row,'Prior schema definition changed'
 versions=rows(c,'_schema_version');assert versions[:8]==rows(old,'_schema_version');assert len(versions)==9 and versions[8][0:2]==(9,'sales')
-alertcols='id,branch_id,alert_type,product_package_id,batch_id,status,fingerprint,first_detected_at,created_at'
-assert old.execute(f'SELECT {alertcols} FROM inventory_alerts ORDER BY id').fetchall()==c.execute(f'SELECT {alertcols} FROM inventory_alerts ORDER BY id').fetchall()
+alert_identity='id,branch_id,alert_type,product_package_id,batch_id,severity,fingerprint,first_detected_at,created_at'
+old_alerts=old.execute(f'SELECT {alert_identity} FROM inventory_alerts ORDER BY id').fetchall()
+alert_placeholders=','.join('?' for _ in old_alerts)
+current_alerts=c.execute(f'SELECT {alert_identity} FROM inventory_alerts WHERE id IN ({alert_placeholders}) ORDER BY id',[r[0] for r in old_alerts]).fetchall()
+assert old_alerts==current_alerts,'A pre-existing alert identity changed'
+near='ef006804-7633-463a-a7ba-53ca276ca4c2'
+assert c.execute("SELECT status FROM inventory_alerts WHERE alert_type='BATCH_EXPIRING' AND batch_id=?",[near]).fetchone()==('RESOLVED',)
+assert c.execute("SELECT count(*) FROM inventory_alerts WHERE alert_type='BATCH_EXPIRED' AND batch_id=? AND status='ACTIVE'",[near]).fetchone()[0]==1
 stock=dict(c.execute('SELECT branch_id,sum(quantity_delta) FROM inventory_movements GROUP BY branch_id'));assert stock==baseline['stock']
 added=list(set(rows(c,'inventory_movements'))-set(rows(old,'inventory_movements')));assert len(added)==2
 new_ids=[r[0] for r in added];q=c.execute('SELECT id,branch_id,movement_type,quantity_delta,batch_id,reference_type,reference_id FROM inventory_movements WHERE id IN (?,?)',new_ids);movements=[dict(zip([x[0] for x in q.description],r)) for r in q]
@@ -43,5 +49,5 @@ counts={t:len(rows(c,t)) for t in tables+list(expected)}
 assert all(counts[t]==n for t,n in expected.items()),counts
 assert dict(c.execute('SELECT status,count(*) FROM sales GROUP BY status'))=={'HELD':1,'POSTED':1}
 assert c.execute('SELECT amount_minor FROM sale_payments').fetchone()[0]==c.execute('SELECT amount_minor FROM sale_refunds').fetchone()[0]==smoke['sale']['totalMinor']
-result={'integrity':integrity,'foreignKeyViolations':fk,'versions':versions,'countsBefore':baseline['counts'],'countsAfter':counts,'unchangedTables':unchanged,'priorSchemaPreserved':True,'priorLedgerAndAlertHistoryPreserved':True,'alertIdentityAndStatusPreserved':True,'hashes':hashes,'stock':stock,'newMovements':movements,'nativePassed':True}
+result={'integrity':integrity,'foreignKeyViolations':fk,'versions':versions,'countsBefore':baseline['counts'],'countsAfter':counts,'unchangedTables':unchanged,'priorSchemaPreserved':True,'priorLedgerAndAlertHistoryPreserved':True,'priorAlertIdentityPreserved':True,'calendarAlertTransition':{'resolved':'BATCH_EXPIRING','activated':'BATCH_EXPIRED','batchId':near},'hashes':hashes,'stock':stock,'newMovements':movements,'nativePassed':True}
 (folder/'after.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf8');print(json.dumps(result,indent=2))

@@ -53,6 +53,16 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "sales",
         sql: include_str!("../../migrations/009_sales.sql"),
     },
+    Migration {
+        version: 10,
+        name: "partners",
+        sql: include_str!("../../migrations/010_partners.sql"),
+    },
+    Migration {
+        version: 11,
+        name: "purchasing",
+        sql: include_str!("../../migrations/011_purchasing.sql"),
+    },
 ];
 
 pub fn run(connection: &mut Connection) -> Result<(), AppError> {

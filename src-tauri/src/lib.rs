@@ -3,6 +3,8 @@ pub mod commands;
 pub mod db;
 pub mod error;
 pub mod inventory;
+pub mod partners;
+pub mod purchasing;
 pub mod recovery;
 pub mod sales;
 use commands::branches::DatabaseState;
@@ -40,6 +42,23 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            purchasing::commands::create_purchase_order_draft,
+            purchasing::commands::update_purchase_order_draft,
+            purchasing::commands::order_purchase_order,
+            purchasing::commands::cancel_purchase_order,
+            purchasing::commands::get_purchase_order,
+            purchasing::commands::list_purchase_orders,
+            purchasing::commands::search_purchase_packages,
+            partners::commands::create_canonical_supplier,
+            partners::commands::get_canonical_supplier,
+            partners::commands::update_canonical_supplier,
+            partners::commands::set_canonical_supplier_active,
+            partners::commands::list_canonical_suppliers,
+            partners::commands::create_canonical_customer,
+            partners::commands::get_canonical_customer,
+            partners::commands::update_canonical_customer,
+            partners::commands::set_canonical_customer_active,
+            partners::commands::list_canonical_customers,
             sales::commands::search_pos_products,
             sales::commands::get_pos_package_availability,
             sales::commands::save_sale_draft,

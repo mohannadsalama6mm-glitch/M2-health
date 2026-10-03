@@ -1,0 +1,599 @@
+{
+  "errors": [],
+  "baselineStock": 6,
+  "availability": {
+    "availableQuantity": 1,
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "currentPriceMinor": 1000,
+    "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+    "stockStatus": "IN_STOCK"
+  },
+  "searchEvidence": {
+    "english": {
+      "items": [
+        {
+          "arabicName": "1 2 3",
+          "availableQuantity": 1,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 1000,
+          "packageLabel": "Default Package",
+          "productId": "1e49bfb5-878c-458b-bce0-5849485282bf",
+          "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "IN_STOCK"
+        },
+        {
+          "arabicName": "1 2 3 إكسترا",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 6400,
+          "packageLabel": "Default Package",
+          "productId": "85f95bb9-9f06-4bd6-b7a5-56bb88de54cf",
+          "productName": "1 2 3 (ONE TWO THREE) EXTRA 20 F.C.TABS.",
+          "productPackageId": "87aeb6df-d925-40db-86cc-fb1873c65088",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "1 2 3",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 700,
+          "packageLabel": "Default Package",
+          "productId": "67e7564b-5c6d-4a61-8ceb-4cedcc669224",
+          "productName": "1 2 3 (ONE TWO THREE) SUSP. 120 ML",
+          "productPackageId": "465711d0-9674-4e47-be13-211ebde61034",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        }
+      ],
+      "total": 3
+    },
+    "arabic": {
+      "items": [
+        {
+          "arabicName": "1 2 3 إكسترا",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 6400,
+          "packageLabel": "Default Package",
+          "productId": "85f95bb9-9f06-4bd6-b7a5-56bb88de54cf",
+          "productName": "1 2 3 (ONE TWO THREE) EXTRA 20 F.C.TABS.",
+          "productPackageId": "87aeb6df-d925-40db-86cc-fb1873c65088",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        }
+      ],
+      "total": 1
+    },
+    "scientific": {
+      "items": [
+        {
+          "arabicName": "1 2 3",
+          "availableQuantity": 1,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 1000,
+          "packageLabel": "Default Package",
+          "productId": "1e49bfb5-878c-458b-bce0-5849485282bf",
+          "productName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "IN_STOCK"
+        },
+        {
+          "arabicName": "1 2 3 إكسترا",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 6400,
+          "packageLabel": "Default Package",
+          "productId": "85f95bb9-9f06-4bd6-b7a5-56bb88de54cf",
+          "productName": "1 2 3 (ONE TWO THREE) EXTRA 20 F.C.TABS.",
+          "productPackageId": "87aeb6df-d925-40db-86cc-fb1873c65088",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "1 2 3",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 700,
+          "packageLabel": "Default Package",
+          "productId": "67e7564b-5c6d-4a61-8ceb-4cedcc669224",
+          "productName": "1 2 3 (ONE TWO THREE) SUSP. 120 ML",
+          "productPackageId": "465711d0-9674-4e47-be13-211ebde61034",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "بابيرهينو",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 750,
+          "packageLabel": "Default Package",
+          "productId": "b86f48c6-8e35-4cc6-979a-2184db8fef51",
+          "productName": "BABYRHINO SYRUP 100ML",
+          "productPackageId": "02a5da19-bd35-4e99-9ca4-3dcf3dc02744",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كالمالجيني",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 365,
+          "packageLabel": "Default Package",
+          "productId": "6d75345d-7a40-4d21-b5c9-287b1a1802be",
+          "productName": "CALMALGINE 10 TAB.",
+          "productPackageId": "967ecb39-db95-4ef4-aac1-1a351d87ba81",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PHENYLEPHRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "سيتال كولد & فلو 20 كابليتس",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 3600,
+          "packageLabel": "Default Package",
+          "productId": "4239f966-b2eb-41e9-a09c-c2fea5e77484",
+          "productName": "CETAL COLD & FLU 20 CAPLETS",
+          "productPackageId": "9d893f5f-937d-4d41-9f62-c5d3f898a03c",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كولد فري",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 5000,
+          "packageLabel": "Default Package",
+          "productId": "a9417148-2589-420d-8893-12306db0dfba",
+          "productName": "COLD FREE 20 TABS.",
+          "productPackageId": "38af6c39-f480-4b71-92f5-6590a5c7bbc2",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كولد ستوب ن",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 5100,
+          "packageLabel": "Default Package",
+          "productId": "9c50d312-4319-45fa-a6b8-9a45e46c53a3",
+          "productName": "COLD STOP N 30 F.C. TABS",
+          "productPackageId": "626654c3-f547-448e-81fe-fe580987b444",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كولداكت",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 600,
+          "packageLabel": "Default Package",
+          "productId": "05f65cb5-0abd-44de-95c2-f3040404f8e2",
+          "productName": "COLDACT 16 CAPS.",
+          "productPackageId": "6f01ede4-8f63-4153-8f3f-0cd6f33ec6de",
+          "scientificName": "CAFFEINE+CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كولديكس-2",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 800,
+          "packageLabel": "Default Package",
+          "productId": "c5bd5ecf-8836-4a48-b09c-d3390117fcb6",
+          "productName": "COLDEX-2  18 F.C.TAB.(N/A)",
+          "productPackageId": "8f88e32b-389e-42f4-84bf-e4e4e8187521",
+          "scientificName": "CAFFEINE+CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "كونجيستال",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 5000,
+          "packageLabel": "Default Package",
+          "productId": "4832e952-ed61-4685-bc18-7939fce3aa18",
+          "productName": "CONGESTAL 20 TABS.",
+          "productPackageId": "88921605-b0f3-4062-bdf1-bef454ec5f25",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "إوروباك بلوس كولد 5 إفف. ساتشيتس",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 550,
+          "packageLabel": "Default Package",
+          "productId": "224c6e3f-9615-426b-8474-c26b0487038c",
+          "productName": "EUROPACK PLUS FOR COLD 5 EFF. SACHETS",
+          "productPackageId": "95d807a8-c262-4018-80a6-e9a47e8911a2",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE+SODIUM ASCORBATE+VITAMIN C",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فيفانو كولد",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 975,
+          "packageLabel": "Default Package",
+          "productId": "71ed39f5-ac36-4951-bf25-27dc5a0ee34a",
+          "productName": "FEVANO COLD 10 F.C. TABS.",
+          "productPackageId": "08fc89c6-e871-4309-a99f-9ddbfa994cbc",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فيفير ن فلو",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 600,
+          "packageLabel": "Default Package",
+          "productId": "75019eb7-2190-44e0-a3b6-402feaaea7a2",
+          "productName": "FEVER N FLU 120ML SYRUP",
+          "productPackageId": "a0b2409a-5eaf-428a-90ac-7c5da8bb612b",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فيفير ن فلو",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 950,
+          "packageLabel": "Default Package",
+          "productId": "31528fe0-1b99-456f-88e3-ec2d05ef8e26",
+          "productName": "FEVER N FLU 20 TABS.",
+          "productPackageId": "ec5a0695-7edb-45e3-9c3f-147e72b6fde8",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فلو كوت ن",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 1350,
+          "packageLabel": "Default Package",
+          "productId": "112f6a42-06e2-41db-9518-0c2f609b6fae",
+          "productName": "FLU CUT N 20 TAB.",
+          "productPackageId": "12696522-3a42-4eb1-a862-1e349afa04c6",
+          "scientificName": "CAFFEINE+CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فلو-ك",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 3900,
+          "packageLabel": "Default Package",
+          "productId": "6300328a-44e0-46c3-a3cf-0feab2035cf2",
+          "productName": "FLU-C 6 SACHETS",
+          "productPackageId": "fda93a5c-a92c-4468-b074-7b126599ca4c",
+          "scientificName": "CAFFEINE+CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+VITAMIN C",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فلومول",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 825,
+          "packageLabel": "Default Package",
+          "productId": "35a4dd94-f03e-4800-81be-3f46a495c567",
+          "productName": "FLUMOL SYRUP 120ML",
+          "productPackageId": "93fc83d8-370a-4d70-8d3e-55d70c40d879",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فلوريست ن",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 3200,
+          "packageLabel": "Default Package",
+          "productId": "efad12a7-642e-4483-8132-5521da627d82",
+          "productName": "FLUREST N  20 TABS.",
+          "productPackageId": "51b14ded-2a20-4d09-9b85-d7b2be1d1d9b",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PHENYLEPHRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        },
+        {
+          "arabicName": "فلوستات",
+          "availableQuantity": 0,
+          "barcodeMatch": 0,
+          "currentPriceMinor": 3400,
+          "packageLabel": "Default Package",
+          "productId": "87e0c578-1554-4e92-b9fa-94cfe639b638",
+          "productName": "FLUSTAT 20 TABS.",
+          "productPackageId": "b559e5fd-80b7-4823-9ab2-623e56a3e67f",
+          "scientificName": "CHLORPHENIRAMINE+PARACETAMOL(ACETAMINOPHEN)+PSEUDOEPHEDRINE",
+          "stockStatus": "OUT_OF_STOCK"
+        }
+      ],
+      "total": 32
+    },
+    "inactiveBarcode": {
+      "items": [],
+      "total": 0
+    }
+  },
+  "saleIntent": true,
+  "postRequest": {
+    "id": "7a584241-47fb-45ec-be0e-a3c5ccf7691c",
+    "expectedRevision": 1,
+    "requestId": "d16a532d-2a1b-4735-8956-a863087cd934",
+    "payments": [
+      {
+        "paymentMethod": "CASH",
+        "amountMinor": 1000,
+        "reference": null
+      }
+    ]
+  },
+  "sale": {
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "cart": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "customerName": null,
+      "discountMinor": 0,
+      "lines": [
+        {
+          "discountMinor": 0,
+          "displayName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS. · Default Package",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "quantity": 1,
+          "unitPriceMinor": 1000
+        }
+      ],
+      "notes": "DEV PHASE4 controlled sale quantity 1",
+      "taxMinor": 0
+    },
+    "createdAt": "2026-10-03T07:13:13.791Z",
+    "customerName": null,
+    "discountMinor": 0,
+    "id": "7a584241-47fb-45ec-be0e-a3c5ccf7691c",
+    "items": [
+      {
+        "allocations": [
+          {
+            "batchId": "39722ede-8343-4ff8-988e-1e21ce20bd16",
+            "expiryDate": null,
+            "id": "d4385052-ba21-4188-b180-04f6b15903c0",
+            "lotNumber": "DEV-PHASE3E-OPENING",
+            "movementId": "a60a0aa8-3ce6-4266-a86a-6f62e16450d4",
+            "quantity": 1,
+            "unitCostMinor": 100
+          }
+        ],
+        "discountMinor": 0,
+        "id": "8dd21dbe-7035-4de0-9660-74eac9980d93",
+        "lineTotalMinor": 1000,
+        "packageLabelSnapshot": "Default Package",
+        "productNameSnapshot": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "quantity": 1,
+        "remainingQuantity": 1,
+        "returnedQuantity": 0,
+        "saleDiscountMinor": 0,
+        "taxMinor": 0,
+        "unitCostMinor": 100,
+        "unitPriceMinor": 1000
+      }
+    ],
+    "notes": "DEV PHASE4 controlled sale quantity 1",
+    "paymentMethods": "CASH",
+    "paymentStatus": "PAID",
+    "payments": [
+      {
+        "amountMinor": 1000,
+        "id": "c126faef-fe0a-43b0-b22d-54d06c896b38",
+        "paymentMethod": "CASH",
+        "reference": null
+      }
+    ],
+    "postedAt": "2026-10-03T07:13:13.843Z",
+    "refundedMinor": 0,
+    "returns": [],
+    "revision": 2,
+    "saleNumber": "SAL-20261003-0001",
+    "status": "POSTED",
+    "subtotalMinor": 1000,
+    "taxMinor": 0,
+    "totalMinor": 1000,
+    "voidAllocations": [],
+    "voidedAt": null,
+    "voids": []
+  },
+  "salePassed": true,
+  "holdIntent": true,
+  "held": {
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "cart": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "customerName": null,
+      "discountMinor": 0,
+      "lines": [
+        {
+          "discountMinor": 0,
+          "displayName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS. · Default Package",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "quantity": 1,
+          "unitPriceMinor": 1000
+        }
+      ],
+      "notes": "DEV PHASE4 durable held cart only",
+      "taxMinor": 0
+    },
+    "createdAt": "2026-10-03T07:15:42.425Z",
+    "customerName": null,
+    "discountMinor": 0,
+    "id": "2a889be3-fb68-4e4b-a345-fbeb7837d901",
+    "items": [],
+    "notes": "DEV PHASE4 durable held cart only",
+    "paymentMethods": null,
+    "paymentStatus": "UNPAID",
+    "payments": [],
+    "postedAt": null,
+    "refundedMinor": 0,
+    "returns": [],
+    "revision": 2,
+    "saleNumber": null,
+    "status": "HELD",
+    "subtotalMinor": 1000,
+    "taxMinor": 0,
+    "totalMinor": 1000,
+    "voidAllocations": [],
+    "voidedAt": null,
+    "voids": []
+  },
+  "holdPassed": true,
+  "heldAfterResume": {
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "cart": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "customerName": null,
+      "discountMinor": 0,
+      "lines": [
+        {
+          "discountMinor": 0,
+          "displayName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS. · Default Package",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "quantity": 1,
+          "unitPriceMinor": 1000
+        }
+      ],
+      "notes": "DEV PHASE4 durable held cart only",
+      "taxMinor": 0
+    },
+    "createdAt": "2026-10-03T07:15:42.425Z",
+    "customerName": null,
+    "discountMinor": 0,
+    "id": "2a889be3-fb68-4e4b-a345-fbeb7837d901",
+    "items": [],
+    "notes": "DEV PHASE4 durable held cart only",
+    "paymentMethods": null,
+    "paymentStatus": "UNPAID",
+    "payments": [],
+    "postedAt": null,
+    "refundedMinor": 0,
+    "returns": [],
+    "revision": 5,
+    "saleNumber": null,
+    "status": "HELD",
+    "subtotalMinor": 1000,
+    "taxMinor": 0,
+    "totalMinor": 1000,
+    "voidAllocations": [],
+    "voidedAt": null,
+    "voids": []
+  },
+  "restartSalePassed": true,
+  "returnIntent": true,
+  "returnRequest": {
+    "id": "4b3a5168-8189-4503-9f73-0edff1514345",
+    "requestId": "bebe6ef2-ac9e-478a-bcdc-6714001807fd"
+  },
+  "returned": {
+    "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+    "cart": {
+      "branchId": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "customerName": null,
+      "discountMinor": 0,
+      "lines": [
+        {
+          "discountMinor": 0,
+          "displayName": "1 2 3 (ONE TWO THREE) 20 F.C.TABS. · Default Package",
+          "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+          "quantity": 1,
+          "unitPriceMinor": 1000
+        }
+      ],
+      "notes": "DEV PHASE4 controlled sale quantity 1",
+      "taxMinor": 0
+    },
+    "createdAt": "2026-10-03T07:13:13.791Z",
+    "customerName": null,
+    "discountMinor": 0,
+    "id": "7a584241-47fb-45ec-be0e-a3c5ccf7691c",
+    "items": [
+      {
+        "allocations": [
+          {
+            "batchId": "39722ede-8343-4ff8-988e-1e21ce20bd16",
+            "expiryDate": null,
+            "id": "d4385052-ba21-4188-b180-04f6b15903c0",
+            "lotNumber": "DEV-PHASE3E-OPENING",
+            "movementId": "a60a0aa8-3ce6-4266-a86a-6f62e16450d4",
+            "quantity": 1,
+            "unitCostMinor": 100
+          }
+        ],
+        "discountMinor": 0,
+        "id": "8dd21dbe-7035-4de0-9660-74eac9980d93",
+        "lineTotalMinor": 1000,
+        "packageLabelSnapshot": "Default Package",
+        "productNameSnapshot": "1 2 3 (ONE TWO THREE) 20 F.C.TABS.",
+        "productPackageId": "40bad73e-196c-4a7e-81e7-b6dfb90e64af",
+        "quantity": 1,
+        "remainingQuantity": 0,
+        "returnedQuantity": 1,
+        "saleDiscountMinor": 0,
+        "taxMinor": 0,
+        "unitCostMinor": 100,
+        "unitPriceMinor": 1000
+      }
+    ],
+    "notes": "DEV PHASE4 controlled sale quantity 1",
+    "paymentMethods": "CASH",
+    "paymentStatus": "PAID",
+    "payments": [
+      {
+        "amountMinor": 1000,
+        "id": "c126faef-fe0a-43b0-b22d-54d06c896b38",
+        "paymentMethod": "CASH",
+        "reference": null
+      }
+    ],
+    "postedAt": "2026-10-03T07:13:13.843Z",
+    "refundedMinor": 1000,
+    "returns": [
+      {
+        "allocations": [
+          {
+            "movementId": "8a4a7731-fc3f-4e49-9d0f-3e6cf461e355",
+            "originalAllocationId": "d4385052-ba21-4188-b180-04f6b15903c0",
+            "quantity": 1,
+            "refundMinor": 1000
+          }
+        ],
+        "createdAt": "2026-10-03T07:17:24.176Z",
+        "id": "4b3a5168-8189-4503-9f73-0edff1514345",
+        "lines": [
+          {
+            "quantity": 1,
+            "saleItemId": "8dd21dbe-7035-4de0-9660-74eac9980d93"
+          }
+        ],
+        "postedAt": "2026-10-03T07:17:24.219Z",
+        "reason": "DEV PHASE4 controlled return of original unit",
+        "refundMinor": 1000,
+        "status": "POSTED"
+      }
+    ],
+    "revision": 2,
+    "saleNumber": "SAL-20261003-0001",
+    "status": "POSTED",
+    "subtotalMinor": 1000,
+    "taxMinor": 0,
+    "totalMinor": 1000,
+    "voidAllocations": [],
+    "voidedAt": null,
+    "voids": []
+  },
+  "voidAfterReturnError": {
+    "code": "validation",
+    "message": "A sale with posted returns cannot be voided."
+  },
+  "returnPassed": true,
+  "finalPassed": true
+}

@@ -17,6 +17,8 @@ pub struct RecoveryStatus {
     pub inventory_alerts_enabled: bool,
     pub inventory_ui_enabled: bool,
     pub sales_enabled: bool,
+    pub partners_enabled: bool,
+    pub purchasing_enabled: bool,
 }
 
 #[tauri::command]
@@ -28,6 +30,8 @@ pub fn recovery_status() -> RecoveryStatus {
         inventory_alerts_enabled: true,
         inventory_ui_enabled: true,
         sales_enabled: true,
+        partners_enabled: true,
+        purchasing_enabled: true,
     }
 }
 

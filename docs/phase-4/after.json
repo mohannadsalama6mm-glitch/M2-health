@@ -1,0 +1,211 @@
+{
+  "integrity": "ok",
+  "foreignKeyViolations": [],
+  "versions": [
+    [
+      1,
+      "branches",
+      "2026-09-12T09:31:52.890Z"
+    ],
+    [
+      2,
+      "catalog_core",
+      "2026-09-12T10:06:57.913Z"
+    ],
+    [
+      3,
+      "catalog_import",
+      "2026-09-12T20:32:32.305Z"
+    ],
+    [
+      4,
+      "inventory_core",
+      "2026-09-13T07:52:18.434Z"
+    ],
+    [
+      5,
+      "inventory_workflows",
+      "2026-09-14T05:23:54.485Z"
+    ],
+    [
+      6,
+      "stock_counts",
+      "2026-09-14T06:14:46.861Z"
+    ],
+    [
+      7,
+      "catalog_source_actions",
+      "2026-09-14T12:53:21.286Z"
+    ],
+    [
+      8,
+      "inventory_alerts",
+      "2026-09-15T07:55:33.281Z"
+    ],
+    [
+      9,
+      "sales",
+      "2026-10-03T07:09:52.645Z"
+    ]
+  ],
+  "countsBefore": {
+    "_schema_version": 8,
+    "branches": 3,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "products": 25062,
+    "product_active_ingredients": 1,
+    "product_packages": 25062,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 2,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 8,
+    "inventory_transfers": 1,
+    "inventory_movements": 17,
+    "inventory_levels": 1,
+    "inventory_document_sequences": 5,
+    "inventory_documents": 6,
+    "inventory_document_lines": 8,
+    "inventory_document_movements": 9,
+    "inventory_post_requests": 6,
+    "stock_count_sequences": 1,
+    "stock_count_sessions": 1,
+    "stock_count_lines": 1,
+    "stock_count_results": 1,
+    "stock_count_completion_requests": 1,
+    "catalog_source_runs": 1,
+    "catalog_source_rows": 25088,
+    "inventory_alert_settings": 3,
+    "inventory_alerts": 4,
+    "inventory_alert_history": 10
+  },
+  "countsAfter": {
+    "_schema_version": 9,
+    "branches": 3,
+    "manufacturers": 5545,
+    "categories": 2446,
+    "routes": 14,
+    "active_ingredients": 1,
+    "products": 25062,
+    "product_active_ingredients": 1,
+    "product_packages": 25062,
+    "barcodes": 1,
+    "product_price_history": 25063,
+    "catalog_import_runs": 2,
+    "catalog_import_rows": 25061,
+    "inventory_batches": 8,
+    "inventory_transfers": 1,
+    "inventory_movements": 19,
+    "inventory_levels": 1,
+    "inventory_document_sequences": 5,
+    "inventory_documents": 6,
+    "inventory_document_lines": 8,
+    "inventory_document_movements": 9,
+    "inventory_post_requests": 6,
+    "stock_count_sequences": 1,
+    "stock_count_sessions": 1,
+    "stock_count_lines": 1,
+    "stock_count_results": 1,
+    "stock_count_completion_requests": 1,
+    "catalog_source_runs": 1,
+    "catalog_source_rows": 25088,
+    "inventory_alert_settings": 3,
+    "inventory_alerts": 5,
+    "inventory_alert_history": 12,
+    "sales": 2,
+    "sale_items": 1,
+    "sale_item_allocations": 1,
+    "sale_payments": 1,
+    "sale_returns": 1,
+    "sale_return_items": 1,
+    "sale_return_allocations": 1,
+    "sale_refunds": 1,
+    "sale_voids": 0,
+    "sale_void_allocations": 0,
+    "sale_requests": 2,
+    "sale_sequences": 1
+  },
+  "unchangedTables": {
+    "_schema_version": false,
+    "branches": true,
+    "manufacturers": true,
+    "categories": true,
+    "routes": true,
+    "active_ingredients": true,
+    "products": true,
+    "product_active_ingredients": true,
+    "product_packages": true,
+    "barcodes": true,
+    "product_price_history": true,
+    "catalog_import_runs": true,
+    "catalog_import_rows": true,
+    "inventory_batches": true,
+    "inventory_transfers": true,
+    "inventory_movements": false,
+    "inventory_levels": true,
+    "inventory_document_sequences": true,
+    "inventory_documents": true,
+    "inventory_document_lines": true,
+    "inventory_document_movements": true,
+    "inventory_post_requests": true,
+    "stock_count_sequences": true,
+    "stock_count_sessions": true,
+    "stock_count_lines": true,
+    "stock_count_results": true,
+    "stock_count_completion_requests": true,
+    "catalog_source_runs": true,
+    "catalog_source_rows": true,
+    "inventory_alert_settings": true,
+    "inventory_alerts": false,
+    "inventory_alert_history": false
+  },
+  "priorSchemaPreserved": true,
+  "priorLedgerAndAlertHistoryPreserved": true,
+  "priorAlertIdentityPreserved": true,
+  "calendarAlertTransition": {
+    "resolved": "BATCH_EXPIRING",
+    "activated": "BATCH_EXPIRED",
+    "batchId": "ef006804-7633-463a-a7ba-53ca276ca4c2"
+  },
+  "hashes": {
+    "src\\data\\karem\\egyptian-drugs.csv": "5f31d97c3491dd75bae780bba8ce52bb8e33bf81a7f0f085884159f08d38de41",
+    "config\\catalog-source.json": "c84361272efc3890978b5802cec5766ac3ae0a3110c7d6bd88affabf3c6a9c87",
+    "src-tauri\\migrations\\001_branches.sql": "192b2f0e16bf13e6d8fc355a173efbc19b15be753d21a44c7027658f4d6cb6fb",
+    "src-tauri\\migrations\\002_catalog_core.sql": "c71291d00c8d7580d9650bbb465a0b6e1e8aa056d50896d4e963c9982d440738",
+    "src-tauri\\migrations\\003_catalog_import.sql": "860281f335d2877fcd77c04bc8d9a84b297ecc3ac673b24eae126f508d8c6be2",
+    "src-tauri\\migrations\\004_inventory_core.sql": "0ac19da1fb94f190aa387367037a3dc3ef521dca290abf94faa3a021e87b4df0",
+    "src-tauri\\migrations\\005_inventory_workflows.sql": "e4d00170e2010ed9354cca3a615e779e84e8f1915ebaff1d78e8b07f6d5feb81",
+    "src-tauri\\migrations\\006_stock_counts.sql": "f0a579d39fed0c44cdfc4c33657242304e8cb12680cc635bbd33ad22b2f7d308",
+    "src-tauri\\migrations\\007_catalog_source_actions.sql": "df5d72f61f6a2c0f98fe3a6ad318ece16df060a491f7efda3f985cd3f7546074",
+    "src-tauri\\migrations\\008_inventory_alerts.sql": "7125642b0a5bd1196fb21bc0bf94d5c606ef769881a087a38ff6732270390874"
+  },
+  "stock": {
+    "0fc16eaf-cefa-4576-8201-9b03541036f8": 6,
+    "461dd52b-1136-409b-a019-9f5429b4ed09": 2,
+    "f319a917-95d0-47bf-b007-ab76b7c044ae": 8
+  },
+  "newMovements": [
+    {
+      "id": "8a4a7731-fc3f-4e49-9d0f-3e6cf461e355",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "movement_type": "SALE_RETURN",
+      "quantity_delta": 1,
+      "batch_id": "39722ede-8343-4ff8-988e-1e21ce20bd16",
+      "reference_type": "sale_return_allocation",
+      "reference_id": "e2ae6c1c-1ed3-4e08-93b5-b4ce488e2f81"
+    },
+    {
+      "id": "a60a0aa8-3ce6-4266-a86a-6f62e16450d4",
+      "branch_id": "0fc16eaf-cefa-4576-8201-9b03541036f8",
+      "movement_type": "SALE",
+      "quantity_delta": -1,
+      "batch_id": "39722ede-8343-4ff8-988e-1e21ce20bd16",
+      "reference_type": "sale_item_allocation",
+      "reference_id": "d4385052-ba21-4188-b180-04f6b15903c0"
+    }
+  ],
+  "nativePassed": true
+}

@@ -1,7 +1,15 @@
 import { nativeRequest } from "./client";
 
 export const recoveryStatus = () =>
-  nativeRequest<{ laterWorkflowsEnabled: boolean; inventoryWorkflowsEnabled: boolean; stockCountsEnabled: boolean; inventoryAlertsEnabled: boolean; inventoryUiEnabled: boolean; salesEnabled: boolean }>("recovery_status");
+  nativeRequest<{
+    laterWorkflowsEnabled: boolean;
+    inventoryWorkflowsEnabled: boolean;
+    stockCountsEnabled: boolean;
+    inventoryAlertsEnabled: boolean;
+    inventoryUiEnabled: boolean;
+    salesEnabled: boolean;
+    partnersEnabled: boolean;
+  }>("recovery_status");
 
 export interface CoreBalance {
   branchId: string;
@@ -26,5 +34,3 @@ export const coreMovements = (branchId: string, offset: number) =>
   nativeRequest<CoreMovement[]>("list_stock_movements", {
     query: { branchId, limit: 20, offset },
   });
-
-

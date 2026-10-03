@@ -33,7 +33,16 @@ export function AppShell() {
     mainRef = useRef<HTMLElement>(null);
   const navigate = useNavigate(),
     location = useLocation();
-  const nativeInventory = isDesktopRuntime() && /^\/(inventory|sales)(\/|$)/.test(location.pathname);
+  const nativeWorkspace =
+    isDesktopRuntime() &&
+    /^\/(inventory|sales|suppliers|customers)(\/|$)/.test(location.pathname);
+  const nativeWorkspaceName = location.pathname.startsWith("/sales")
+    ? "Sales"
+    : location.pathname.startsWith("/suppliers")
+      ? "Suppliers"
+      : location.pathname.startsWith("/customers")
+        ? "Customers"
+        : "Inventory";
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [location.pathname]);
@@ -114,9 +123,13 @@ export function AppShell() {
           </IconButton>
           <div className="global-search" ref={searchRef}>
             <SearchInput
-              placeholder={nativeInventory ? 'Use the search in this workspace' : 'Search products or barcodes…'}
+              placeholder={
+                nativeWorkspace
+                  ? "Use the search in this workspace"
+                  : "Search products or barcodes…"
+              }
               label="Global search"
-              disabled={nativeInventory}
+              disabled={nativeWorkspace}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -126,7 +139,7 @@ export function AppShell() {
               }}
             />
             <kbd>Ctrl K</kbd>
-            {query && !nativeInventory && (
+            {query && !nativeWorkspace && (
               <div className="search-results global-results">
                 {matches.length ? (
                   matches.map((p) => (
@@ -195,8 +208,11 @@ export function AppShell() {
         </main>
         <div className="desktop-statusbar">
           <span>
-            {nativeInventory ? branchName : branch} <span className="caption-separator">/</span>{' '}
-            {nativeInventory ? `Local ${location.pathname.startsWith('/sales') ? 'Sales' : 'Inventory'} · persisted SQLite data` : 'UI demo · no persistent data'}
+            {nativeWorkspace ? branchName : branch}{" "}
+            <span className="caption-separator">/</span>{" "}
+            {nativeWorkspace
+              ? `Local ${nativeWorkspaceName} · persisted SQLite data`
+              : "UI demo · no persistent data"}
           </span>
           <NavLink to="/sync">
             <CloudOff size={12} /> Local / cloud not connected

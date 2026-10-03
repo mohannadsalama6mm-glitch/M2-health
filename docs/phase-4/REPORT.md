@@ -1,4 +1,6 @@
-# M² Health — Phase 4
+# M² Health — Phase 4 implementation notes (superseded)
+
+The completed A–AJ report is in `FINAL-REPORT.md`.
 
 This report is in progress until native and preservation evidence is recorded.
 
@@ -96,7 +98,7 @@ Existing cards, inputs, tables, alerts and dialogs are reused. Search/cart scrol
 
 **X. Frontend Tests**
 
-28 Phase 4 tests passed independently. Full 138-test regression run pending at report creation.
+28 Phase 4 tests passed independently. The completed full regression is 138/138; see `FINAL-REPORT.md` for all native and preservation evidence.
 
 **Y–AD. Native and preservation evidence**
 
@@ -112,7 +114,7 @@ Customer account links, external payment/refund processing, cash change, multi-m
 
 **AG. Phase 4 Status**
 
-NOT COMPLETE
+COMPLETE — superseded by the A–AJ decision in `FINAL-REPORT.md`.
 
 **AH. Recommended Phase 5 Plan**
 

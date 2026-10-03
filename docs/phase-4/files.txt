@@ -11,6 +11,7 @@ tests/canonical-sales-double.ts
 tests/canonical-sales.spec.ts
 scripts/phase4-baseline.py
 scripts/phase4-native-smoke.mjs
+scripts/inspect_phase4.py
 scripts/verify_phase4.py
 docs/phase-4/*
 
