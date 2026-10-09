@@ -15,7 +15,9 @@ use crate::{
     },
 };
 use models::*;
-pub use returns::{create_return, post_return, preview_return, void};
+pub use returns::{
+    create_return, create_return_as, post_return, post_return_as, preview_return, void, void_as,
+};
 use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 use serde_json::{json, Value};
 use std::collections::HashSet;
@@ -42,6 +44,31 @@ fn branch(c: &Connection, b: &str) -> Result<(), AppError> {
         return Err(invalid("Select an active branch."));
     }
     Ok(())
+}
+fn customer_snapshot(
+    c: &Connection,
+    customer_id: Option<&str>,
+    require_active: bool,
+) -> Result<Option<(String, String, Option<String>)>, AppError> {
+    let Some(customer_id) = customer_id else {
+        return Ok(None);
+    };
+    id(customer_id)?;
+    let customer: Option<(String, String, Option<String>, bool)> = c
+        .query_row(
+            "SELECT code,display_name,primary_phone,is_active FROM customers WHERE id=?1",
+            [customer_id],
+            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+        )
+        .optional()?;
+    let (code, name, phone, active) = customer
+        .ok_or_else(|| AppError::new(crate::error::ErrorCode::NotFound, "Customer not found."))?;
+    if require_active && !active {
+        return Err(invalid(
+            "Select an active customer or remove the customer from this sale.",
+        ));
+    }
+    Ok(Some((code, name, phone)))
 }
 fn decode<T: serde::de::DeserializeOwned>(s: &str) -> Result<T, AppError> {
     serde_json::from_str(s).map_err(|_| invalid("Stored sales data is invalid."))
@@ -98,6 +125,9 @@ fn eligible(
 }
 pub fn calculate(c: &Connection, cart: &Cart, allocate: bool) -> Result<Preview, AppError> {
     branch(c, &cart.branch_id)?;
+    if let Some(customer_id) = &cart.customer_id {
+        id(customer_id)?;
+    }
     optional(&cart.customer_name)?;
     optional(&cart.notes)?;
     money(cart.discount_minor as i128)?;
@@ -205,11 +235,16 @@ pub fn preview(db: &AppDb, cart: &Cart) -> Result<Preview, AppError> {
     calculate(&*db.lock()?, cart, true)
 }
 pub fn save(db: &AppDb, input: &Save) -> Result<Value, AppError> {
+    save_as(db, input, None)
+}
+pub fn save_as(db: &AppDb, input: &Save, actor: Option<&str>) -> Result<Value, AppError> {
     id(&input.id)?;
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let totals = calculate(&tx, &input.cart, false)?;
     let mut cart = input.cart.clone();
+    let customer = customer_snapshot(&tx, cart.customer_id.as_deref(), true)?;
+    cart.customer_name = customer.as_ref().map(|value| value.1.clone());
     for (l, p) in cart.lines.iter_mut().zip(&totals.lines) {
         l.unit_price_minor = Some(p.unit_price_minor);
         l.display_name = Some(format!(
@@ -239,12 +274,12 @@ pub fn save(db: &AppDb, input: &Save) -> Result<Value, AppError> {
         if old.branch_id != cart.branch_id {
             return Err(invalid("A persisted cart cannot change branch."));
         }
-        tx.execute("UPDATE sales SET draft_json=?2,customer_name=?3,notes=?4,revision=revision+1 WHERE id=?1",params![input.id,text(&cart)?,cart.customer_name,cart.notes])?;
+        tx.execute("UPDATE sales SET draft_json=?2,customer_id=?3,customer_name=?4,customer_code_snapshot=?5,customer_phone_snapshot=?6,notes=?7,revision=revision+1 WHERE id=?1",params![input.id,text(&cart)?,cart.customer_id,cart.customer_name,customer.as_ref().map(|v|&v.0),customer.as_ref().and_then(|v|v.2.as_ref()),cart.notes])?;
     } else {
         if input.expected_revision.is_some() {
             return Err(invalid("Sale no longer exists."));
         }
-        tx.execute("INSERT INTO sales(id,branch_id,status,draft_json,customer_name,notes) VALUES(?1,?2,'DRAFT',?3,?4,?5)",params![input.id,cart.branch_id,text(&cart)?,cart.customer_name,cart.notes])?;
+        tx.execute("INSERT INTO sales(id,branch_id,status,draft_json,customer_id,customer_name,customer_code_snapshot,customer_phone_snapshot,notes,created_by) VALUES(?1,?2,'DRAFT',?3,?4,?5,?6,?7,?8,?9)",params![input.id,cart.branch_id,text(&cart)?,cart.customer_id,cart.customer_name,customer.as_ref().map(|v|&v.0),customer.as_ref().and_then(|v|v.2.as_ref()),cart.notes,actor])?;
     }
     tx.execute("UPDATE sales SET subtotal_minor=?2,discount_minor=?3,tax_minor=?4,total_minor=?5 WHERE id=?1",params![input.id,totals.subtotal_minor,totals.discount_minor,totals.tax_minor,totals.total_minor])?;
     let result = detail_on(&tx, &input.id)?;
@@ -301,14 +336,23 @@ fn receipt(
     Ok(())
 }
 pub fn post(db: &AppDb, input: &Post) -> Result<Value, AppError> {
-    let payload = text(input)?;
+    post_as(db, input, None)
+}
+pub fn post_as(db: &AppDb, input: &Post, actor: Option<&str>) -> Result<Value, AppError> {
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
+    let bound_customer: Option<String> = tx.query_row(
+        "SELECT customer_id FROM sales WHERE id=?1",
+        [&input.id],
+        |row| row.get(0),
+    )?;
+    let payload = text(&json!({"post": input, "customerId": bound_customer, "actor": actor}))?;
     if retry(&tx, &input.request_id, "POST", &input.id, &payload)? {
         return detail_on(&tx, &input.id);
     }
     let (s, r, cart) = stored(&tx, &input.id)?;
     editable(&s, r, input.expected_revision)?;
+    let customer = customer_snapshot(&tx, cart.customer_id.as_deref(), true)?;
     if cart.lines.is_empty() {
         return Err(invalid("Add a package before posting."));
     }
@@ -351,7 +395,7 @@ pub fn post(db: &AppDb, input: &Post) -> Result<Value, AppError> {
                 batch_id: a.batch_id.clone(),
                 quantity: a.quantity,
                 reason: format!("Sale {number}"),
-                created_by: None,
+                created_by: actor.map(str::to_owned),
             };
             let m = movements::insert_referenced(
                 &tx,
@@ -366,7 +410,8 @@ pub fn post(db: &AppDb, input: &Post) -> Result<Value, AppError> {
     for pay in &input.payments {
         tx.execute("INSERT INTO sale_payments(id,sale_id,payment_method,amount_minor,reference) VALUES(?1,?2,?3,?4,?5)",params![uuid(),input.id,pay.payment_method.as_str(),pay.amount_minor,pay.reference])?;
     }
-    tx.execute("UPDATE sales SET status='POSTED',revision=revision+1,sale_number=?2,payment_status='PAID',post_request_id=?3,posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),subtotal_minor=?4,discount_minor=?5,tax_minor=?6,total_minor=?7 WHERE id=?1",params![input.id,number,input.request_id,p.subtotal_minor,p.discount_minor,p.tax_minor,p.total_minor])?;
+    tx.execute("UPDATE sales SET status='POSTED',revision=revision+1,sale_number=?2,payment_status='PAID',post_request_id=?3,posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),subtotal_minor=?4,discount_minor=?5,tax_minor=?6,total_minor=?7,customer_name=?8,customer_code_snapshot=?9,customer_phone_snapshot=?10 WHERE id=?1",params![input.id,number,input.request_id,p.subtotal_minor,p.discount_minor,p.tax_minor,p.total_minor,customer.as_ref().map(|v|&v.1),customer.as_ref().map(|v|&v.0),customer.as_ref().and_then(|v|v.2.as_ref())])?;
+    crate::finance::post_sale(&tx, &input.id)?;
     receipt(&tx, &input.request_id, "POST", &input.id, &payload)?;
     let result = detail_on(&tx, &input.id)?;
     tx.commit()?;
@@ -374,7 +419,7 @@ pub fn post(db: &AppDb, input: &Post) -> Result<Value, AppError> {
     inventory::alerts::refresh_all(db);
     Ok(result)
 }
-const HEADER:&str="SELECT json_object('id',id,'saleNumber',sale_number,'branchId',branch_id,'customerName',customer_name,'status',status,'revision',revision,'cart',json(draft_json),'subtotalMinor',subtotal_minor,'discountMinor',discount_minor,'taxMinor',tax_minor,'totalMinor',total_minor,'paymentStatus',payment_status,'paymentMethods',(SELECT group_concat(DISTINCT payment_method) FROM sale_payments WHERE sale_id=sales.id),'refundedMinor',(SELECT coalesce(sum(amount_minor),0) FROM sale_refunds WHERE sale_id=sales.id),'createdAt',created_at,'postedAt',posted_at,'voidedAt',voided_at,'notes',notes) FROM sales";
+const HEADER:&str="SELECT json_object('id',id,'saleNumber',sale_number,'branchId',branch_id,'customerId',customer_id,'customerCodeSnapshot',customer_code_snapshot,'customerName',customer_name,'customerPhoneSnapshot',customer_phone_snapshot,'status',status,'revision',revision,'cart',json(draft_json),'subtotalMinor',subtotal_minor,'discountMinor',discount_minor,'taxMinor',tax_minor,'totalMinor',total_minor,'paymentStatus',payment_status,'paymentMethods',(SELECT group_concat(DISTINCT payment_method) FROM sale_payments WHERE sale_id=sales.id),'refundedMinor',(SELECT coalesce(sum(amount_minor),0) FROM sale_refunds WHERE sale_id=sales.id),'createdAt',created_at,'postedAt',posted_at,'voidedAt',voided_at,'notes',notes) FROM sales";
 pub fn detail(db: &AppDb, sale: &str) -> Result<Value, AppError> {
     detail_on(&*db.lock()?, sale)
 }
@@ -456,6 +501,50 @@ pub fn list(db: &AppDb, q: &Query) -> Result<Value, AppError> {
         )?
         .collect::<Result<Vec<_>, _>>()?;
     Ok(json!({"items":items,"total":total}))
+}
+pub fn customer_history(db: &AppDb, q: &CustomerSalesQuery) -> Result<Value, AppError> {
+    customer_history_on(db, q, None)
+}
+pub fn customer_history_for_branch(
+    db: &AppDb,
+    q: &CustomerSalesQuery,
+    branch_id: &str,
+) -> Result<Value, AppError> {
+    customer_history_on(db, q, Some(branch_id))
+}
+fn customer_history_on(
+    db: &AppDb,
+    q: &CustomerSalesQuery,
+    branch_id: Option<&str>,
+) -> Result<Value, AppError> {
+    id(&q.customer_id)?;
+    let c = db.lock()?;
+    if let Some(branch_id) = branch_id {
+        branch(&c, branch_id)?;
+    }
+    if !c.query_row(
+        "SELECT EXISTS(SELECT 1 FROM customers WHERE id=?1)",
+        [&q.customer_id],
+        |r| r.get::<_, bool>(0),
+    )? {
+        return Err(AppError::new(
+            crate::error::ErrorCode::NotFound,
+            "Customer not found.",
+        ));
+    }
+    let (limit, offset) = inventory::page(q.limit, q.offset)?;
+    let total: i64 = c.query_row(
+        "SELECT count(*) FROM sales WHERE customer_id=?1 AND (?2 IS NULL OR branch_id=?2)",
+        params![q.customer_id, branch_id],
+        |r| r.get(0),
+    )?;
+    let mut statement = c.prepare(&format!(
+        "{HEADER} WHERE customer_id=?1 AND (?2 IS NULL OR branch_id=?2) ORDER BY created_at DESC,id DESC LIMIT ?3 OFFSET ?4"
+    ))?;
+    let items = statement
+        .query_map(params![q.customer_id, branch_id, limit, offset], jsonrow)?
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(json!({"items":items,"total":total,"limit":limit,"offset":offset}))
 }
 pub fn search(db: &AppDb, q: &Query) -> Result<Value, AppError> {
     let c = db.lock()?;

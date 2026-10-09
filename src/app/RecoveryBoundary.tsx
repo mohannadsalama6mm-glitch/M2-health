@@ -1,6 +1,10 @@
 import { InventoryWorkspace } from "../features/inventory/InventoryWorkspace";
 import { CanonicalSales } from "../features/sales/CanonicalSales";
 import { CanonicalPartners } from "../features/relationships/CanonicalPartners";
+import { CanonicalPurchases } from "../features/purchases/CanonicalPurchases";
+import { CanonicalReports } from "../features/reports/CanonicalReports";
+import { CanonicalFinance } from "../features/finance/CanonicalFinance";
+import { CanonicalDashboard } from "../features/dashboard/CanonicalDashboard";
 import { useEffect, useState, type ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import {
@@ -31,6 +35,10 @@ export function RecoveryBoundary({ children }: { children: ReactNode }) {
   const [inventoryUiEnabled, setInventoryUiEnabled] = useState(false);
   const [salesEnabled, setSalesEnabled] = useState(false);
   const [partnersEnabled, setPartnersEnabled] = useState(false);
+  const [purchasingEnabled, setPurchasingEnabled] = useState(false);
+  const [reportingEnabled, setReportingEnabled] = useState(false);
+  const [financeEnabled, setFinanceEnabled] = useState(false);
+  const [dashboardEnabled, setDashboardEnabled] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     if (!isDesktopRuntime()) return;
@@ -45,6 +53,10 @@ export function RecoveryBoundary({ children }: { children: ReactNode }) {
           setInventoryUiEnabled(s.inventoryUiEnabled === true);
           setSalesEnabled(s.salesEnabled === true);
           setPartnersEnabled(s.partnersEnabled === true);
+          setPurchasingEnabled(s.purchasingEnabled === true);
+          setReportingEnabled(s.reportingEnabled === true);
+          setFinanceEnabled(s.financeEnabled === true);
+          setDashboardEnabled(s.dashboardEnabled === true);
         }
       })
       .catch((e: unknown) => {
@@ -60,11 +72,16 @@ export function RecoveryBoundary({ children }: { children: ReactNode }) {
     };
   }, []);
   const affected =
-    /^\/(inventory|sales|purchases|suppliers|customers)(\/|$)/.test(pathname);
+    /^\/(dashboard|inventory|sales|purchases|suppliers|customers|reports|finance)(\/|$)/.test(pathname);
+  if (dashboardEnabled && reportingEnabled && financeEnabled && pathname === "/dashboard") return <CanonicalDashboard />;
+  if (financeEnabled && /^\/finance(\/|$)/.test(pathname)) return <CanonicalFinance />;
+  if (reportingEnabled && pathname === "/reports") return <CanonicalReports />;
   if (salesEnabled && /^\/sales(\/|$)/.test(pathname))
     return <CanonicalSales />;
   if (partnersEnabled && /^\/(suppliers|customers)(\/|$)/.test(pathname))
     return <CanonicalPartners />;
+  if (purchasingEnabled && /^\/purchases(\/|$)/.test(pathname))
+    return <CanonicalPurchases />;
   if (inventoryUiEnabled && pathname === "/inventory")
     return <InventoryWorkspace />;
   if (
@@ -80,6 +97,14 @@ export function RecoveryBoundary({ children }: { children: ReactNode }) {
       />
     );
   if (!affected || !isDesktopRuntime() || enabled === true) return children;
+  if (error)
+    if (pathname === "/dashboard")
+      return (
+        <p role="status">
+          The canonical Dashboard is unavailable until local workflow
+          capabilities can be verified.
+        </p>
+      );
   if (error)
     return (
       <Alert title="Workflow availability could not be verified" tone="danger">

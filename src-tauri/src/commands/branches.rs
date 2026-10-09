@@ -1,4 +1,5 @@
 use crate::{
+    auth::{self, AuthState},
     db::{
         connection::AppDb,
         models::branch::{Branch, CreateBranch},
@@ -21,8 +22,17 @@ pub fn ensure_default_branch(state: State<'_, DatabaseState>) -> Result<Branch, 
     branches::ensure_default_branch(state.db()?)
 }
 #[tauri::command]
-pub fn list_branches(state: State<'_, DatabaseState>) -> Result<Vec<Branch>, AppError> {
-    branches::list_branches(state.db()?)
+pub fn list_branches(
+    state: State<'_, DatabaseState>,
+    auth_state: State<'_, AuthState>,
+    session_token: String,
+) -> Result<Vec<Branch>, AppError> {
+    let principal = auth::principal(state.db()?, &auth_state, &session_token)?;
+    let mut rows = branches::list_branches(state.db()?)?;
+    if !principal.roles.iter().any(|role| role == "ADMIN") {
+        rows.retain(|branch| principal.branch_ids.iter().any(|id| id == &branch.id));
+    }
+    Ok(rows)
 }
 #[tauri::command]
 pub fn get_branch(state: State<'_, DatabaseState>, id: String) -> Result<Branch, AppError> {

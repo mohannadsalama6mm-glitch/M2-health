@@ -85,32 +85,56 @@ pub fn preview_return(db: &AppDb, input: &ReturnDraft) -> Result<Value, AppError
     )
 }
 pub fn create_return(db: &AppDb, input: &ReturnDraft) -> Result<Value, AppError> {
+    create_return_as(db, input, None)
+}
+pub fn create_return_as(
+    db: &AppDb,
+    input: &ReturnDraft,
+    actor: Option<&str>,
+) -> Result<Value, AppError> {
     id(&input.id)?;
     required(&input.reason)?;
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let existing: Option<(String, String, String)> = tx
-        .query_row(
-            "SELECT sale_id,reason,lines_json FROM sale_returns WHERE id=?1",
+    let has_actor = tx
+        .prepare("PRAGMA table_info(sale_returns)")?
+        .query_map([], |row| row.get::<_, String>(1))?
+        .collect::<Result<Vec<_>, _>>()?
+        .iter()
+        .any(|column| column == "created_by");
+    let expected = (
+        input.sale_id.clone(),
+        input.reason.clone(),
+        text(&input.lines)?,
+    );
+    let existing: Option<(String, String, String, Option<String>)> = if has_actor {
+        tx.query_row(
+            "SELECT sale_id,reason,lines_json,created_by FROM sale_returns WHERE id=?1",
             [&input.id],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
         )
-        .optional()?;
+        .optional()?
+    } else {
+        tx.query_row(
+            "SELECT sale_id,reason,lines_json,NULL FROM sale_returns WHERE id=?1",
+            [&input.id],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )
+        .optional()?
+    };
     if let Some(old) = existing {
-        if old
-            != (
-                input.sale_id.clone(),
-                input.reason.clone(),
-                text(&input.lines)?,
-            )
-        {
+        if (old.0, old.1, old.2) != expected || (has_actor && old.3 != actor.map(str::to_owned)) {
             return Err(invalid("Return ID already belongs to another payload."));
         }
         return return_detail(&tx, &input.id);
     }
     let p = plan(&tx, &input.sale_id, &input.lines)?;
     let refund = money(p.iter().map(|l| l.refund as i128).sum())?;
-    tx.execute("INSERT INTO sale_returns(id,sale_id,status,reason,lines_json,refund_minor) VALUES(?1,?2,'DRAFT',?3,?4,?5)",params![input.id,input.sale_id,input.reason,text(&input.lines)?,refund])?;
+    if has_actor {
+        tx.execute("INSERT INTO sale_returns(id,sale_id,status,reason,lines_json,refund_minor,created_by) VALUES(?1,?2,'DRAFT',?3,?4,?5,?6)",params![input.id,input.sale_id,input.reason,text(&input.lines)?,refund,actor])?;
+    } else {
+        tx.execute("INSERT INTO sale_returns(id,sale_id,status,reason,lines_json,refund_minor) VALUES(?1,?2,'DRAFT',?3,?4,?5)",params![input.id,input.sale_id,input.reason,text(&input.lines)?,refund])?;
+    }
     let result = return_detail(&tx, &input.id)?;
     tx.commit()?;
     Ok(result)
@@ -126,6 +150,7 @@ fn restore(
     quantity: i64,
     reason: &str,
     reference: (&str, &str),
+    actor: Option<&str>,
 ) -> Result<String, AppError> {
     let op = StockOperation {
         request_id: uuid(),
@@ -134,13 +159,20 @@ fn restore(
         batch_id: batch.into(),
         quantity,
         reason: reason.into(),
-        created_by: None,
+        created_by: actor.map(str::to_owned),
     };
     Ok(movements::insert_referenced(c, &op, MovementType::SaleReturn, None, Some(reference))?.id)
 }
 pub fn post_return(db: &AppDb, input: &ReturnPost) -> Result<Value, AppError> {
+    post_return_as(db, input, None)
+}
+pub fn post_return_as(
+    db: &AppDb,
+    input: &ReturnPost,
+    actor: Option<&str>,
+) -> Result<Value, AppError> {
     id(&input.id)?;
-    let payload = text(input)?;
+    let payload = text(&json!({"input": input, "actor": actor}))?;
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let (sale, status, reason, lines, expected): (String, String, String, String, i64) = tx
@@ -176,6 +208,7 @@ pub fn post_return(db: &AppDb, input: &ReturnPost) -> Result<Value, AppError> {
                 quantity,
                 &reason,
                 ("sale_return_allocation", &allocation),
+                actor,
             )?;
             tx.execute("INSERT INTO sale_return_allocations(id,return_item_id,original_allocation_id,quantity,movement_id) VALUES(?1,?2,?3,?4,?5)",params![allocation,item,original,quantity,m])?;
         }
@@ -196,6 +229,7 @@ pub fn post_return(db: &AppDb, input: &ReturnPost) -> Result<Value, AppError> {
         params![uuid(), sale, input.id, refund],
     )?;
     tx.execute("UPDATE sale_returns SET status='POSTED',posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",[&input.id])?;
+    crate::finance::post_return(&tx, &input.id)?;
     receipt(&tx, &input.request_id, "RETURN", &input.id, &payload)?;
     let result = detail_on(&tx, &sale)?;
     tx.commit()?;
@@ -204,8 +238,11 @@ pub fn post_return(db: &AppDb, input: &ReturnPost) -> Result<Value, AppError> {
     Ok(result)
 }
 pub fn void(db: &AppDb, input: &Void) -> Result<Value, AppError> {
+    void_as(db, input, None)
+}
+pub fn void_as(db: &AppDb, input: &Void, actor: Option<&str>) -> Result<Value, AppError> {
     required(&input.reason)?;
-    let payload = text(input)?;
+    let payload = text(&json!({"input": input, "actor": actor}))?;
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
     if retry(&tx, &input.request_id, "VOID", &input.id, &payload)? {
@@ -256,6 +293,7 @@ pub fn void(db: &AppDb, input: &Void) -> Result<Value, AppError> {
             quantity,
             &input.reason,
             ("sale_void_allocation", &allocation),
+            actor,
         )?;
         tx.execute("INSERT INTO sale_void_allocations(id,void_id,original_allocation_id,movement_id) VALUES(?1,?2,?3,?4)",params![allocation,void,original,m])?;
     }
@@ -264,6 +302,7 @@ pub fn void(db: &AppDb, input: &Void) -> Result<Value, AppError> {
         params![uuid(), input.id, void, total],
     )?;
     tx.execute("UPDATE sales SET status='VOIDED',payment_status='REFUNDED',voided_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),revision=revision+1 WHERE id=?1",[&input.id])?;
+    crate::finance::post_void(&tx, &void, &input.id)?;
     receipt(&tx, &input.request_id, "VOID", &input.id, &payload)?;
     let result = detail_on(&tx, &input.id)?;
     tx.commit()?;

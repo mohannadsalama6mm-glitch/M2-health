@@ -1,53 +1,74 @@
 use super::{models::*, *};
-use crate::{commands::branches::DatabaseState, error::AppError};
+use crate::{
+    authorization::AuthorizationState, commands::branches::DatabaseState, error::AppError,
+};
 use tauri::State;
 #[tauri::command]
 pub fn create_inventory_batch(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: CreateBatch,
 ) -> Result<InventoryBatch, AppError> {
-    batches::create(state.db()?, &input)
+    batches::create_as(state.db()?, &input, Some(&authorization.actor()?))
 }
 #[tauri::command]
 pub fn record_opening_stock(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: OpeningStock,
 ) -> Result<InventoryMovement, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     movements::opening(state.db()?, &input)
 }
 #[tauri::command]
 pub fn record_batch_opening_stock(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: StockOperation,
 ) -> Result<InventoryMovement, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     movements::opening_existing(state.db()?, &input)
 }
 #[tauri::command]
 pub fn record_adjustment(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: Adjustment,
 ) -> Result<InventoryMovement, AppError> {
+    let mut input = input;
+    input.operation.created_by = Some(authorization.actor()?);
     movements::adjust(state.db()?, &input)
 }
 #[tauri::command]
 pub fn record_damage(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: StockOperation,
 ) -> Result<InventoryMovement, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     movements::damage(state.db()?, &input)
 }
 #[tauri::command]
 pub fn record_expiry_write_off(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: StockOperation,
 ) -> Result<InventoryMovement, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     movements::write_off(state.db()?, &input)
 }
 #[tauri::command]
 pub fn transfer_inventory_stock(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: TransferStock,
 ) -> Result<TransferResult, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     transfers::transfer(state.db()?, &input)
 }
 #[tauri::command]

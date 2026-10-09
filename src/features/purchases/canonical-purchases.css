@@ -1,0 +1,27 @@
+.canonical-purchases { min-width: 0; }
+.purchase-editor-grid { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(340px, 1.2fr); gap: 16px; }
+.purchase-editor-grid .card { display: grid; align-content: start; gap: 14px; min-width: 0; }
+.purchase-editor-grid h2, .canonical-purchases .card > h2 { margin: 0 0 8px; font-size: 1rem; }
+.purchase-package-results { display: grid; gap: 8px; max-height: 310px; overflow: auto; }
+.purchase-package-results button { border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: inherit; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px; text-align: start; cursor: pointer; }
+.purchase-package-results button:hover:not(:disabled) { border-color: var(--primary-500); background: var(--primary-50); }
+.purchase-package-results button:disabled { opacity: .55; cursor: default; }
+.purchase-package-results button span { display: grid; gap: 2px; }
+.purchase-package-results small, .purchase-lines td span { color: var(--text-secondary); }
+.purchase-lines-scroll { overflow-x: auto; }
+.purchase-lines { width: 100%; border-collapse: collapse; min-width: 760px; }
+.purchase-lines th, .purchase-lines td { border-bottom: 1px solid var(--border); padding: 10px; text-align: start; vertical-align: middle; }
+.purchase-lines td:first-child { display: grid; gap: 3px; min-width: 240px; }
+.purchase-lines td .field { min-width: 110px; }
+.purchase-totals-edit { display: grid; grid-template-columns: repeat(2, minmax(160px, 220px)) minmax(220px, 1fr); align-items: end; gap: 16px; margin-top: 18px; }
+.purchase-totals-edit dl { margin: 0; display: grid; gap: 7px; }
+.purchase-totals-edit dl div, .purchase-totals { display: flex; justify-content: flex-end; gap: 18px; }
+.purchase-totals-edit dd { margin: 0; font-weight: 700; }
+.purchase-totals { flex-wrap: wrap; padding-top: 16px; }
+.purchase-totals span { display: grid; gap: 3px; min-width: 110px; }
+@media (max-width: 1050px) {
+  .purchase-editor-grid { grid-template-columns: 1fr; }
+  .purchase-totals-edit { grid-template-columns: repeat(2, 1fr); }
+  .purchase-totals-edit dl { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) { .purchase-totals-edit { grid-template-columns: 1fr; } }

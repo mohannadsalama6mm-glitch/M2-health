@@ -9,6 +9,11 @@ export const recoveryStatus = () =>
     inventoryUiEnabled: boolean;
     salesEnabled: boolean;
     partnersEnabled: boolean;
+    purchasingEnabled: boolean;
+    reportingEnabled: boolean;
+    financeEnabled: boolean;
+    dashboardEnabled: boolean;
+    authEnabled: boolean;
   }>("recovery_status");
 
 export interface CoreBalance {

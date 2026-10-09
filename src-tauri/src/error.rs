@@ -4,6 +4,8 @@ use std::fmt;
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub enum ErrorCode {
+    Unauthorized,
+    Forbidden,
     Database,
     Migration,
     Validation,

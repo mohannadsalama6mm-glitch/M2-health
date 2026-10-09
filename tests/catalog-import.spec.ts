@@ -107,6 +107,7 @@ async function setup(page: Page, mode = "success") {
       __importCalls: 0,
       __TAURI_INTERNALS__: {
         invoke: async (command: string) => {
+          if (command === "recovery_status") return { authEnabled: false };
           if (command === "ensure_default_branch") return branch;
           if (command === "list_branches") return [branch];
           if (command === "profile_catalog_source") return profile;

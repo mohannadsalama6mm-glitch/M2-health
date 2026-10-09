@@ -24,20 +24,31 @@ import { AppRoutes } from "./AppRoutes";
 import { BranchSelector } from "./BranchSelector";
 import { useBranch } from "./BranchContext";
 import { isDesktopRuntime } from "../lib/tauri/client";
+import { useAuth } from "./AuthContext";
+import type { Permission } from "../lib/permissions";
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false),
     [query, setQuery] = useState("");
   const { branch, products } = useDemo();
   const { branchName } = useBranch();
+  const auth = useAuth();
   const searchRef = useRef<HTMLDivElement>(null),
     mainRef = useRef<HTMLElement>(null);
   const navigate = useNavigate(),
     location = useLocation();
   const nativeWorkspace =
     isDesktopRuntime() &&
-    /^\/(inventory|sales|suppliers|customers)(\/|$)/.test(location.pathname);
-  const nativeWorkspaceName = location.pathname.startsWith("/sales")
+    /^\/(dashboard|inventory|sales|suppliers|customers|purchases|reports|finance)(\/|$)/.test(location.pathname);
+  const nativeWorkspaceName = location.pathname.startsWith("/dashboard")
+    ? "Dashboard"
+    : location.pathname.startsWith("/finance")
+    ? "Finance"
+    : location.pathname.startsWith("/sales")
     ? "Sales"
+    : location.pathname.startsWith("/reports")
+      ? "Reports"
+    : location.pathname.startsWith("/purchases")
+      ? "Purchasing"
     : location.pathname.startsWith("/suppliers")
       ? "Suppliers"
       : location.pathname.startsWith("/customers")
@@ -78,7 +89,7 @@ export function AppShell() {
           <Logo variant={collapsed ? "icon" : "compact"} />
         </div>
         <nav aria-label="Pharmacy navigation">
-          {navigation.map((group) => (
+          {navigation.map((group) => ({ ...group, items: group.items.filter((item) => !("permission" in item) || auth.hasPermission(item.permission as Permission)) })).filter((group) => group.items.length).map((group) => (
             <div className="nav-group" key={group.group}>
               {group.group && <div className="nav-label">{group.group}</div>}
               {group.items.map(({ label, to, icon: Icon }) => (
@@ -178,10 +189,10 @@ export function AppShell() {
             <Dropdown
               label={
                 <>
-                  <Avatar name="Mohannad" />
+                  <Avatar name={auth.user?.displayName ?? "Mohannad"} />
                   <span className="user-info">
-                    <strong>Mohannad</strong>
-                    <small>Owner · demo role</small>
+                    <strong>{auth.user?.displayName ?? "Mohannad"}</strong>
+                    <small>{auth.user ? auth.user.roles.map((role) => role.name).join(" · ") || "No role assigned" : "Owner · demo role"}</small>
                   </span>
                   <ChevronDown size={14} />
                 </>
@@ -189,7 +200,7 @@ export function AppShell() {
               items={[
                 {
                   label: "Employee profile",
-                  onSelect: () => navigate("/employees/e1"),
+                  onSelect: () => navigate(auth.user ? `/employees/${auth.user.id}` : "/employees/e1"),
                 },
                 {
                   label: "Roles & permissions",
@@ -199,6 +210,7 @@ export function AppShell() {
                   label: "Workspace settings",
                   onSelect: () => navigate("/settings"),
                 },
+                ...(auth.user ? [{ label: "Sign out", onSelect: () => { void auth.signOut(); } }] : []),
               ]}
             />
           </div>

@@ -207,26 +207,14 @@ test("contacts management reports finance and system controls", async ({
   await expect(
     page.getByRole("table", { name: "Branch devices" }),
   ).toBeVisible();
-  await page.goto("/audit-log");
-  await page
-    .getByRole("button", { name: "Inspect", exact: true })
-    .first()
-    .click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await page.goto("/sync");
-  await page.getByRole("button", { name: "View queue", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Pending synchronization queue" }),
-  ).toBeVisible();
-  await page.keyboard.press("Escape");
-  await page.goto("/settings");
-  await page.getByRole("button", { name: "Receipt", exact: true }).click();
-  await page.getByLabel("Footer", { exact: true }).fill("Thank you");
-  await page.getByRole("button", { name: "Save settings preview" }).click();
-  await expect(page.getByLabel("Footer", { exact: true })).toHaveValue(
-    "Thank you",
-  );
+  for (const [path, heading] of [
+    ["/audit-log", "Audit log unavailable"],
+    ["/sync", "Synchronization unavailable"],
+    ["/settings", "Settings unavailable"],
+  ]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+  }
   await page.goto("/reports");
   await page.getByRole("button", { name: "Inventory", exact: true }).click();
   await expect(

@@ -146,6 +146,32 @@ test("hold persists without posting", async ({ page }) => {
   ).toBeVisible();
   expect(await calls(page, "post_sale")).toHaveLength(0);
 });
+test("canonical active customer selection is persisted with the cart", async ({ page }) => {
+  await expect.poll(async () => (await calls(page, "list_canonical_customers")).at(-1)?.args.query).toMatchObject({ isActive: true, limit: 8, offset: 0 });
+  await page.getByRole("button", { name: "Ahmed Hassan · CUS-000001" }).click();
+  await expect(page.getByLabel("Selected customer")).toContainText("Ahmed Hassan");
+  await add(page);
+  await page.getByRole("button", { name: "Hold Sale" }).click();
+  const saved = (await calls(page, "save_sale_draft")).at(-1)?.args.input as { cart: { customerId: string; customerName: string } };
+  expect(saved.cart).toMatchObject({ customerId: "customer-1", customerName: "Ahmed Hassan" });
+});
+test("held cart restores its canonical customer", async ({ page }) => {
+  await page.getByRole("button", { name: "Ahmed Hassan · CUS-000001" }).click();
+  await add(page);
+  await page.getByRole("button", { name: "Hold Sale" }).click();
+  await page.goto("/sales/history");
+  await page.getByRole("table", { name: "Canonical sales history" }).getByRole("link").click();
+  await page.getByRole("button", { name: "Resume Cart" }).click();
+  await expect(page.getByLabel("Selected customer")).toContainText("Ahmed Hassan");
+});
+test("customer can be removed to keep walk-in checkout easy", async ({ page }) => {
+  await page.getByRole("button", { name: "Ahmed Hassan · CUS-000001" }).click();
+  await page.getByRole("button", { name: "Remove customer" }).click();
+  await add(page);
+  await page.getByRole("button", { name: "Save Draft" }).click();
+  const saved = (await calls(page, "save_sale_draft")).at(-1)?.args.input as { cart: { customerId: string | null; customerName: string | null } };
+  expect(saved.cart).toMatchObject({ customerId: null, customerName: null });
+});
 test("held cart resumes after page reload", async ({ page }) => {
   await add(page);
   await page.getByRole("button", { name: "Hold Sale" }).click();
@@ -212,6 +238,7 @@ test("details expose batch costs and movement ID", async ({ page }) => {
     page.getByRole("link", { name: "sale-movement-1" }),
   ).toBeVisible();
 });
+test("posted sale detail exposes its immutable Finance trace",async({page})=>{await post(page);await expect(page.getByRole("heading",{name:"Finance trace"})).toBeVisible();await expect(page.getByRole("link",{name:"JRN-20261005-00001"})).toHaveAttribute("href","/finance/journals/journal-sale");await expect(page.getByText("This sale has a posted Finance journal.")).toBeVisible()});
 test("return previews refund and restores original allocation trace", async ({
   page,
 }) => {

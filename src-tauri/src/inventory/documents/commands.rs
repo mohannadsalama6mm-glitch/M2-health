@@ -1,11 +1,14 @@
 use super::{models::*, *};
-use crate::commands::branches::DatabaseState;
+use crate::{authorization::AuthorizationState, commands::branches::DatabaseState};
 use tauri::State;
 #[tauri::command]
 pub fn save_inventory_document(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: SaveDocument,
 ) -> Result<Document, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     save(state.db()?, &input)
 }
 #[tauri::command]
@@ -39,20 +42,22 @@ pub fn cancel_inventory_document(
 #[tauri::command]
 pub fn post_inventory_document(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: PostDocument,
 ) -> Result<Document, AppError> {
     let db = state.db()?;
-    let result = post(db, &input)?;
+    let result = post_as(db, &input, Some(&authorization.actor()?))?;
     crate::inventory::alerts::refresh_all(db);
     Ok(result)
 }
 #[tauri::command]
 pub fn reverse_inventory_document(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: ReverseDocument,
 ) -> Result<Document, AppError> {
     let db = state.db()?;
-    let result = reverse(db, &input)?;
+    let result = reverse_as(db, &input, Some(&authorization.actor()?))?;
     crate::inventory::alerts::refresh_all(db);
     Ok(result)
 }

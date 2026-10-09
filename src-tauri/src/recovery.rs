@@ -19,6 +19,10 @@ pub struct RecoveryStatus {
     pub sales_enabled: bool,
     pub partners_enabled: bool,
     pub purchasing_enabled: bool,
+    pub reporting_enabled: bool,
+    pub finance_enabled: bool,
+    pub dashboard_enabled: bool,
+    pub auth_enabled: bool,
 }
 
 #[tauri::command]
@@ -32,6 +36,10 @@ pub fn recovery_status() -> RecoveryStatus {
         sales_enabled: true,
         partners_enabled: true,
         purchasing_enabled: true,
+        reporting_enabled: true,
+        finance_enabled: true,
+        dashboard_enabled: true,
+        auth_enabled: true,
     }
 }
 

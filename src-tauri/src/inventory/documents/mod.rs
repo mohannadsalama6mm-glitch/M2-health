@@ -277,9 +277,17 @@ fn link(
     Ok(())
 }
 pub fn post(db: &AppDb, input: &PostDocument) -> Result<Document, AppError> {
+    post_as(db, input, None)
+}
+pub fn post_as(
+    db: &AppDb,
+    input: &PostDocument,
+    actor: Option<&str>,
+) -> Result<Document, AppError> {
     let payload = format!(
-        "post:{}",
-        serde_json::to_string(input).map_err(|_| invalid("Invalid post request."))?
+        "post:{}:{}",
+        serde_json::to_string(input).map_err(|_| invalid("Invalid post request."))?,
+        actor.unwrap_or("")
     );
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
@@ -312,7 +320,7 @@ pub fn post(db: &AppDb, input: &PostDocument) -> Result<Document, AppError> {
                         .ok_or_else(|| invalid("Batch required."))?,
                     quantity: l.quantity,
                     reason: l.reason.clone(),
-                    created_by: d.header.created_by.clone(),
+                    created_by: actor.map(str::to_owned),
                 },
                 Some(&d.header.id),
             )?;
@@ -341,6 +349,7 @@ pub fn post(db: &AppDb, input: &PostDocument) -> Result<Document, AppError> {
                                 |r| r.get(0),
                             )?),
                         },
+                        actor,
                     )?
                     .id
                 }
@@ -362,7 +371,7 @@ pub fn post(db: &AppDb, input: &PostDocument) -> Result<Document, AppError> {
                     batch_id: batch,
                     quantity: l.quantity,
                     reason: l.reason.clone(),
-                    created_by: d.header.created_by.clone(),
+                    created_by: actor.map(str::to_owned),
                 },
                 kind,
                 None,
@@ -378,10 +387,18 @@ pub fn post(db: &AppDb, input: &PostDocument) -> Result<Document, AppError> {
     Ok(result)
 }
 pub fn reverse(db: &AppDb, input: &ReverseDocument) -> Result<Document, AppError> {
+    reverse_as(db, input, None)
+}
+pub fn reverse_as(
+    db: &AppDb,
+    input: &ReverseDocument,
+    actor: Option<&str>,
+) -> Result<Document, AppError> {
     required(&input.reason)?;
     let payload = format!(
-        "reverse:{}",
-        serde_json::to_string(input).map_err(|_| invalid("Invalid reversal request."))?
+        "reverse:{}:{}",
+        serde_json::to_string(input).map_err(|_| invalid("Invalid reversal request."))?,
+        actor.unwrap_or("")
     );
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
@@ -403,7 +420,7 @@ pub fn reverse(db: &AppDb, input: &ReverseDocument) -> Result<Document, AppError
     }
     let doc = uuid();
     let number = repository::number(&tx, Kind::Reversal)?;
-    tx.execute("INSERT INTO inventory_documents(id,document_number,kind,branch_id,reversal_of,reversal_reason) VALUES(?1,?2,'REVERSAL',?3,?4,?5)",params![doc,number,original.header.branch_id,input.document_id,input.reason.trim()])?;
+    tx.execute("INSERT INTO inventory_documents(id,document_number,kind,branch_id,reversal_of,reversal_reason,created_by) VALUES(?1,?2,'REVERSAL',?3,?4,?5,?6)",params![doc,number,original.header.branch_id,input.document_id,input.reason.trim(),actor])?;
     let mut work = Vec::new();
     for (pos, m) in original.movements.iter().enumerate() {
         let line = LineInput {
@@ -435,7 +452,7 @@ pub fn reverse(db: &AppDb, input: &ReverseDocument) -> Result<Document, AppError
                 batch_id: original.batch_id.clone(),
                 quantity: line.quantity,
                 reason: line.reason,
-                created_by: None,
+                created_by: actor.map(str::to_owned),
             },
             if line.action == Action::Out {
                 MovementType::AdjustmentOut

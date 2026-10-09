@@ -32,7 +32,11 @@ pub(crate) fn get(c: &Connection, branch: &str, batch: &str) -> Result<Inventory
     .optional()?
     .ok_or_else(|| invalid("Batch does not belong to the specified branch."))
 }
-pub(crate) fn create_on(c: &Connection, input: &CreateBatch) -> Result<InventoryBatch, AppError> {
+pub(crate) fn create_on(
+    c: &Connection,
+    input: &CreateBatch,
+    actor: Option<&str>,
+) -> Result<InventoryBatch, AppError> {
     scope(c, &input.branch_id, &input.product_package_id, true)?;
     optional(&input.lot_number)?;
     optional(&input.supplier_reference)?;
@@ -46,13 +50,29 @@ pub(crate) fn create_on(c: &Connection, input: &CreateBatch) -> Result<Inventory
         return Err(invalid("Cost must be non-negative integer minor units."));
     }
     let id = uuid::Uuid::new_v4().to_string();
-    c.execute("INSERT INTO inventory_batches(id,branch_id,product_package_id,lot_number,expiry_date,received_at,cost_price_minor,supplier_reference) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)",params![id,input.branch_id,input.product_package_id,input.lot_number,input.expiry_date,input.received_at,input.cost_price_minor,input.supplier_reference])?;
+    let has_actor: bool = c.query_row(
+        "SELECT EXISTS(SELECT 1 FROM pragma_table_info('inventory_batches') WHERE name='created_by')",
+        [],
+        |r| r.get(0),
+    )?;
+    if has_actor {
+        c.execute("INSERT INTO inventory_batches(id,branch_id,product_package_id,lot_number,expiry_date,received_at,cost_price_minor,supplier_reference,created_by) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)",params![id,input.branch_id,input.product_package_id,input.lot_number,input.expiry_date,input.received_at,input.cost_price_minor,input.supplier_reference,actor])?;
+    } else {
+        c.execute("INSERT INTO inventory_batches(id,branch_id,product_package_id,lot_number,expiry_date,received_at,cost_price_minor,supplier_reference) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)",params![id,input.branch_id,input.product_package_id,input.lot_number,input.expiry_date,input.received_at,input.cost_price_minor,input.supplier_reference])?;
+    }
     get(c, &input.branch_id, &id)
 }
 pub fn create(db: &AppDb, input: &CreateBatch) -> Result<InventoryBatch, AppError> {
+    create_as(db, input, None)
+}
+pub fn create_as(
+    db: &AppDb,
+    input: &CreateBatch,
+    actor: Option<&str>,
+) -> Result<InventoryBatch, AppError> {
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let b = create_on(&tx, input)?;
+    let b = create_on(&tx, input, actor)?;
     tx.commit()?;
     Ok(b)
 }

@@ -177,8 +177,9 @@ test("purchase receiving and notification state", async ({ page }) => {
     .getByRole("navigation", { name: "Pharmacy navigation" })
     .getByRole("link", { name: "Notifications", exact: true })
     .click();
-  await page.getByRole("button", { name: "Mark all read" }).click();
-  await expect(page.getByText("0 unread")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Notifications unavailable" }),
+  ).toBeVisible();
 });
 test("stock counts and backup destructive preview", async ({ page }) => {
   await page.goto("/inventory/counts");

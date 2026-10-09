@@ -482,7 +482,7 @@ fn partner_identity_rows_are_retained() {
 }
 
 #[test]
-fn phase_four_sales_schema_and_snapshots_are_unchanged() {
+fn phase_five_e_links_customers_without_rewriting_sale_snapshots() {
     let db = AppDb::in_memory().unwrap();
     let connection = db.lock().unwrap();
     let sql: String = connection
@@ -493,7 +493,11 @@ fn phase_four_sales_schema_and_snapshots_are_unchanged() {
         )
         .unwrap();
     assert!(sql.contains("customer_name TEXT"));
-    assert!(sql.contains("customer_id TEXT CHECK(customer_id IS NULL)"));
+    assert!(sql.contains("customer_id TEXT REFERENCES customers(id)"));
+    assert_eq!(
+        connection.query_row("SELECT count(*) FROM pragma_table_info('sales') WHERE name IN ('customer_code_snapshot','customer_phone_snapshot')", [], |r| r.get::<_, i64>(0)).unwrap(),
+        2
+    );
     assert_eq!(
         connection
             .query_row(

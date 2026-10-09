@@ -63,6 +63,36 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "purchasing",
         sql: include_str!("../../migrations/011_purchasing.sql"),
     },
+    Migration {
+        version: 12,
+        name: "purchase_receiving",
+        sql: include_str!("../../migrations/012_purchase_receiving.sql"),
+    },
+    Migration {
+        version: 13,
+        name: "purchase_returns",
+        sql: include_str!("../../migrations/013_purchase_returns.sql"),
+    },
+    Migration {
+        version: 14,
+        name: "customer_sales",
+        sql: include_str!("../../migrations/014_customer_sales.sql"),
+    },
+    Migration {
+        version: 15,
+        name: "finance_core",
+        sql: include_str!("../../migrations/015_finance_core.sql"),
+    },
+    Migration {
+        version: 16,
+        name: "identity_foundation",
+        sql: include_str!("../../migrations/016_identity_foundation.sql"),
+    },
+    Migration {
+        version: 17,
+        name: "security_events",
+        sql: include_str!("../../migrations/017_security_events.sql"),
+    },
 ];
 
 pub fn run(connection: &mut Connection) -> Result<(), AppError> {

@@ -7,11 +7,11 @@ import {
   type ReactNode,
 } from "react";
 import {
-  ensureDefaultBranch,
   listBranches,
   type LocalBranch,
 } from "../lib/tauri/branches";
-import { isDesktopRuntime } from "../lib/tauri/client";
+import { isDesktopRuntime, setNativeBranch } from "../lib/tauri/client";
+import { useAuth } from "./AuthContext";
 
 export interface BranchState {
   branchId: string;
@@ -36,21 +36,12 @@ const fallback: LocalBranch = {
   updatedAt: "",
 };
 
-let inFlight: Promise<{ default_: LocalBranch; branches: LocalBranch[] }> | null =
-  null;
 function loadBranches() {
-  if (!inFlight) {
-    inFlight = Promise.all([ensureDefaultBranch(), listBranches()]).then(
-      ([default_, branches]) => ({ default_, branches }),
-    );
-    inFlight.catch(() => {
-      inFlight = null;
-    });
-  }
-  return inFlight;
+  return listBranches();
 }
 
 export function BranchProvider({ children }: { children: ReactNode }) {
+  const auth = useAuth();
   const [state, setState] = useState({
     loading: true,
     branches: [] as LocalBranch[],
@@ -62,9 +53,10 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     if (!isDesktopRuntime()) return;
     let cancelled = false;
     loadBranches()
-      .then(({ default_, branches }) => {
+      .then((branches) => {
         if (cancelled) return;
-        setState({ loading: false, branches, selected: default_.id, error: "" });
+        const primary = auth.user?.branches.find((branch) => branch.isPrimary)?.branchId;
+        setState({ loading: false, branches, selected: primary ?? branches[0]?.id ?? "", error: "" });
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -81,17 +73,18 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [attempt]);
+  }, [attempt, auth.user]);
   const select = useCallback((branchId: string) => {
     setState((prev) => ({ ...prev, selected: branchId }));
   }, []);
   const refresh = useCallback(() => setAttempt((v) => v + 1), []);
-  const branchId =
-    state.selected ||
-    (state.branches.some((b) => b.id === state.selected)
-      ? state.selected
-      : state.branches.find((b) => b.isActive)?.id ?? fallback.id);
+  const branchId = state.branches.some((b) => b.id === state.selected)
+    ? state.selected
+    : state.branches.find((b) => b.isActive)?.id ?? "";
   const selected = state.branches.find((b) => b.id === branchId) ?? fallback;
+  useEffect(() => {
+    setNativeBranch(state.branches.some((branch) => branch.id === branchId) ? branchId : "");
+  }, [branchId, state.branches]);
   return (
     <BranchContext.Provider
       value={{

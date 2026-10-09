@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useBranch } from "../../app/BranchContext";
+import { phase6, type SaleFinanceTrace } from "../../lib/tauri/phase6";
 import {
   Alert,
   Button,
@@ -13,6 +14,8 @@ import {
   LinkButton,
 } from "../../design-system";
 import * as api from "../../lib/tauri/canonical-sales";
+import { canonicalPartners } from "../../lib/tauri/canonical-partners";
+import type { Customer } from "../../lib/tauri/canonical-partners";
 import type {
   Cart,
   Product,
@@ -37,6 +40,7 @@ function minor(s: string) {
 }
 const empty = (branchId: string): Cart => ({
   branchId,
+  customerId: null,
   customerName: null,
   notes: null,
   discountMinor: 0,
@@ -65,6 +69,9 @@ function POS() {
   const { branchId, branchName } = useBranch();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Cart>(() => empty(branchId));
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerError, setCustomerError] = useState("");
   const [sale, setSale] = useState<Sale | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
   const [search, setSearch] = useState(""),
@@ -92,6 +99,31 @@ function POS() {
     draftId = useRef<string>(crypto.randomUUID()),
     pending = useRef<PostInput | null>(null);
   const [pendingPost, setPendingPost] = useState(false);
+  useEffect(() => {
+    let active = true;
+    const timer = setTimeout(() => {
+      canonicalPartners
+        .listCustomers({
+          search: customerSearch || null,
+          isActive: true,
+          limit: 8,
+          offset: 0,
+        })
+        .then((result) => {
+          if (active) {
+            setCustomers(result.items);
+            setCustomerError("");
+          }
+        })
+        .catch((e) => {
+          if (active) setCustomerError(errorText(e));
+        });
+    }, 150);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [customerSearch]);
   useEffect(() => {
     let active = true;
     const t = setTimeout(
@@ -506,13 +538,50 @@ function POS() {
                 )
               }
             />
-            <Input
-              label="Customer name (optional snapshot)"
-              value={cart.customerName ?? ""}
-              onChange={(e) =>
-                change({ ...cart, customerName: e.target.value || null })
-              }
-            />
+            <div className="customer-picker">
+              <Input
+                label="Customer search (optional)"
+                value={customerSearch}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                placeholder="Name, code, phone or email"
+              />
+              {cart.customerId ? (
+                <div className="selected-customer" aria-label="Selected customer">
+                  <strong>{cart.customerName}</strong>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      change({ ...cart, customerId: null, customerName: null });
+                      setCustomerSearch("");
+                    }}
+                  >
+                    Remove customer
+                  </Button>
+                </div>
+              ) : (
+                <div className="customer-results" aria-label="Active customer results">
+                  {customers.map((customer) => (
+                    <Button
+                      key={customer.id}
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        change({
+                          ...cart,
+                          customerId: customer.id,
+                          customerName: customer.displayName,
+                        });
+                        setCustomerSearch(customer.displayName);
+                      }}
+                    >
+                      {customer.displayName} · {customer.code}
+                    </Button>
+                  ))}
+                  {!customers.length && !customerError && <small>No active customers found. Continue as walk-in.</small>}
+                </div>
+              )}
+              {customerError && <small role="alert">{customerError}</small>}
+            </div>
             <Input
               label="Sale notes"
               value={cart.notes ?? ""}
@@ -856,7 +925,9 @@ function Detail({ id }: { id: string }) {
     [quantities, setQuantities] = useState<Record<string, number>>({}),
     [refund, setRefund] = useState<number | null>(null),
     [returnFrozen, setReturnFrozen] = useState(false),
-    [voidFrozen, setVoidFrozen] = useState(false);
+    [voidFrozen, setVoidFrozen] = useState(false),
+    [financeTrace, setFinanceTrace] = useState<SaleFinanceTrace | null>(null),
+    [financeError, setFinanceError] = useState("");
   const lock = useRef(false),
     returnPending = useRef<{ input: ReturnInput; requestId: string } | null>(
       null,
@@ -886,6 +957,13 @@ function Detail({ id }: { id: string }) {
       active = false;
     };
   }, [id, attempt]);
+  useEffect(() => {
+    let active = true;
+    phase6.saleTrace(id).then((value) => {
+      if (active) { setFinanceTrace(value); setFinanceError(""); }
+    }).catch((e) => active && setFinanceError(errorText(e)));
+    return () => { active = false; };
+  }, [id, attempt, sale?.status, sale?.refundedMinor]);
   async function action(fn: () => Promise<void>) {
     if (lock.current) return;
     lock.current = true;
@@ -1070,6 +1148,17 @@ function Detail({ id }: { id: string }) {
           </>
         )}
       </Card>
+      {(sale.status === "POSTED" || sale.status === "VOIDED") && (
+        <Card>
+          <h2>Finance trace</h2>
+          {financeError && <Alert title="Finance trace could not be loaded" tone="danger">{financeError}</Alert>}
+          {!financeError && !financeTrace && <p role="status">Loading Finance trace…</p>}
+          {financeTrace && <>
+            <p>{financeTrace.coverageNote}</p>
+            {financeTrace.journals.length === 0 ? <p className="muted">No related Finance journals.</p> : financeTrace.journals.map((journal) => <p key={journal.id}><LinkButton to={`/finance/journals/${journal.id}`}>{journal.journalNumber}</LinkButton> · {journal.sourceType} · {money(journal.debitTotalMinor)} · {journal.cogsComplete ? "Cost complete" : "Cost incomplete"}</p>)}
+          </>}
+        </Card>
+      )}
       <Card>
         <h2>Returns and reversals</h2>
         {!sale.returns.length && !sale.voids.length && (

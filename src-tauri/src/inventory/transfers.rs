@@ -56,6 +56,7 @@ pub(crate) fn transfer_on(
             cost_price_minor: source.cost_price_minor,
             supplier_reference: source.supplier_reference,
         },
+        input.created_by.as_deref(),
     )?;
     let outgoing = uuid::Uuid::new_v4().to_string();
     let incoming = uuid::Uuid::new_v4().to_string();

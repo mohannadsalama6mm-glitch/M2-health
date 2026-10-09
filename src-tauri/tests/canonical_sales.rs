@@ -9,6 +9,10 @@ use m2_health_lib::{
         models::{CreateBatch, OpeningStock},
         movements,
     },
+    partners::{
+        self,
+        models::{CustomerFields, SetPartnerActive},
+    },
     sales::{self, models::*},
 };
 use serde_json::Value;
@@ -162,6 +166,89 @@ fn query(f: &F, search: &str) -> Query {
         search: Some(search.into()),
         ..Default::default()
     }
+}
+fn customer(f: &F, name: &str) -> m2_health_lib::partners::models::Customer {
+    partners::create_customer(
+        &f.db,
+        &CustomerFields {
+            display_name: name.into(),
+            primary_phone: Some("01000000000".into()),
+            ..Default::default()
+        },
+    )
+    .unwrap()
+}
+
+#[test]
+fn authenticated_sales_actor_is_persisted_on_sale_return_and_ledger_movements() {
+    let f = f();
+    seed(&f, 5, Some("2030-01-01"), Some(40));
+    let creator = id();
+    let poster = id();
+    let return_creator = id();
+    let return_poster = id();
+    let draft = sales::save_as(
+        &f.db,
+        &Save {
+            id: id(),
+            expected_revision: None,
+            cart: cart(&f, 2),
+        },
+        Some(&creator),
+    )
+    .unwrap();
+    let sale_id = draft["id"].as_str().unwrap().to_owned();
+    let posted = sales::post_as(&f.db, &post_input(&draft), Some(&poster)).unwrap();
+    let return_input = ret(&posted, 1);
+    let return_id = return_input.id.clone();
+    sales::create_return_as(&f.db, &return_input, Some(&return_creator)).unwrap();
+    sales::post_return_as(
+        &f.db,
+        &ReturnPost {
+            id: return_id.clone(),
+            request_id: id(),
+        },
+        Some(&return_poster),
+    )
+    .unwrap();
+
+    let c = f.db.lock().unwrap();
+    assert_eq!(
+        c.query_row(
+            "SELECT created_by FROM sales WHERE id=?1",
+            [&sale_id],
+            |r| r.get::<_, String>(0)
+        )
+        .unwrap(),
+        creator
+    );
+    assert_eq!(
+        c.query_row(
+            "SELECT created_by FROM sale_returns WHERE id=?1",
+            [&return_id],
+            |r| r.get::<_, String>(0)
+        )
+        .unwrap(),
+        return_creator
+    );
+    assert_eq!(
+        c.query_row(
+            "SELECT created_by FROM inventory_movements WHERE movement_type='SALE'",
+            [],
+            |r| r.get::<_, String>(0)
+        )
+        .unwrap(),
+        poster
+    );
+    assert_eq!(
+        c.query_row(
+            "SELECT created_by FROM inventory_movements WHERE movement_type='SALE_RETURN'",
+            [],
+            |r| r.get::<_, String>(0)
+        )
+        .unwrap(),
+        return_poster
+    );
 }
 #[test]
 fn migration_009_creates_domain_without_second_ledger() {
@@ -628,6 +715,210 @@ fn sales_history_filters_and_pages() {
     assert_ne!(a["items"][0]["id"], b["items"][0]["id"]);
     q.status = Some("POSTED".into());
     assert_eq!(sales::list(&f.db, &q).unwrap()["total"], 0);
+}
+
+#[test]
+fn migration_014_preserves_unlinked_phase_four_sales() {
+    let db = AppDb::in_memory_with_migrations(&MIGRATIONS[..13]).unwrap();
+    let f = fixture(db);
+    let sale_id = id();
+    let legacy_cart = serde_json::json!({
+        "branchId": f.b,
+        "customerName": null,
+        "notes": null,
+        "lines": [],
+        "discountMinor": 0,
+        "taxMinor": 0
+    });
+    f.db.lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO sales(id,branch_id,status,draft_json) VALUES(?1,?2,'DRAFT',?3)",
+            rusqlite::params![sale_id, f.b, legacy_cart.to_string()],
+        )
+        .unwrap();
+    migrations::run(&mut f.db.lock().unwrap()).unwrap();
+    let after = sales::detail(&f.db, &sale_id).unwrap();
+    assert!(after["customerId"].is_null());
+    assert!(after["customerName"].is_null());
+    assert_eq!(after["cart"]["branchId"], f.b);
+}
+
+#[test]
+fn migration_014_failure_rolls_back_schema_and_metadata() {
+    let db = AppDb::in_memory_with_migrations(&MIGRATIONS[..13]).unwrap();
+    let mut connection = db.lock().unwrap();
+    connection
+        .execute(
+            "CREATE INDEX sales_customer_history ON sales(created_at)",
+            [],
+        )
+        .unwrap();
+    assert!(migrations::run(&mut connection).is_err());
+    assert_eq!(
+        connection
+            .query_row("SELECT max(version) FROM _schema_version", [], |r| r
+                .get::<_, i64>(0))
+            .unwrap(),
+        13
+    );
+    let sql: String = connection
+        .query_row(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='sales'",
+            [],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert!(sql.contains("customer_id TEXT CHECK(customer_id IS NULL)"));
+    assert_eq!(connection.query_row("SELECT count(*) FROM pragma_table_info('sales') WHERE name='customer_code_snapshot'", [], |r| r.get::<_, i64>(0)).unwrap(), 0);
+}
+
+#[test]
+fn canonical_customer_is_preserved_through_hold_and_resume() {
+    let f = f();
+    let customer = customer(&f, "Ahmed Hassan");
+    let mut c = cart(&f, 1);
+    c.customer_id = Some(customer.id.clone());
+    c.customer_name = Some("untrusted text".into());
+    let draft = save(&f, c);
+    assert_eq!(draft["customerId"], customer.id);
+    assert_eq!(draft["customerName"], "Ahmed Hassan");
+    assert_eq!(draft["cart"]["customerName"], "Ahmed Hassan");
+    let held = sales::transition(
+        &f.db,
+        &Transition {
+            id: draft["id"].as_str().unwrap().into(),
+            expected_revision: 1,
+        },
+        true,
+    )
+    .unwrap();
+    let resumed = sales::transition(
+        &f.db,
+        &Transition {
+            id: held["id"].as_str().unwrap().into(),
+            expected_revision: 2,
+        },
+        false,
+    )
+    .unwrap();
+    assert_eq!(resumed["cart"]["customerId"], customer.id);
+}
+
+#[test]
+fn deactivated_customer_cannot_be_used_for_new_or_held_sale() {
+    let f = f();
+    seed(&f, 2, None, None);
+    let customer = customer(&f, "Deactivate Me");
+    let mut c = cart(&f, 1);
+    c.customer_id = Some(customer.id.clone());
+    let draft = save(&f, c.clone());
+    partners::set_customer_active(
+        &f.db,
+        &SetPartnerActive {
+            id: customer.id,
+            expected_revision: 1,
+            active: false,
+        },
+    )
+    .unwrap();
+    assert!(sales::post(&f.db, &post_input(&draft)).is_err());
+    assert!(sales::save(
+        &f.db,
+        &Save {
+            id: id(),
+            expected_revision: None,
+            cart: c
+        }
+    )
+    .is_err());
+    assert_eq!(balance(&f), 2);
+}
+
+#[test]
+fn posted_customer_snapshots_are_immutable_after_customer_edit() {
+    let f = f();
+    seed(&f, 2, None, None);
+    let customer = customer(&f, "Original Name");
+    let mut c = cart(&f, 1);
+    c.customer_id = Some(customer.id.clone());
+    let draft = save(&f, c);
+    let posted = sales::post(&f.db, &post_input(&draft)).unwrap();
+    partners::update_customer(
+        &f.db,
+        &m2_health_lib::partners::models::UpdateCustomer {
+            id: customer.id,
+            expected_revision: 1,
+            fields: CustomerFields {
+                display_name: "Renamed Customer".into(),
+                primary_phone: Some("01111111111".into()),
+                ..Default::default()
+            },
+        },
+    )
+    .unwrap();
+    let reread = sales::detail(&f.db, posted["id"].as_str().unwrap()).unwrap();
+    assert_eq!(reread["customerName"], "Original Name");
+    assert_eq!(reread["customerPhoneSnapshot"], "01000000000");
+}
+
+#[test]
+fn customer_history_is_exact_and_backend_paginated() {
+    let f = f();
+    let a = customer(&f, "A");
+    let b = customer(&f, "B");
+    for customer_id in [&a.id, &a.id, &b.id] {
+        let mut c = cart(&f, 1);
+        c.customer_id = Some(customer_id.clone());
+        save(&f, c);
+    }
+    let first = sales::customer_history(
+        &f.db,
+        &CustomerSalesQuery {
+            customer_id: a.id.clone(),
+            branch_id: f.b.clone(),
+            limit: Some(1),
+            offset: Some(0),
+        },
+    )
+    .unwrap();
+    let second = sales::customer_history(
+        &f.db,
+        &CustomerSalesQuery {
+            customer_id: a.id,
+            branch_id: f.b.clone(),
+            limit: Some(1),
+            offset: Some(1),
+        },
+    )
+    .unwrap();
+    assert_eq!(first["total"], 2);
+    assert_ne!(first["items"][0]["id"], second["items"][0]["id"]);
+}
+
+#[test]
+fn customer_link_survives_return_and_void_workflows() {
+    let f = f();
+    seed(&f, 4, None, None);
+    let customer = customer(&f, "Returns Customer");
+    let mut c = cart(&f, 1);
+    c.customer_id = Some(customer.id.clone());
+    let sale = sales::post(&f.db, &post_input(&save(&f, c))).unwrap();
+    let returned = returned(&f, &sale, 1);
+    assert_eq!(returned["customerId"], customer.id);
+    let mut c2 = cart(&f, 1);
+    c2.customer_id = Some(customer.id.clone());
+    let sale2 = sales::post(&f.db, &post_input(&save(&f, c2))).unwrap();
+    let voided = sales::void(
+        &f.db,
+        &Void {
+            id: sale2["id"].as_str().unwrap().into(),
+            request_id: id(),
+            reason: "Customer requested cancellation".into(),
+        },
+    )
+    .unwrap();
+    assert_eq!(voided["customerId"], customer.id);
 }
 #[test]
 fn partial_return_restores_exact_quantity() {

@@ -16,6 +16,7 @@ export interface CartLine {
 }
 export interface Cart {
   branchId: string;
+  customerId: string | null;
   customerName: string | null;
   notes: string | null;
   discountMinor: number;
@@ -76,7 +77,10 @@ export interface Sale {
   id: string;
   saleNumber: string | null;
   branchId: string;
+  customerId: string | null;
+  customerCodeSnapshot: string | null;
   customerName: string | null;
+  customerPhoneSnapshot: string | null;
   status: "DRAFT" | "HELD" | "POSTED" | "VOIDED";
   revision: number;
   cart: Cart;
@@ -150,6 +154,16 @@ export const list = (query: Query) =>
   nativeRequest<{ items: Sale[]; total: number }>("list_canonical_sales", {
     query,
   });
+export const listCustomerSales = (query: {
+  customerId: string;
+  branchId: string;
+  limit?: number;
+  offset?: number;
+}) =>
+  nativeRequest<{ items: Sale[]; total: number; limit: number; offset: number }>(
+    "list_customer_sales",
+    { query },
+  );
 export const get = (id: string) =>
   nativeRequest<Sale>("get_canonical_sale", { id });
 export const previewReturn = (input: ReturnInput) =>

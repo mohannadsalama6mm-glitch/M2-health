@@ -264,3 +264,26 @@ body,
 .topbar-end .native-branch-selector select {
   width: 150px;
 }
+.auth-screen { min-height: 100vh; display: grid; place-items: center; padding: var(--space-6); background: radial-gradient(circle at 20% 10%, var(--color-primary-subtle), transparent 40%), var(--color-surface); }
+.auth-card { width: min(440px, 100%); display: grid; gap: var(--space-5); padding: var(--space-7); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-white); box-shadow: var(--shadow-lg); }
+.auth-card h1 { margin: 0 0 var(--space-1); }
+.auth-card p { margin: 0; }
+.auth-form { display: grid; gap: var(--space-4); }
+.auth-local-note, .field-help { color: var(--color-text-muted); font-size: var(--text-caption); }
+.identity-filters { display: grid; grid-template-columns: minmax(240px, 1fr) 200px 160px; gap: var(--space-3); align-items: end; margin-bottom: var(--space-4); }
+.identity-pagination { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); margin-top: var(--space-4); }
+.identity-pagination > div { display: flex; gap: var(--space-2); }
+.identity-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); align-items: end; }
+.identity-form h2, .identity-form .alert { grid-column: 1 / -1; }
+.identity-detail-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.identity-details { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-4); }
+.identity-details dt { color: var(--color-text-muted); }
+.identity-details dd { margin: 0; }
+.identity-password { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+.identity-check-list { display: grid; gap: var(--space-2); }
+.identity-check-list label { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-2); border-radius: var(--radius-sm); }
+.identity-check-list label:hover { background: var(--color-primary-subtle); }
+.identity-check-list span, .identity-check-list small { display: block; }
+.identity-check-list small { color: var(--color-text-muted); }
+.identity-role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4); }
+@media (max-width: 1000px) { .identity-detail-grid { grid-template-columns: 1fr; } .identity-filters, .identity-form { grid-template-columns: 1fr; } }

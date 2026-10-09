@@ -24,7 +24,7 @@ CREATE TABLE purchase_orders (
  ordered_at TEXT,
  cancelled_at TEXT,
  cancellation_reason TEXT,
- CHECK((status='ORDERED')=(ordered_at IS NOT NULL)),
+ CHECK(status NOT IN ('ORDERED','PARTIALLY_RECEIVED','RECEIVED') OR ordered_at IS NOT NULL),
  CHECK((status='CANCELLED')=(cancelled_at IS NOT NULL)),
  CHECK(status!='CANCELLED' OR length(trim(cancellation_reason)) BETWEEN 1 AND 2000),
  CHECK(status!='ORDERED' OR (supplier_code_snapshot IS NOT NULL AND supplier_name_snapshot IS NOT NULL))

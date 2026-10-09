@@ -176,7 +176,7 @@ test("backend create rejection remains in the dialog", async ({ page }) => {
   );
 });
 
-test("detail shows durable identity and honest future history state", async ({
+test("supplier detail shows real linked purchasing documents", async ({
   page,
 }) => {
   await page.getByRole("link", { name: /Nile Medical/ }).click();
@@ -184,9 +184,44 @@ test("detail shows durable identity and honest future history state", async ({
     page.getByRole("heading", { name: "Nile Medical" }),
   ).toBeVisible();
   await expect(page.getByText("SUP-000001 · Revision 1")).toBeVisible();
-  await expect(
-    page.getByText("No linked workflow is active yet"),
-  ).toBeVisible();
+  await expect(page.getByRole("table", { name: "Supplier purchase orders" })).toContainText("PUR-0001");
+  await expect(page.getByRole("table", { name: "Supplier receipts" })).toContainText("REC-0001");
+  await expect(page.getByRole("table", { name: "Supplier returns" })).toContainText("PRN-0001");
+});
+
+test("customer detail shows backend-paginated sales with navigation", async ({ page }) => {
+  await page.goto("/customers/c1");
+  const table = page.getByRole("table", { name: "Customer sales history" });
+  await expect(table).toContainText("SAL-20261003-0001");
+  await expect(table.getByRole("link", { name: "SAL-20261003-0001" })).toHaveAttribute("href", "/sales/sale-customer-1");
+  expect((await calls(page, "list_customer_sales")).at(-1)?.args.query).toMatchObject({ customerId: "c1", limit: 10, offset: 0 });
+});
+test("customer history exposes loading, empty and structured error states", async ({ page }) => {
+  await page.evaluate(() => ((window as unknown as { partnerDelay: number }).partnerDelay = 500));
+  await page.getByRole("link", { name: "Customers", exact: true }).click();
+  await page.getByRole("link", { name: /Ahmed Hassan/ }).click();
+  await expect(page.getByText("Loading transaction history…")).toBeVisible();
+  await page.evaluate(() => {
+    const w = window as unknown as { partnerDelay: number; partnerHistoryTotal: number };
+    w.partnerDelay = 0; w.partnerHistoryTotal = 0;
+  });
+  await page.getByRole("link", { name: "Customers", exact: true }).first().click();
+  await page.getByRole("link", { name: /Ahmed Hassan/ }).click();
+  await expect(page.getByText("No sales are linked to this customer.")).toBeVisible();
+  await page.evaluate(() => ((window as unknown as { partnerFailCommand: string }).partnerFailCommand = "list_customer_sales"));
+  await page.getByRole("link", { name: "Customers", exact: true }).first().click();
+  await page.getByRole("link", { name: /Ahmed Hassan/ }).click();
+  await expect(page.getByText("Controlled backend rejection")).toBeVisible();
+});
+test("customer history pagination is backend driven", async ({ page }) => {
+  await page.evaluate(() => ((window as unknown as { partnerHistoryTotal: number }).partnerHistoryTotal = 25));
+  await page.getByRole("link", { name: "Customers", exact: true }).click();
+  await page.getByRole("link", { name: /Ahmed Hassan/ }).click();
+  await expect(page.getByRole("table", { name: "Customer sales history" })).toBeVisible();
+  const next = page.getByRole("button", { name: "Next" }).last();
+  await expect(next).toBeEnabled();
+  await next.click();
+  await expect.poll(async () => (await calls(page, "list_customer_sales")).at(-1)?.args.query).toMatchObject({ customerId: "c1", limit: 10, offset: 10 });
 });
 
 test("edit sends expected revision", async ({ page }) => {
@@ -246,6 +281,12 @@ for (const [width, height] of [
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+  });
+  test(`integrated partner detail fits supported viewport ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/suppliers/s1");
+    await expect(page.getByRole("table", { name: "Supplier purchase orders" })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
 

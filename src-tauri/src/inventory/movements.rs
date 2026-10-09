@@ -69,6 +69,7 @@ pub(crate) fn insert_referenced(
     }
     let delta = match kind {
         MovementType::Sale
+        | MovementType::PurchaseReturn
         | MovementType::AdjustmentOut
         | MovementType::Damage
         | MovementType::Expiry
@@ -92,7 +93,7 @@ pub(crate) fn insert_referenced(
 pub fn opening(db: &AppDb, input: &OpeningStock) -> Result<InventoryMovement, AppError> {
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
-    let b = batches::create_on(&tx, &input.batch)?;
+    let b = batches::create_on(&tx, &input.batch, input.created_by.as_deref())?;
     let op = StockOperation {
         request_id: input.request_id.clone(),
         branch_id: b.branch_id,

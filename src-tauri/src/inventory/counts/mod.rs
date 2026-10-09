@@ -160,6 +160,7 @@ pub fn discover(db: &AppDb, i: &Discover) -> Result<Detail, AppError> {
                 expiry_date: i.expiry_date.clone(),
                 ..Default::default()
             },
+            s.created_by.as_deref(),
         )?
         .id
     };
@@ -196,8 +197,12 @@ pub fn transition(db: &AppDb, i: &Transition, to: Status) -> Result<Detail, AppE
     Ok(d)
 }
 pub fn complete(db: &AppDb, i: &Complete) -> Result<Detail, AppError> {
+    complete_as(db, i, None)
+}
+pub fn complete_as(db: &AppDb, i: &Complete, actor: Option<&str>) -> Result<Detail, AppError> {
     id(&i.request_id)?;
-    let payload = serde_json::to_string(i).map_err(|_| invalid("Invalid completion request."))?;
+    let payload =
+        serde_json::to_string(&(i, actor)).map_err(|_| invalid("Invalid completion request."))?;
     let mut c = db.lock()?;
     let tx = c.transaction_with_behavior(TransactionBehavior::Immediate)?;
     if let Some((previous, session)) = tx
@@ -244,7 +249,7 @@ pub fn complete(db: &AppDb, i: &Complete) -> Result<Detail, AppError> {
                 delta,
                 &l.id,
                 &s.session_number,
-                s.created_by.as_deref(),
+                actor,
             )?)
         };
         tx.execute("INSERT INTO stock_count_results(line_id,live_baseline,correction_delta,intervening_movements,movement_id) VALUES(?1,?2,?3,?4,?5)",params![l.id,l.current_live,delta,l.intervening_movements,movement])?;

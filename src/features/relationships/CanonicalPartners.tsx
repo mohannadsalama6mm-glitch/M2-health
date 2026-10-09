@@ -27,6 +27,9 @@ import {
   type Supplier,
   type SupplierFields,
 } from "../../lib/tauri/canonical-partners";
+import * as salesApi from "../../lib/tauri/canonical-sales";
+import { canonicalPurchasing } from "../../lib/tauri/canonical-purchasing";
+import { useBranch } from "../../app/BranchContext";
 
 type Kind = "suppliers" | "customers";
 type Partner = Supplier | Customer;
@@ -387,14 +390,7 @@ function Details({ kind, id }: { kind: Kind; id: string }) {
         </Card>
         <Card>
           <SectionHeader title="Transaction history" />
-          <EmptyState
-            title="No linked workflow is active yet"
-            description={
-              supplier
-                ? "Phase 5B can reference this stable supplier ID without changing this record."
-                : "A later controlled Sales integration can link this customer while preserving sale-time snapshots."
-            }
-          />
+          <PartnerHistory supplier={supplier} partnerId={partner.id} />
         </Card>
         <Editor
           key={`${partner.id}-${partner.revision}-${editor ? "open" : "closed"}`}
@@ -410,6 +406,73 @@ function Details({ kind, id }: { kind: Kind; id: string }) {
       </div>
     </>
   );
+}
+
+function PartnerHistory({ supplier, partnerId }: { supplier: boolean; partnerId: string }) {
+  const { branchId } = useBranch();
+  const [page, setPage] = useState(0);
+  const [data, setData] = useState<{
+    sales?: Awaited<ReturnType<typeof salesApi.listCustomerSales>>;
+    orders?: Awaited<ReturnType<typeof canonicalPurchasing.list>>;
+    receipts?: Awaited<ReturnType<typeof canonicalPurchasing.listReceipts>>;
+    returns?: Awaited<ReturnType<typeof canonicalPurchasing.listReturns>>;
+  } | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    const request = supplier
+      ? Promise.all([
+          canonicalPurchasing.list({ supplierId: partnerId, limit: 10, offset: page * 10 }),
+          canonicalPurchasing.listReceipts({ supplierId: partnerId, limit: 10, offset: page * 10 }),
+          canonicalPurchasing.listReturns({ supplierId: partnerId, limit: 10, offset: page * 10 }),
+        ]).then(([orders, receipts, returns]) => ({ orders, receipts, returns }))
+      : salesApi.listCustomerSales({ customerId: partnerId, branchId, limit: 10, offset: page * 10 }).then((sales) => ({ sales }));
+    request.then((result) => active && (setData(result), setError(""))).catch((e) => active && setError(errorText(e)));
+    return () => { active = false; };
+  }, [supplier, partnerId, branchId, page]);
+  if (error) return <Alert title="History could not be loaded" tone="danger">{error}</Alert>;
+  if (!data) return <p role="status">Loading transaction history…</p>;
+  if (!supplier) {
+    const sales = data.sales!;
+    return <div className="stack">
+      <Table label="Customer sales history" rows={sales.items} rowKey={(sale) => sale.id} columns={[
+        { key: "number", header: "Sale", render: (sale) => <Link to={`/sales/${sale.id}`}>{sale.saleNumber || "Draft / held"}</Link> },
+        { key: "status", header: "Status", render: (sale) => <Status value={sale.status} /> },
+        { key: "total", header: "Total", render: (sale) => `${(sale.totalMinor / 100).toFixed(2)} EGP` },
+        { key: "date", header: "Created", render: (sale) => stamp(sale.createdAt) },
+      ]} />
+      {!sales.total && <p>No sales are linked to this customer.</p>}
+      <HistoryPager page={page} total={sales.total} setPage={setPage} />
+    </div>;
+  }
+  const orders = data.orders!, receipts = data.receipts!, returns = data.returns!;
+  return <div className="stack">
+    <Table label="Supplier purchase orders" rows={orders.items} rowKey={(row) => row.id} columns={[
+      { key: "number", header: "Purchase", render: (row) => <Link to={`/purchases/${row.id}`}>{row.purchaseNumber}</Link> },
+      { key: "status", header: "Status", render: (row) => <Status value={row.status} /> },
+      { key: "total", header: "Total", render: (row) => `${(row.totalMinor / 100).toFixed(2)} EGP` },
+    ]} />
+    <Table label="Supplier receipts" rows={receipts.items} rowKey={(row) => row.id} columns={[
+      { key: "number", header: "Receipt", render: (row) => <Link to={`/purchases/receipts/${row.id}`}>{row.receiptNumber}</Link> },
+      { key: "branch", header: "Branch", render: (row) => row.branchName },
+      { key: "quantity", header: "Quantity", render: (row) => row.totalQuantity },
+    ]} />
+    <Table label="Supplier returns" rows={returns.items} rowKey={(row) => row.id} columns={[
+      { key: "number", header: "Return", render: (row) => <Link to={`/purchases/returns/${row.id}`}>{row.returnNumber}</Link> },
+      { key: "receipt", header: "Receipt", render: (row) => row.receiptNumber },
+      { key: "quantity", header: "Quantity", render: (row) => row.totalQuantity },
+    ]} />
+    {!orders.total && !receipts.total && !returns.total && <p>No purchasing documents are linked to this supplier.</p>}
+    <HistoryPager page={page} total={Math.max(orders.total, receipts.total, returns.total)} setPage={setPage} />
+  </div>;
+}
+
+function HistoryPager({ page, total, setPage }: { page: number; total: number; setPage: (page: number) => void }) {
+  return <div className="grid-footer">
+    <Button disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</Button>
+    <span>{total} linked records · Page {page + 1}</span>
+    <Button disabled={(page + 1) * 10 >= total} onClick={() => setPage(page + 1)}>Next</Button>
+  </div>;
 }
 
 function Editor({

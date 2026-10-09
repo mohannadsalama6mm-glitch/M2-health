@@ -244,7 +244,7 @@ fn monitor(f: &F, min: i64, max: i64) -> MonitorQuery {
 #[test]
 fn migration_eight_creates_only_advisory_schema() {
     let f = f();
-    assert_eq!(count(&f.db, "_schema_version"), 11);
+    assert_eq!(count(&f.db, "_schema_version"), 17);
     assert_eq!(count(&f.db, "inventory_alerts"), 0);
     assert_eq!(count(&f.db, "inventory_movements"), 0);
     assert_eq!(MIGRATIONS[7].name, "inventory_alerts");

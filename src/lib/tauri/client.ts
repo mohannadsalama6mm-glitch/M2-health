@@ -1,5 +1,7 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
 export type AppErrorCode =
+  | "unauthorized"
+  | "forbidden"
   | "database"
   | "migration"
   | "validation"
@@ -17,6 +19,25 @@ export class NativeError extends Error {
     this.name = "NativeError";
   }
 }
+let nativeSession = { token: "", userId: "", branchId: "" };
+export function setNativeSession(token: string, userId: string) {
+  nativeSession = { ...nativeSession, token, userId };
+}
+export function setNativeBranch(branchId: string) {
+  nativeSession = { ...nativeSession, branchId };
+}
+const actorKeys = new Set([
+  "createdBy", "created_by", "postedBy", "posted_by", "voidedBy",
+  "voided_by", "performedBy", "performed_by", "assignedBy", "assigned_by", "user",
+]);
+function secureArgs(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(secureArgs);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, entry]) => [
+    key,
+    actorKeys.has(key) && nativeSession.userId ? nativeSession.userId : secureArgs(entry),
+  ]));
+}
 export function isDesktopRuntime(): boolean {
   return isTauri();
 }
@@ -29,6 +50,8 @@ function normalizeError(error: unknown): NativeError {
     typeof error.message === "string"
   ) {
     const codes: AppErrorCode[] = [
+      "unauthorized",
+      "forbidden",
       "database",
       "migration",
       "validation",
@@ -56,8 +79,16 @@ export async function nativeRequest<T>(
       "Local database access requires the M² Health desktop app.",
     );
   try {
-    return await invoke<T>(command, args);
+    const secured = secureArgs(args ?? {}) as Record<string, unknown>;
+    delete secured.sessionToken;
+    if (nativeSession.token) secured.sessionToken = nativeSession.token;
+    if (nativeSession.branchId && !("authorizationBranchId" in secured))
+      secured.authorizationBranchId = nativeSession.branchId;
+    return await invoke<T>(command, secured);
   } catch (error: unknown) {
-    throw normalizeError(error);
+    const normalized = normalizeError(error);
+    if (normalized.code === "unauthorized")
+      window.dispatchEvent(new CustomEvent("m2-auth-invalidated"));
+    throw normalized;
   }
 }

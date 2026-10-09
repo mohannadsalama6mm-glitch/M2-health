@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 pub struct Cart {
     pub branch_id: String,
     #[serde(default)]
+    pub customer_id: Option<String>,
+    #[serde(default)]
     pub customer_name: Option<String>,
     #[serde(default)]
     pub notes: Option<String>,
@@ -107,6 +109,15 @@ pub struct Query {
     pub date_from: Option<String>,
     pub date_to: Option<String>,
     pub payment_method: Option<Method>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct CustomerSalesQuery {
+    pub customer_id: String,
+    pub branch_id: String,
     pub limit: Option<i64>,
     pub offset: Option<i64>,
 }

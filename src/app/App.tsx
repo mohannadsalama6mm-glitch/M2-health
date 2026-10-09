@@ -4,6 +4,8 @@ import { Toast } from "../design-system";
 import { DemoProvider } from "./DemoContext";
 import { BranchProvider } from "./BranchContext";
 import { AppShell } from "./AppShell";
+import { AuthProvider } from "./AuthContext";
+import { AuthGate } from "../features/auth/AuthGate";
 
 export function App() {
   const [toast, setToast] = useState("");
@@ -15,9 +17,13 @@ export function App() {
   return (
     <BrowserRouter>
       <DemoProvider notify={setToast}>
-        <BranchProvider>
-          <AppShell />
-        </BranchProvider>
+        <AuthProvider>
+          <AuthGate>
+            <BranchProvider>
+              <AppShell />
+            </BranchProvider>
+          </AuthGate>
+        </AuthProvider>
         {toast && <Toast message={toast} onClose={() => setToast("")} />}
       </DemoProvider>
     </BrowserRouter>

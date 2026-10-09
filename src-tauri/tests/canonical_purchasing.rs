@@ -116,7 +116,7 @@ fn movement_count(db: &AppDb) -> i64 {
 
 #[test]
 fn migration_011_creates_only_pre_receiving_schema() {
-    let db = AppDb::in_memory().unwrap();
+    let db = AppDb::in_memory_with_migrations(&MIGRATIONS[..11]).unwrap();
     let c = db.lock().unwrap();
     assert_eq!(
         c.query_row("SELECT max(version) FROM _schema_version", [], |r| r

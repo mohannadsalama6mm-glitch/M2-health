@@ -1,6 +1,8 @@
 //! Canonical Phase 5B purchase orders. This module never writes Inventory.
 pub mod commands;
 pub mod models;
+pub mod receiving;
+pub mod returns;
 use crate::{
     db::{catalog_validation::*, connection::AppDb},
     error::{AppError, ErrorCode},
@@ -282,7 +284,7 @@ pub fn cancel(db: &AppDb, input: &CancelPurchase) -> Result<PurchaseOrder, AppEr
     if !["DRAFT", "ORDERED"].contains(&s.as_str()) {
         return Err(invalid("This purchase order cannot be cancelled."));
     }
-    tx.execute("UPDATE purchase_orders SET status='CANCELLED',revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),ordered_at=NULL,cancelled_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),cancellation_reason=?2 WHERE id=?1",params![input.id,reason])?;
+    tx.execute("UPDATE purchase_orders SET status='CANCELLED',revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),cancelled_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),cancellation_reason=?2 WHERE id=?1",params![input.id,reason])?;
     record(&tx, &input.request_id, "CANCEL", &input.id, &payload)?;
     let out = detail_on(&tx, &input.id)?;
     tx.commit()?;
@@ -304,20 +306,63 @@ fn fields_on(c: &Connection, value: &str) -> Result<PurchaseDraftFields, AppErro
 }
 fn detail_on(c: &Connection, value: &str) -> Result<PurchaseOrder, AppError> {
     id(value)?;
-    let mut out=c.query_row("SELECT o.id,o.purchase_number,o.supplier_id,coalesce(o.supplier_code_snapshot,s.code),coalesce(o.supplier_name_snapshot,s.display_name),o.status,o.revision,o.supplier_reference,o.expected_date,o.notes,o.subtotal_minor,o.discount_minor,o.tax_minor,o.total_minor,o.created_at,o.updated_at,o.ordered_at,o.cancelled_at,o.cancellation_reason FROM purchase_orders o JOIN suppliers s ON s.id=o.supplier_id WHERE o.id=?1",[value],|r|Ok(PurchaseOrder{id:r.get(0)?,purchase_number:r.get(1)?,supplier_id:r.get(2)?,supplier_code:r.get(3)?,supplier_name:r.get(4)?,status:r.get(5)?,revision:r.get(6)?,supplier_reference:r.get(7)?,expected_date:r.get(8)?,notes:r.get(9)?,subtotal_minor:r.get(10)?,discount_minor:r.get(11)?,tax_minor:r.get(12)?,total_minor:r.get(13)?,created_at:r.get(14)?,updated_at:r.get(15)?,ordered_at:r.get(16)?,cancelled_at:r.get(17)?,cancellation_reason:r.get(18)?,lines:vec![]})).optional()?.ok_or_else(||AppError::new(ErrorCode::NotFound,"Purchase order not found."))?;
-    let mut s=c.prepare("SELECT id,product_id,product_package_id,product_name_snapshot,package_label_snapshot,ordered_quantity,unit_cost_minor,line_total_minor,position FROM purchase_order_lines WHERE purchase_order_id=?1 ORDER BY position,id")?;
+    let mut out=c.query_row("SELECT o.id,o.purchase_number,o.supplier_id,coalesce(o.supplier_code_snapshot,s.code),coalesce(o.supplier_name_snapshot,s.display_name),o.status,o.revision,o.supplier_reference,o.expected_date,o.notes,o.subtotal_minor,o.discount_minor,o.tax_minor,o.total_minor,o.created_at,o.updated_at,o.ordered_at,o.cancelled_at,o.cancellation_reason FROM purchase_orders o JOIN suppliers s ON s.id=o.supplier_id WHERE o.id=?1",[value],|r|Ok(PurchaseOrder{id:r.get(0)?,purchase_number:r.get(1)?,supplier_id:r.get(2)?,supplier_code:r.get(3)?,supplier_name:r.get(4)?,status:r.get(5)?,revision:r.get(6)?,supplier_reference:r.get(7)?,expected_date:r.get(8)?,notes:r.get(9)?,subtotal_minor:r.get(10)?,discount_minor:r.get(11)?,tax_minor:r.get(12)?,total_minor:r.get(13)?,created_at:r.get(14)?,updated_at:r.get(15)?,ordered_at:r.get(16)?,cancelled_at:r.get(17)?,cancellation_reason:r.get(18)?,lines:vec![],receipts:vec![],returns:vec![]})).optional()?.ok_or_else(||AppError::new(ErrorCode::NotFound,"Purchase order not found."))?;
+    let mut s=c.prepare("SELECT id,product_id,product_package_id,product_name_snapshot,package_label_snapshot,ordered_quantity,unit_cost_minor,line_total_minor,position,coalesce((SELECT sum(quantity) FROM purchase_receipt_lines rl JOIN purchase_receipts r ON r.id=rl.receipt_id WHERE rl.purchase_order_line_id=purchase_order_lines.id AND r.status='POSTED'),0),coalesce((SELECT sum(x.quantity) FROM purchase_return_lines x JOIN purchase_returns pr ON pr.id=x.return_id WHERE x.purchase_order_line_id=purchase_order_lines.id AND pr.status='POSTED'),0) FROM purchase_order_lines WHERE purchase_order_id=?1 ORDER BY position,id")?;
     out.lines = s
         .query_map([value], |r| {
+            let ordered: i64 = r.get(5)?;
+            let received: i64 = r.get(9)?;
+            let returned: i64 = r.get(10)?;
             Ok(PurchaseLine {
                 id: r.get(0)?,
                 product_id: r.get(1)?,
                 product_package_id: r.get(2)?,
                 product_name_snapshot: r.get(3)?,
                 package_label_snapshot: r.get(4)?,
-                ordered_quantity: r.get(5)?,
+                ordered_quantity: ordered,
                 unit_cost_minor: r.get(6)?,
                 line_total_minor: r.get(7)?,
                 position: r.get(8)?,
+                received_quantity: received,
+                remaining_quantity: ordered - received,
+                returned_quantity: returned,
+                remaining_returnable_quantity: received - returned,
+            })
+        })?
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut receipts=c.prepare("SELECT r.id,r.receipt_number,r.branch_id,b.code,b.name,r.total_quantity,r.posted_at FROM purchase_receipts r JOIN branches b ON b.id=r.branch_id WHERE r.purchase_order_id=?1 AND r.status='POSTED' ORDER BY r.posted_at,r.id")?;
+    out.receipts = receipts
+        .query_map([value], |r| {
+            Ok(PurchaseReceiptSummary {
+                id: r.get(0)?,
+                receipt_number: r.get(1)?,
+                branch_id: r.get(2)?,
+                branch_code: r.get(3)?,
+                branch_name: r.get(4)?,
+                total_quantity: r.get(5)?,
+                posted_at: r.get(6)?,
+            })
+        })?
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut returns=c.prepare("SELECT x.id,x.return_number,x.purchase_order_id,o.purchase_number,x.receipt_id,r.receipt_number,x.branch_id,b.code,b.name,x.supplier_id,coalesce(o.supplier_code_snapshot,s.code),coalesce(o.supplier_name_snapshot,s.display_name),x.total_quantity,x.reason,x.posted_at FROM purchase_returns x JOIN purchase_orders o ON o.id=x.purchase_order_id JOIN purchase_receipts r ON r.id=x.receipt_id JOIN branches b ON b.id=x.branch_id JOIN suppliers s ON s.id=x.supplier_id WHERE x.purchase_order_id=?1 AND x.status='POSTED' ORDER BY x.posted_at,x.id")?;
+    out.returns = returns
+        .query_map([value], |r| {
+            Ok(PurchaseReturnSummary {
+                id: r.get(0)?,
+                return_number: r.get(1)?,
+                purchase_order_id: r.get(2)?,
+                purchase_number: r.get(3)?,
+                receipt_id: r.get(4)?,
+                receipt_number: r.get(5)?,
+                branch_id: r.get(6)?,
+                branch_code: r.get(7)?,
+                branch_name: r.get(8)?,
+                supplier_id: r.get(9)?,
+                supplier_code: r.get(10)?,
+                supplier_name: r.get(11)?,
+                total_quantity: r.get(12)?,
+                reason: r.get(13)?,
+                posted_at: r.get(14)?,
             })
         })?
         .collect::<Result<Vec<_>, _>>()?;

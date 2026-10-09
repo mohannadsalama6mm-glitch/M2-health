@@ -1,11 +1,14 @@
 use super::{models::*, *};
-use crate::commands::branches::DatabaseState;
+use crate::{authorization::AuthorizationState, commands::branches::DatabaseState};
 use tauri::State;
 #[tauri::command]
 pub fn create_count_session(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: Create,
 ) -> Result<Detail, AppError> {
+    let mut input = input;
+    input.created_by = Some(authorization.actor()?);
     create(state.db()?, &input)
 }
 #[tauri::command]
@@ -69,10 +72,11 @@ pub fn cancel_count_session(
 #[tauri::command]
 pub fn complete_count_session(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: Complete,
 ) -> Result<Detail, AppError> {
     let db = state.db()?;
-    let result = complete(db, &input)?;
+    let result = complete_as(db, &input, Some(&authorization.actor()?))?;
     crate::inventory::alerts::refresh_all(db);
     Ok(result)
 }

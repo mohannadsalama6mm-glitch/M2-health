@@ -1,5 +1,5 @@
 use super::{models::*, *};
-use crate::commands::branches::DatabaseState;
+use crate::{authorization::AuthorizationState, commands::branches::DatabaseState};
 use tauri::State;
 #[tauri::command]
 pub fn get_pos_package_availability(
@@ -27,8 +27,12 @@ pub fn search_pos_products(
     search(state.db()?, &query)
 }
 #[tauri::command]
-pub fn save_sale_draft(state: State<'_, DatabaseState>, input: Save) -> Result<Value, AppError> {
-    save(state.db()?, &input)
+pub fn save_sale_draft(
+    state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
+    input: Save,
+) -> Result<Value, AppError> {
+    save_as(state.db()?, &input, Some(&authorization.actor()?))
 }
 #[tauri::command]
 pub fn hold_sale(state: State<'_, DatabaseState>, input: Transition) -> Result<Value, AppError> {
@@ -46,8 +50,12 @@ pub fn preview_sale_totals(
     preview(state.db()?, &cart)
 }
 #[tauri::command]
-pub fn post_sale(state: State<'_, DatabaseState>, input: Post) -> Result<Value, AppError> {
-    post(state.db()?, &input)
+pub fn post_sale(
+    state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
+    input: Post,
+) -> Result<Value, AppError> {
+    post_as(state.db()?, &input, Some(&authorization.actor()?))
 }
 #[tauri::command]
 pub fn list_canonical_sales(
@@ -55,6 +63,13 @@ pub fn list_canonical_sales(
     query: Query,
 ) -> Result<Value, AppError> {
     list(state.db()?, &query)
+}
+#[tauri::command]
+pub fn list_customer_sales(
+    state: State<'_, DatabaseState>,
+    query: CustomerSalesQuery,
+) -> Result<Value, AppError> {
+    customer_history_for_branch(state.db()?, &query, &query.branch_id)
 }
 #[tauri::command]
 pub fn get_canonical_sale(state: State<'_, DatabaseState>, id: String) -> Result<Value, AppError> {
@@ -70,21 +85,24 @@ pub fn preview_sale_return(
 #[tauri::command]
 pub fn create_sale_return(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: ReturnDraft,
 ) -> Result<Value, AppError> {
-    create_return(state.db()?, &input)
+    create_return_as(state.db()?, &input, Some(&authorization.actor()?))
 }
 #[tauri::command]
 pub fn post_sale_return(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: ReturnPost,
 ) -> Result<Value, AppError> {
-    post_return(state.db()?, &input)
+    post_return_as(state.db()?, &input, Some(&authorization.actor()?))
 }
 #[tauri::command]
 pub fn void_canonical_sale(
     state: State<'_, DatabaseState>,
+    authorization: State<'_, AuthorizationState>,
     input: Void,
 ) -> Result<Value, AppError> {
-    void(state.db()?, &input)
+    void_as(state.db()?, &input, Some(&authorization.actor()?))
 }

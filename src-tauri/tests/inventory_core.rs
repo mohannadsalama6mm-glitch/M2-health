@@ -13,6 +13,34 @@ use m2_health_lib::{
 use rusqlite::{params, Connection};
 
 #[test]
+fn attributed_opening_stock_records_the_same_actor_on_batch_and_movement() {
+    let f = setup();
+    let actor = uuid();
+    let movement = movements::opening(
+        &f.db,
+        &OpeningStock {
+            batch: input(&f),
+            request_id: uuid(),
+            quantity: 4,
+            reason: "Authenticated opening".into(),
+            created_by: Some(actor.clone()),
+        },
+    )
+    .unwrap();
+    assert_eq!(movement.created_by.as_deref(), Some(actor.as_str()));
+    let batch_actor: String =
+        f.db.lock()
+            .unwrap()
+            .query_row(
+                "SELECT created_by FROM inventory_batches WHERE id=?1",
+                [&movement.batch_id],
+                |r| r.get(0),
+            )
+            .unwrap();
+    assert_eq!(batch_actor, actor);
+}
+
+#[test]
 fn migration_four_failure_rolls_back_pending_inventory_schema() {
     let mut c = Connection::open_in_memory().unwrap();
     migrations::apply(&mut c, &MIGRATIONS[..3]).unwrap();
@@ -668,7 +696,7 @@ fn migration_from_v3_preserves_catalog_branch_and_import_metadata() {
         assert_eq!(count(&db, t), 1);
     }
     assert_eq!(count(&db, "inventory_movements"), 0);
-    assert_eq!(count(&db, "_schema_version"), 11);
+    assert_eq!(count(&db, "_schema_version"), 17);
 }
 #[test]
 fn sqlite_rejects_invalid_type_sign_foreign_keys_and_unpaired_transfer() {

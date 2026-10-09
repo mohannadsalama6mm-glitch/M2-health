@@ -31,6 +31,7 @@ export async function installCanonicalPartnersDouble(page: Page) {
       partnerFailCommand: string;
       partnerDelay: number;
       partnerEmpty: boolean;
+      partnerHistoryTotal: number;
     };
     const original = w.__TAURI_INTERNALS__.invoke;
     const now = "2026-10-03T10:00:00.000Z";
@@ -89,6 +90,7 @@ export async function installCanonicalPartnersDouble(page: Page) {
     w.partnerFailCommand = "";
     w.partnerDelay = 0;
     w.partnerEmpty = false;
+    w.partnerHistoryTotal = 1;
     const list = (rows: Partner[], query: Record<string, unknown>) => {
       const search = String(query.search ?? "").toLowerCase();
       const active = query.isActive;
@@ -133,7 +135,7 @@ export async function installCanonicalPartnersDouble(page: Page) {
         };
       if (command === w.partnerFailCommand)
         throw { code: "validation", message: "Controlled backend rejection" };
-      if (command.startsWith("list_canonical_") && w.partnerDelay)
+      if ((command.startsWith("list_canonical_") || command === "list_customer_sales") && w.partnerDelay)
         await new Promise((resolve) => setTimeout(resolve, w.partnerDelay));
       if (command === "list_canonical_suppliers")
         return list(suppliers, args.query as Record<string, unknown>);
@@ -143,6 +145,24 @@ export async function installCanonicalPartnersDouble(page: Page) {
         return structuredClone(find(suppliers, args.id));
       if (command === "get_canonical_customer")
         return structuredClone(find(customers, args.id));
+      if (command === "list_customer_sales") {
+        const total = w.partnerHistoryTotal;
+        return {
+          items: total ? [{
+            id: "sale-customer-1", saleNumber: "SAL-20261003-0001", branchId: "main",
+            customerId: String((args.query as { customerId: string }).customerId),
+            customerCodeSnapshot: "CUS-000001", customerName: "Ahmed Hassan",
+            customerPhoneSnapshot: "01100000001", status: "POSTED", revision: 2,
+            cart: { branchId: "main", customerId: "c1", customerName: "Ahmed Hassan", notes: null, discountMinor: 0, taxMinor: 0, lines: [] },
+            subtotalMinor: 1250, discountMinor: 0, taxMinor: 0, totalMinor: 1250,
+            paymentStatus: "PAID", createdAt: now, postedAt: now, voidedAt: null,
+            notes: null, items: [], payments: [], returns: [], voids: [], voidAllocations: [], refundedMinor: 0,
+          }] : [], total, limit: 10, offset: Number((args.query as { offset?: number }).offset ?? 0),
+        };
+      }
+      if (command === "list_purchase_orders") return { items: [{ id: "po-1", purchaseNumber: "PUR-0001", supplierId: "s1", supplierCode: "SUP-000001", supplierName: "Nile Medical", status: "RECEIVED", revision: 3, totalMinor: 5000, lineCount: 1, createdAt: now, orderedAt: now }], total: 1, limit: 10, offset: 0 };
+      if (command === "list_purchase_receipts") return { items: [{ id: "receipt-1", receiptNumber: "REC-0001", branchId: "main", branchCode: "MAIN", branchName: "Main Pharmacy", totalQuantity: 5, postedAt: now }], total: 1, limit: 10, offset: 0 };
+      if (command === "list_purchase_returns") return { items: [{ id: "return-1", returnNumber: "PRN-0001", purchaseOrderId: "po-1", purchaseNumber: "PUR-0001", receiptId: "receipt-1", receiptNumber: "REC-0001", branchId: "main", branchCode: "MAIN", branchName: "Main Pharmacy", supplierId: "s1", supplierCode: "SUP-000001", supplierName: "Nile Medical", totalQuantity: 1, reason: "Damaged", postedAt: now }], total: 1, limit: 10, offset: 0 };
       if (
         command === "create_canonical_supplier" ||
         command === "create_canonical_customer"

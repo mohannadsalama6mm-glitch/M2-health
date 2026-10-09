@@ -1,11 +1,16 @@
+pub mod auth;
+pub mod authorization;
 pub mod catalog_import;
 pub mod commands;
 pub mod db;
 pub mod error;
+pub mod finance;
 pub mod inventory;
 pub mod partners;
+pub mod phase6;
 pub mod purchasing;
 pub mod recovery;
+pub mod reporting;
 pub mod sales;
 use commands::branches::DatabaseState;
 use db::{connection::AppDb, repositories::branches};
@@ -38,10 +43,53 @@ pub fn run() {
     let result = tauri::Builder::default()
         .setup(|app| {
             app.manage(DatabaseState(initialize(app)));
+            app.manage(auth::AuthState::default());
+            app.manage(authorization::AuthorizationState::default());
             app.manage(catalog_import::commands::ImportState::default());
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
+        .invoke_handler(authorization::guard(tauri::generate_handler![
+            auth::commands::get_auth_status,
+            auth::commands::bootstrap_admin,
+            auth::commands::login,
+            auth::commands::current_session,
+            auth::commands::logout,
+            auth::commands::list_users,
+            auth::commands::get_user,
+            auth::commands::create_user,
+            auth::commands::update_user,
+            auth::commands::set_user_active,
+            auth::commands::reset_user_password,
+            auth::commands::list_roles,
+            auth::commands::assign_user_role,
+            auth::commands::remove_user_role,
+            auth::commands::set_user_branches,
+            phase6::commands::get_phase6_dashboard,
+            phase6::commands::get_phase6_reconciliation,
+            phase6::commands::get_sale_finance_trace,
+            phase6::commands::export_phase6_csv,
+            finance::commands::list_finance_accounts,
+            finance::commands::create_finance_expense,
+            finance::commands::get_finance_expense,
+            finance::commands::list_finance_expenses,
+            finance::commands::get_finance_journal,
+            finance::commands::list_finance_journals,
+            finance::commands::get_trial_balance,
+            finance::commands::get_account_activity,
+            finance::commands::get_sales_financial_summary,
+            finance::commands::get_expense_report,
+            reporting::commands::get_reporting_overview,
+            reporting::commands::get_sales_report,
+            reporting::commands::get_sales_by_product_report,
+            reporting::commands::get_sales_by_customer_report,
+            reporting::commands::get_inventory_stock_report,
+            reporting::commands::get_inventory_movement_report,
+            reporting::commands::get_expiry_report,
+            reporting::commands::get_low_stock_report,
+            reporting::commands::get_purchasing_report,
+            reporting::commands::get_purchase_receipt_report,
+            reporting::commands::get_purchase_return_report,
+            reporting::commands::get_supplier_analytics,
             purchasing::commands::create_purchase_order_draft,
             purchasing::commands::update_purchase_order_draft,
             purchasing::commands::order_purchase_order,
@@ -49,6 +97,12 @@ pub fn run() {
             purchasing::commands::get_purchase_order,
             purchasing::commands::list_purchase_orders,
             purchasing::commands::search_purchase_packages,
+            purchasing::commands::receive_purchase_order,
+            purchasing::commands::get_purchase_receipt,
+            purchasing::commands::list_purchase_receipts,
+            purchasing::commands::create_purchase_return,
+            purchasing::commands::get_purchase_return,
+            purchasing::commands::list_purchase_returns,
             partners::commands::create_canonical_supplier,
             partners::commands::get_canonical_supplier,
             partners::commands::update_canonical_supplier,
@@ -67,6 +121,7 @@ pub fn run() {
             sales::commands::preview_sale_totals,
             sales::commands::post_sale,
             sales::commands::list_canonical_sales,
+            sales::commands::list_customer_sales,
             sales::commands::get_canonical_sale,
             sales::commands::preview_sale_return,
             sales::commands::create_sale_return,
@@ -156,7 +211,7 @@ pub fn run() {
             commands::catalog::set_package_price,
             commands::catalog::get_current_package_price,
             commands::catalog::get_package_price_history,
-        ])
+        ]))
         .run(tauri::generate_context!());
     if let Err(error) = result {
         eprintln!("M² Health could not start: {error}");

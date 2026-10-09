@@ -21,6 +21,7 @@ async function nativeBoundary(
       isTauri: true,
       __TAURI_INTERNALS__: {
         invoke: async (command: string) => {
+          if (command === "recovery_status") return { authEnabled: false };
           if (mode === "loading") await new Promise(() => {});
           if (mode === "error")
             throw {
@@ -113,4 +114,19 @@ test("browser preview keeps the original demo branches", async ({ page }) => {
   const selector = page.getByRole("combobox", { name: "Branch", exact: true });
   await expect(selector).toHaveValue("Main branch");
   await expect(selector.locator("option")).toHaveCount(3);
+});
+
+test("desktop system routes never render Phase 1 fixture records", async ({ page }) => {
+  await nativeBoundary(page, "success");
+  for (const [path, heading] of [
+    ["/notifications", "Notifications unavailable"],
+    ["/audit-log", "Audit log unavailable"],
+    ["/backup", "Backup and restore unavailable"],
+    ["/sync", "Synchronization unavailable"],
+    ["/settings", "Settings unavailable"],
+  ]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+    await expect(page.getByText("This workspace is a design preview and is not connected to persisted desktop data.")).toBeVisible();
+  }
 });

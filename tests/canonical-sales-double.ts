@@ -59,6 +59,10 @@ export async function installSalesDouble(page: Page) {
           stockCountsEnabled: true,
           inventoryAlertsEnabled: true,
         };
+      if (command === "get_sale_finance_trace") {
+        const saleId=String(args!.saleId);
+        return {saleId,financePosted:true,historicalUnposted:false,coverageNote:"This sale has a posted Finance journal.",journals:[{id:"journal-sale",journalNumber:"JRN-20261005-00001",sourceType:"SALE",sourceId:saleId,sourceParentId:null,branchId:"main",reversalOfJournalId:null,description:"Posted sale",debitTotalMinor:100,creditTotalMinor:100,cogsComplete:true,postedAt:"2026-10-05T10:00:00.000Z"}]};
+      }
       if (command === "search_pos_products") {
         if (w.salesDelay) await new Promise((r) => setTimeout(r, w.salesDelay));
         const q = args!.query as Query;
@@ -83,6 +87,17 @@ export async function installSalesDouble(page: Page) {
           total: q.search === "missing" ? 0 : 1,
         };
       }
+      if (command === "list_canonical_customers") {
+        return {
+          items: [{
+            id: "customer-1", code: "CUS-000001", displayName: "Ahmed Hassan",
+            primaryPhone: "01000000000", secondaryPhone: null, email: null,
+            address: null, notes: null, isActive: true, revision: 1,
+            createdAt: "2026-09-15T00:00:00Z", updatedAt: "2026-09-15T00:00:00Z",
+          }],
+          total: 1, limit: 8, offset: 0,
+        };
+      }
       if (command === "preview_sale_totals") {
         const cart = args!.cart as Cart;
         if (cart.lines.some((l) => l.quantity > 8))
@@ -104,6 +119,9 @@ export async function installSalesDouble(page: Page) {
             id: i.id,
             saleNumber: null,
             branchId: i.cart.branchId,
+            customerId: i.cart.customerId,
+            customerCodeSnapshot: i.cart.customerId ? "CUS-000001" : null,
+            customerPhoneSnapshot: i.cart.customerId ? "01000000000" : null,
             status: "DRAFT",
             revision: 0,
             cart: i.cart,
@@ -124,6 +142,8 @@ export async function installSalesDouble(page: Page) {
           sales.push(s);
         }
         s.cart = structuredClone(i.cart);
+        s.customerId = i.cart.customerId;
+        s.customerName = i.cart.customerName;
         s.cart.lines.forEach(
           (l) => (l.displayName = "Canonical medicine · Box"),
         );
@@ -151,6 +171,8 @@ export async function installSalesDouble(page: Page) {
           };
         if (s.status === "POSTED") return structuredClone(s);
         s.status = "POSTED";
+        s.customerCodeSnapshot = s.customerId ? "CUS-000001" : null;
+        s.customerPhoneSnapshot = s.customerId ? "01000000000" : null;
         s.saleNumber = "SAL-20260915-0001";
         s.revision++;
         s.postedAt = "2026-09-15T00:00:00Z";
