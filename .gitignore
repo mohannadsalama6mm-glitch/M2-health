@@ -3,6 +3,8 @@ dist/
 test-results/
 playwright-report/
 *.local
+config/cloud.local.json
+supabase/.temp/
 src-tauri/target/
 src-tauri/gen/
 *.db

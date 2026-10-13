@@ -168,7 +168,7 @@ fn adjust(f: &F, delta: i64) {
 #[test]
 fn migration_006_has_single_canonical_ledger() {
     let f = f();
-    assert_eq!(total(&f.db, "_schema_version"), 17);
+    assert_eq!(total(&f.db, "_schema_version"), 21);
     assert_eq!(total(&f.db, "stock_count_sessions"), 0);
     assert!(f
         .db

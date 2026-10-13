@@ -209,12 +209,14 @@ test("contacts management reports finance and system controls", async ({
   ).toBeVisible();
   for (const [path, heading] of [
     ["/audit-log", "Audit log unavailable"],
-    ["/sync", "Synchronization unavailable"],
     ["/settings", "Settings unavailable"],
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
   }
+  await page.goto("/sync");
+  await expect(page.getByRole("heading", { name: "Sync / cloud status" })).toBeVisible();
+  await expect(page.getByText("Local-only mode", { exact: true })).toBeVisible();
   await page.goto("/reports");
   await page.getByRole("button", { name: "Inventory", exact: true }).click();
   await expect(

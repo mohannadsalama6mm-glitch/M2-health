@@ -1,7 +1,10 @@
 use super::*;
-use crate::db::{
-    catalog_validation::{id, invalid, optional, required},
-    connection::AppDb,
+use crate::{
+    cloud::outbox,
+    db::{
+        catalog_validation::{id, invalid, optional, required},
+        connection::AppDb,
+    },
 };
 use models::*;
 use rusqlite::{params, Connection, Row, TransactionBehavior};
@@ -84,11 +87,13 @@ pub(crate) fn insert_referenced(
     }
     let reference = reference.or_else(|| transfer.map(|id| ("inventory_transfer", id)));
     c.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reason,created_by,transfer_id,reference_type,reference_id) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)",params![op.request_id,op.branch_id,op.product_package_id,op.batch_id,kind.as_str(),delta,op.reason,op.created_by,transfer,reference.map(|r|r.0),reference.map(|r|r.1)])?;
-    Ok(c.query_row(
+    let movement = c.query_row(
         &format!("SELECT {COLUMNS} FROM inventory_movements WHERE id=?1"),
         [&op.request_id],
         map,
-    )?)
+    )?;
+    outbox::inventory_movement(c, &movement)?;
+    Ok(movement)
 }
 pub fn opening(db: &AppDb, input: &OpeningStock) -> Result<InventoryMovement, AppError> {
     let mut c = db.lock()?;
@@ -135,6 +140,12 @@ pub(crate) fn count_correction(
     }
     let id = uuid::Uuid::new_v4().to_string();
     c.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reference_type,reference_id,reason,created_by) VALUES(?1,?2,?3,?4,'STOCK_COUNT_CORRECTION',?5,'stock_count_line',?6,?7,?8)",params![id,branch,package,batch,delta,line,format!("Stock count {number} reconciliation"),actor])?;
+    let movement = c.query_row(
+        &format!("SELECT {COLUMNS} FROM inventory_movements WHERE id=?1"),
+        [&id],
+        map,
+    )?;
+    outbox::inventory_movement(c, &movement)?;
     Ok(id)
 }
 pub fn opening_existing(db: &AppDb, op: &StockOperation) -> Result<InventoryMovement, AppError> {

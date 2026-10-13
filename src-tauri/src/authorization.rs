@@ -200,10 +200,25 @@ pub fn policy(command: &str) -> Option<Policy> {
             scope: Public,
             write: matches!(command, "bootstrap_admin" | "login"),
         },
-        "current_session" | "logout" => Policy {
+        "current_session"
+        | "logout"
+        | "get_cloud_foundation_status"
+        | "get_cloud_session_status" => Policy {
             permission: "session.self",
             scope: Global,
             write: command == "logout",
+        },
+        "cloud_sign_in" | "cloud_sign_out" | "run_cloud_sync_cycle" | "resolve_sync_conflict" => {
+            Policy {
+                permission: "cloud.manage",
+                scope: Global,
+                write: true,
+            }
+        }
+        "list_sync_conflicts" => Policy {
+            permission: "cloud.manage",
+            scope: Global,
+            write: false,
         },
         "list_users" | "get_user" => Policy {
             permission: "users.read",

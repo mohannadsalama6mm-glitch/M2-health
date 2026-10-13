@@ -49,7 +49,7 @@ fn canonical_v4_reopens_without_reapplying_or_creating_prototype_tables() {
 }
 
 #[test]
-fn future_extension_of_v17_applies_once_and_unknown_version_is_refused() {
+fn future_extension_of_v21_applies_once_and_unknown_version_is_refused() {
     let mut c = Connection::open_in_memory().unwrap();
     migrations::run(&mut c).unwrap();
     let mut extended: Vec<Migration> = MIGRATIONS
@@ -61,7 +61,7 @@ fn future_extension_of_v17_applies_once_and_unknown_version_is_refused() {
         })
         .collect();
     extended.push(Migration {
-        version: 18,
+        version: 22,
         name: "test_only_extension",
         sql:
             "CREATE TABLE recovery_marker(value TEXT); INSERT INTO recovery_marker VALUES('keep');",
@@ -85,6 +85,6 @@ fn future_extension_of_v17_applies_once_and_unknown_version_is_refused() {
         c.query_row("SELECT count(*) FROM _schema_version", [], |r| r
             .get::<_, i64>(0))
             .unwrap(),
-        18
+        22
     );
 }

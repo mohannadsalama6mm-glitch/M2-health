@@ -42,7 +42,7 @@ fn migration_016_creates_identity_foundation_without_users_or_credentials() {
         c.query_row("SELECT max(version) FROM _schema_version", [], |r| r
             .get::<_, i64>(0))
             .unwrap(),
-        17
+        21
     );
     assert_eq!(
         c.query_row("SELECT count(*) FROM roles", [], |r| r.get::<_, i64>(0))

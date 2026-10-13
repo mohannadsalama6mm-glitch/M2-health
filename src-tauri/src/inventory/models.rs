@@ -44,7 +44,7 @@ pub struct CreateBatch {
     pub cost_price_minor: Option<i64>,
     pub supplier_reference: Option<String>,
 }
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct InventoryBatch {
     pub id: String,
@@ -91,7 +91,7 @@ pub enum AdjustmentDirection {
     In,
     Out,
 }
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct InventoryMovement {
     pub id: String,

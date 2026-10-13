@@ -696,7 +696,7 @@ fn migration_from_v3_preserves_catalog_branch_and_import_metadata() {
         assert_eq!(count(&db, t), 1);
     }
     assert_eq!(count(&db, "inventory_movements"), 0);
-    assert_eq!(count(&db, "_schema_version"), 17);
+    assert_eq!(count(&db, "_schema_version"), 21);
 }
 #[test]
 fn sqlite_rejects_invalid_type_sign_foreign_keys_and_unpaired_transfer() {

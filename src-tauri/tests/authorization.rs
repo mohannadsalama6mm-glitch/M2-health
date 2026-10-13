@@ -82,8 +82,8 @@ fn registered_commands() -> Vec<&'static str> {
 fn every_registered_command_has_exactly_one_explicit_policy() {
     let source = include_str!("../src/lib.rs");
     let commands = registered_commands();
-    assert_eq!(commands.len(), 162);
-    assert_eq!(commands.iter().copied().collect::<HashSet<_>>().len(), 162);
+    assert_eq!(commands.len(), 167);
+    assert_eq!(commands.iter().copied().collect::<HashSet<_>>().len(), 167);
     for command in commands {
         assert!(
             policy(command).is_some(),

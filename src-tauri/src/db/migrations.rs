@@ -93,6 +93,26 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "security_events",
         sql: include_str!("../../migrations/017_security_events.sql"),
     },
+    Migration {
+        version: 18,
+        name: "cloud_foundation",
+        sql: include_str!("../../migrations/018_cloud_foundation.sql"),
+    },
+    Migration {
+        version: 19,
+        name: "offline_sync_engine",
+        sql: include_str!("../../migrations/019_offline_sync_engine.sql"),
+    },
+    Migration {
+        version: 20,
+        name: "sync_rollout_controls",
+        sql: include_str!("../../migrations/020_sync_rollout_controls.sql"),
+    },
+    Migration {
+        version: 21,
+        name: "sync_conflict_resolution",
+        sql: include_str!("../../migrations/021_sync_conflict_resolution.sql"),
+    },
 ];
 
 pub fn run(connection: &mut Connection) -> Result<(), AppError> {

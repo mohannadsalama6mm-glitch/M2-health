@@ -29,6 +29,7 @@ import {
 import { Branches, BranchDetails } from "../features/management/Branches";
 import { Notifications, AuditLog } from "../features/system/Notifications";
 import { Backup, Sync } from "../features/system/BackupSync";
+import { CanonicalSync } from "../features/system/CanonicalSync";
 import { Settings } from "../features/system/Settings";
 import { EmptyState, LinkButton } from "../design-system";
 import { useDemo } from "./DemoContext";
@@ -118,7 +119,7 @@ export function AppRoutes() {
       <Route path="/notifications" element={isDesktopRuntime() ? <NativeUnavailable area="Notifications" /> : <Notifications />} />
       <Route path="/audit-log" element={isDesktopRuntime() ? <NativeUnavailable area="Audit log" /> : <AuditLog />} />
       <Route path="/backup" element={isDesktopRuntime() ? <NativeUnavailable area="Backup and restore" /> : <Backup />} />
-      <Route path="/sync" element={isDesktopRuntime() ? <NativeUnavailable area="Synchronization" /> : <Sync />} />
+      <Route path="/sync" element={isDesktopRuntime() ? <CanonicalSync /> : <Sync />} />
       <Route path="/settings" element={isDesktopRuntime() ? <NativeUnavailable area="Settings" /> : <Settings />} />
       {import.meta.env.DEV && (
         <Route

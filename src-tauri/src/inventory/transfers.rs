@@ -1,4 +1,5 @@
 use super::*;
+use crate::cloud::outbox;
 use crate::db::{
     catalog_validation::{id, invalid, optional, required},
     connection::AppDb,
@@ -87,11 +88,13 @@ pub(crate) fn transfer_on(
         Some(&input.request_id),
         document.map(|id| ("inventory_document", id)),
     )?;
-    Ok(TransferResult {
+    let result = TransferResult {
         id: input.request_id.clone(),
         source_batch_id: input.source_batch_id.clone(),
         destination_batch_id: destination.id,
         out_movement,
         in_movement,
-    })
+    };
+    outbox::inventory_transfer(tx, &result, input.created_by.as_deref())?;
+    Ok(result)
 }

@@ -2,6 +2,7 @@
 pub mod commands;
 pub mod models;
 use crate::{
+    cloud::outbox,
     db::{
         catalog_validation::{id, invalid, optional, required, MAX_SAFE_MINOR},
         connection::AppDb,
@@ -146,6 +147,56 @@ fn post(
         c.execute("INSERT INTO finance_journal_lines(id,journal_id,position,account_id,side,amount_minor,memo) VALUES(?1,?2,?3,?4,?5,?6,?7)",params![uuid(),journal,position as i64,account,line.side.as_str(),line.amount,line.memo])?;
     }
     c.execute("UPDATE finance_journals SET status='POSTED',posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",[&journal])?;
+    let actor: Option<String> = match source_type {
+        "SALE" => c
+            .query_row(
+                "SELECT created_by FROM sales WHERE id=?1",
+                [source_id],
+                |r| r.get(0),
+            )
+            .optional()?
+            .flatten(),
+        "SALE_RETURN" => c
+            .query_row(
+                "SELECT created_by FROM sale_returns WHERE id=?1",
+                [source_id],
+                |r| r.get(0),
+            )
+            .optional()?
+            .flatten(),
+        "SALE_VOID" => parent
+            .map(|sale_id| {
+                c.query_row("SELECT created_by FROM sales WHERE id=?1", [sale_id], |r| {
+                    r.get(0)
+                })
+                .optional()
+            })
+            .transpose()?
+            .flatten()
+            .flatten(),
+        "EXPENSE" => c
+            .query_row(
+                "SELECT created_by FROM finance_expenses WHERE id=?1",
+                [source_id],
+                |r| r.get(0),
+            )
+            .optional()?
+            .flatten(),
+        _ => None,
+    };
+    if actor.is_some() {
+        let payload = journal_on(c, &journal)?;
+        outbox::enqueue(
+            c,
+            branch,
+            actor.as_deref(),
+            "finance_journal",
+            &journal,
+            "APPENDED",
+            &payload,
+            Some(source_id),
+        )?;
+    }
     Ok(Some(journal))
 }
 fn payment_code(method: &str) -> Result<&'static str, AppError> {

@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod authorization;
 pub mod catalog_import;
+pub mod cloud;
 pub mod commands;
 pub mod db;
 pub mod error;
@@ -45,6 +46,8 @@ pub fn run() {
             app.manage(DatabaseState(initialize(app)));
             app.manage(auth::AuthState::default());
             app.manage(authorization::AuthorizationState::default());
+            app.manage(cloud::config::CloudConfigState::default());
+            app.manage(cloud::transport::CloudAuthState::default());
             app.manage(catalog_import::commands::ImportState::default());
             Ok(())
         })
@@ -54,6 +57,13 @@ pub fn run() {
             auth::commands::login,
             auth::commands::current_session,
             auth::commands::logout,
+            cloud::commands::get_cloud_foundation_status,
+            cloud::commands::get_cloud_session_status,
+            cloud::commands::cloud_sign_in,
+            cloud::commands::cloud_sign_out,
+            cloud::commands::run_cloud_sync_cycle,
+            cloud::commands::list_sync_conflicts,
+            cloud::commands::resolve_sync_conflict,
             auth::commands::list_users,
             auth::commands::get_user,
             auth::commands::create_user,

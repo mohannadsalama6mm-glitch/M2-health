@@ -445,11 +445,70 @@ export function installCatalogDouble(page: Page) {
       };
     };
     const branchResult = store.branches[0];
+    let cloudSession = {
+      authenticated: false,
+      subjectId: null as string | null,
+      expiresAt: null as number | null,
+    };
     Object.assign(window, {
       isTauri: true,
+      cloudConflicts: [] as Array<Record<string, unknown>>,
       __TAURI_INTERNALS__: {
         invoke: async (command: string, args: Record<string, unknown> = {}) => {
           switch (command) {
+            case "get_cloud_foundation_status":
+              return {
+                mode: "LOCAL_ONLY",
+                configured: false,
+                endpointConfigured: false,
+                deviceId: "11111111-1111-4111-a111-111111111111",
+                deviceStatus: "LOCAL_ONLY",
+                organizationId: null,
+                organizationName: null,
+                cloudIdentityLinked: false,
+                transportEnabled: false,
+                syncAvailable: false,
+                setupRequired: true,
+                outboxPending: 0,
+                inboxApplied: 0,
+                inboxRejected: 0,
+                openConflicts: 0,
+                lastSyncAt: null,
+                lastSuccessfulSyncAt: null,
+                lastSyncOutcome: null,
+                lastAcknowledgedAt: null,
+                retryScheduled: 0,
+                nextRetryAt: null,
+              };
+            case "get_cloud_session_status":
+              return cloudSession;
+            case "cloud_sign_in":
+              cloudSession = {
+                authenticated: true,
+                subjectId: "cloud-user-test",
+                expiresAt: 1_800_000_000,
+              };
+              return cloudSession;
+            case "cloud_sign_out":
+              cloudSession = {
+                authenticated: false,
+                subjectId: null,
+                expiresAt: null,
+              };
+              return undefined;
+            case "list_sync_conflicts":
+              return (window as unknown as { cloudConflicts: Array<Record<string, unknown>> }).cloudConflicts;
+            case "resolve_sync_conflict": {
+              const target = (args.input ?? {}) as { conflictId?: string; action?: string; note?: string };
+              const rows = (window as unknown as { cloudConflicts: Array<Record<string, unknown>> }).cloudConflicts;
+              const row = rows.find((item) => item.id === target.conflictId);
+              if (row) {
+                row.status = target.action === "DISMISS" ? "DISMISSED" : "OPEN";
+                row.resolutionAction = target.action === "DISMISS" ? "DISMISSED" : "RETRIED";
+                row.resolutionNote = target.note;
+              }
+              return undefined;
+            }
             // Retained later-phase UI contracts run against their explicit IPC doubles.
             // Production recovery_status is false; recovery.spec.ts covers that boundary.
             case "recovery_status":

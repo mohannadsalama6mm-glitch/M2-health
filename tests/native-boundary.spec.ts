@@ -30,6 +30,21 @@ async function nativeBoundary(
             };
           if (command === "ensure_default_branch") return branch;
           if (command === "list_branches") return [branch];
+          if (command === "get_cloud_foundation_status") return {
+            mode: "LOCAL_ONLY", configured: false,
+            endpointConfigured: false,
+            deviceId: "11111111-1111-4111-a111-111111111111", deviceStatus: "LOCAL_ONLY",
+            organizationId: null, organizationName: null, cloudIdentityLinked: false,
+            transportEnabled: false, syncAvailable: false, setupRequired: true,
+            outboxPending: 0, inboxApplied: 0, lastAcknowledgedAt: null,
+            inboxRejected: 0, openConflicts: 0, lastSyncAt: null,
+            lastSuccessfulSyncAt: null, lastSyncOutcome: null,
+            retryScheduled: 0, nextRetryAt: null,
+          };
+          if (command === "get_cloud_session_status") return {
+            authenticated: false, subjectId: null, expiresAt: null,
+          };
+          if (command === "list_sync_conflicts") return [];
           throw new Error(`Unexpected native command: ${command}`);
         },
       },
@@ -122,11 +137,16 @@ test("desktop system routes never render Phase 1 fixture records", async ({ page
     ["/notifications", "Notifications unavailable"],
     ["/audit-log", "Audit log unavailable"],
     ["/backup", "Backup and restore unavailable"],
-    ["/sync", "Synchronization unavailable"],
     ["/settings", "Settings unavailable"],
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     await expect(page.getByText("This workspace is a design preview and is not connected to persisted desktop data.")).toBeVisible();
   }
+  await page.goto("/sync");
+  await expect(page.getByRole("heading", { name: "Sync / cloud status" })).toBeVisible();
+  await expect(page.getByText("Cloud endpoint setup is required.", { exact: false })).toBeVisible();
+  await expect(page.getByText("Not enrolled", { exact: true })).toBeVisible();
+  await expect(page.getByText("Pending events", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Synchronize now" })).toBeDisabled();
 });
