@@ -667,9 +667,14 @@ pub fn apply(
             }
             apply_document_owned(connection, payload, |_| Ok(()))
         }
-        "stock_count" | "inventory_document" => {
-            apply_document_owned(connection, payload, |_| Ok(()))
-        }
+        "inventory_document" => apply_document_owned(connection, payload, |_| Ok(())),
+        // Count corrections are guarded by a local REVIEW-state session trigger and are
+        // computed against the local live balance; replaying them remotely is not a
+        // verified operation, so the whole count is quarantined for operator review.
+        "stock_count" => Err(Failure {
+            reason: "UNSUPPORTED_ENTITY",
+            detail: "Remote stock-count completion requires operator review; count corrections are not replayed automatically.",
+        }),
         _ => Err(Failure {
             reason: "UNSUPPORTED_ENTITY",
             detail: "No verified domain handler exists for this remote entity type.",

@@ -1077,6 +1077,52 @@ fn catalog_and_sale_documents_replicate_and_diverged_catalog_is_quarantined() {
 }
 
 #[test]
+fn remote_stock_count_is_quarantined_without_replaying_corrections() {
+    let fixture = fixture();
+    enable_test_gate(&fixture);
+    let session = id();
+    let before: i64 = fixture
+        .db
+        .lock()
+        .unwrap()
+        .query_row("SELECT count(*) FROM inventory_movements", [], |r| r.get(0))
+        .unwrap();
+    let payload = json!({
+        "session":{"id":session,"sessionNumber":"CNT-20261010-0001","branchId":fixture.branch,"status":"COMPLETED","revision":4,"createdBy":fixture.actor,"completedAt":"2026-10-10T12:00:00.000Z"},
+        "lines":[],
+        "results":[],
+        "movements":[]
+    });
+    let result = engine::run_cycle(
+        &fixture.db,
+        &FixedPull {
+            events: vec![domain_remote(
+                &fixture,
+                "stock_count",
+                &session,
+                payload,
+                40,
+            )],
+        },
+    )
+    .unwrap();
+    assert_eq!((result.applied, result.conflicts), (0, 1));
+    let connection = fixture.db.lock().unwrap();
+    let reason: String = connection
+        .query_row(
+            "SELECT reason_code FROM sync_conflicts WHERE entity_id=?1",
+            [&session],
+            |r| r.get(0),
+        )
+        .unwrap();
+    assert_eq!(reason, "UNSUPPORTED_ENTITY");
+    let after: i64 = connection
+        .query_row("SELECT count(*) FROM inventory_movements", [], |r| r.get(0))
+        .unwrap();
+    assert_eq!(before, after);
+}
+
+#[test]
 fn authorized_retry_reopens_a_stock_conflict_without_last_write_wins() {
     let fixture = fixture();
     enable_test_gate(&fixture);
