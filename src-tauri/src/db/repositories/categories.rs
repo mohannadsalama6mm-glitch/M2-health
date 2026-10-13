@@ -1,4 +1,5 @@
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb, models::catalog::*},
     error::{AppError, ErrorCode},
 };
@@ -34,6 +35,7 @@ pub fn create(db: &AppDb, input: &CreateCategory) -> Result<Category, AppError> 
         "INSERT INTO categories(id,name,normalized_name,description) VALUES (?1,?2,?3,?4)",
         params![id, input.name, normalize(&input.name), input.description],
     )?;
+    replication::catalog_lookup(&c, "categories", &id)?;
     get(&c, &id)
 }
 pub fn list(db: &AppDb, include_inactive: bool) -> Result<Vec<Category>, AppError> {

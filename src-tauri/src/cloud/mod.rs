@@ -3,6 +3,7 @@ pub mod config;
 pub mod engine;
 pub mod models;
 pub mod outbox;
+pub mod replication;
 pub mod transport;
 
 use crate::{db::connection::AppDb, error::AppError};

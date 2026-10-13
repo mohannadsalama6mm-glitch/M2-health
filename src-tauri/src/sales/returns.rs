@@ -231,6 +231,7 @@ pub fn post_return_as(
     tx.execute("UPDATE sale_returns SET status='POSTED',posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",[&input.id])?;
     crate::finance::post_return(&tx, &input.id)?;
     receipt(&tx, &input.request_id, "RETURN", &input.id, &payload)?;
+    crate::cloud::replication::sale_return(&tx, &input.id)?;
     let result = detail_on(&tx, &sale)?;
     tx.commit()?;
     drop(c);

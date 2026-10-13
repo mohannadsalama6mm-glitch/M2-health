@@ -256,6 +256,7 @@ pub fn complete_as(db: &AppDb, i: &Complete, actor: Option<&str>) -> Result<Deta
     }
     tx.execute("UPDATE stock_count_sessions SET status='COMPLETED',revision=revision+1,completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",[&s.id])?;
     tx.execute("INSERT INTO stock_count_completion_requests(request_id,payload,session_id) VALUES(?1,?2,?3)",params![i.request_id,payload,s.id])?;
+    crate::cloud::replication::stock_count(&tx, &s.id)?;
     let d = repository::detail(&tx, &s.id, 50, 0)?;
     tx.commit()?;
     Ok(d)

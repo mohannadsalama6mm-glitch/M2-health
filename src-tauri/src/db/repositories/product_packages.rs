@@ -1,4 +1,5 @@
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb, models::catalog::*},
     error::{AppError, ErrorCode},
 };
@@ -55,7 +56,9 @@ pub(crate) fn create_on(
 pub fn create(db: &AppDb, input: &CreateProductPackage) -> Result<ProductPackage, AppError> {
     validate_create(input)?;
     let c = db.lock()?;
-    create_on(&c, input)
+    let package = create_on(&c, input)?;
+    replication::catalog_product(&c, &package.product_id)?;
+    Ok(package)
 }
 /// Editable package fields, kept private so the composite workflows reuse one writer.
 pub(crate) struct PackageEdit {

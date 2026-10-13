@@ -3,6 +3,7 @@ pub mod commands;
 pub mod models;
 
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb},
     error::{AppError, ErrorCode},
 };
@@ -188,6 +189,7 @@ pub fn create_supplier(db: &AppDb, f: &SupplierFields) -> Result<Supplier, AppEr
     let code = next_code(&tx, "SUPPLIER", "SUP")?;
     tx.execute("INSERT INTO suppliers(id,code,display_name,contact_person,primary_phone,secondary_phone,email,address,tax_registration_id,notes) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10)",params![value,code,v.0,v.1,v.2,v.3,v.4,v.5,v.6,v.7])?;
     let result = supplier_on(&tx, &value)?;
+    replication::partner_record(&tx, "suppliers", &value)?;
     tx.commit()?;
     Ok(result)
 }
@@ -199,6 +201,7 @@ pub fn create_customer(db: &AppDb, f: &CustomerFields) -> Result<Customer, AppEr
     let code = next_code(&tx, "CUSTOMER", "CUS")?;
     tx.execute("INSERT INTO customers(id,code,display_name,primary_phone,secondary_phone,email,address,notes) VALUES(?1,?2,?3,?4,?5,?6,?7,?8)",params![value,code,v.0,v.1,v.2,v.3,v.4,v.5])?;
     let result = customer_on(&tx, &value)?;
+    replication::partner_record(&tx, "customers", &value)?;
     tx.commit()?;
     Ok(result)
 }
@@ -228,6 +231,7 @@ pub fn update_supplier(db: &AppDb, input: &UpdateSupplier) -> Result<Supplier, A
             "Supplier changed. Reload before saving.",
         ));
     }
+    replication::partner_record(&c, "suppliers", &input.id)?;
     supplier_on(&c, &input.id)
 }
 pub fn update_customer(db: &AppDb, input: &UpdateCustomer) -> Result<Customer, AppError> {
@@ -245,6 +249,7 @@ pub fn update_customer(db: &AppDb, input: &UpdateCustomer) -> Result<Customer, A
             "Customer changed. Reload before saving.",
         ));
     }
+    replication::partner_record(&c, "customers", &input.id)?;
     customer_on(&c, &input.id)
 }
 

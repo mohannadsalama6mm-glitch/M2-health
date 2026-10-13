@@ -3,6 +3,7 @@ pub mod commands;
 pub mod models;
 mod returns;
 use crate::{
+    cloud::replication,
     db::{
         catalog_validation::{id, invalid, optional, required, MAX_SAFE_MINOR},
         connection::AppDb,
@@ -413,6 +414,7 @@ pub fn post_as(db: &AppDb, input: &Post, actor: Option<&str>) -> Result<Value, A
     tx.execute("UPDATE sales SET status='POSTED',revision=revision+1,sale_number=?2,payment_status='PAID',post_request_id=?3,posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now'),subtotal_minor=?4,discount_minor=?5,tax_minor=?6,total_minor=?7,customer_name=?8,customer_code_snapshot=?9,customer_phone_snapshot=?10 WHERE id=?1",params![input.id,number,input.request_id,p.subtotal_minor,p.discount_minor,p.tax_minor,p.total_minor,customer.as_ref().map(|v|&v.1),customer.as_ref().map(|v|&v.0),customer.as_ref().and_then(|v|v.2.as_ref())])?;
     crate::finance::post_sale(&tx, &input.id)?;
     receipt(&tx, &input.request_id, "POST", &input.id, &payload)?;
+    replication::sale_document(&tx, &input.id)?;
     let result = detail_on(&tx, &input.id)?;
     tx.commit()?;
     drop(c);

@@ -1,4 +1,5 @@
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb, models::catalog::*},
     error::{AppError, ErrorCode},
 };
@@ -38,6 +39,7 @@ pub fn create(db: &AppDb, input: &CreateManufacturer) -> Result<Manufacturer, Ap
     let c = db.lock()?;
     let id = uuid::Uuid::new_v4().to_string();
     c.execute("INSERT INTO manufacturers(id,name,normalized_name,country,phone,email,website) VALUES (?1,?2,?3,?4,?5,?6,?7)",params![id,input.name,normalize(&input.name),input.country,input.phone,input.email,input.website])?;
+    replication::catalog_lookup(&c, "manufacturers", &id)?;
     get(&c, &id)
 }
 pub fn list(db: &AppDb, include_inactive: bool) -> Result<Vec<Manufacturer>, AppError> {

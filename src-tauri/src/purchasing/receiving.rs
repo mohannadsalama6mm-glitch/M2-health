@@ -276,6 +276,7 @@ pub fn receive(db: &AppDb, input: &ReceivePurchase) -> Result<PurchaseReceipt, A
     };
     tx.execute("UPDATE purchase_orders SET status=?2,revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",params![input.purchase_order_id,next])?;
     tx.execute("UPDATE purchase_receipts SET status='POSTED',posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1",[&input.id])?;
+    crate::cloud::replication::purchase_receipt(&tx, &input.id)?;
     let result = receipt_on(&tx, &input.id)?;
     tx.commit()?;
     Ok(result)

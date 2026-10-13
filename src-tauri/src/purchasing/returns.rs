@@ -229,6 +229,7 @@ pub fn create(db: &AppDb, input: &CreatePurchaseReturn) -> Result<PurchaseReturn
     }
     tx.execute("UPDATE purchase_orders SET revision=revision+1,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1", [&input.purchase_order_id])?;
     tx.execute("UPDATE purchase_returns SET status='POSTED',posted_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?1", [&input.id])?;
+    crate::cloud::replication::purchase_return(&tx, &input.id)?;
     let result = return_on(&tx, &input.id)?;
     tx.commit()?;
     Ok(result)

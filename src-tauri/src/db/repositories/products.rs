@@ -1,4 +1,5 @@
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb, models::catalog::*},
     error::{AppError, ErrorCode},
 };
@@ -55,6 +56,7 @@ pub fn create(db: &AppDb, input: &CreateProduct) -> Result<Product, AppError> {
     let c = db.lock()?;
     let value = uuid::Uuid::new_v4().to_string();
     c.execute("INSERT INTO products(id,commercial_name_en,commercial_name_ar,normalized_name_en,normalized_name_ar,scientific_name,normalized_scientific_name,manufacturer_id,category_id,route_id,description,notes) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)",params![value,input.commercial_name_en,input.commercial_name_ar,input.commercial_name_en.as_deref().map(normalize),input.commercial_name_ar.as_deref().map(normalize),input.scientific_name,input.scientific_name.as_deref().map(normalize),input.manufacturer_id,input.category_id,input.route_id,input.description,input.notes])?;
+    replication::catalog_product(&c, &value)?;
     get(&c, &value)
 }
 pub fn get_product(db: &AppDb, value: &str) -> Result<Product, AppError> {
@@ -373,6 +375,7 @@ pub fn create_full(db: &AppDb, input: &CreateProductFull) -> Result<Product, App
         }
     }
     let product = get(&tx, &value)?;
+    replication::catalog_product(&tx, &value)?;
     tx.commit()?;
     Ok(product)
 }
@@ -461,6 +464,7 @@ pub fn update_full(db: &AppDb, input: &UpdateProductFull) -> Result<Product, App
         }
     }
     let product = get(&tx, &input.id)?;
+    replication::catalog_product(&tx, &input.id)?;
     tx.commit()?;
     Ok(product)
 }

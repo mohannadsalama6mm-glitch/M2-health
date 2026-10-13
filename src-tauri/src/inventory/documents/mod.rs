@@ -382,6 +382,7 @@ pub fn post_as(
     }
     set_status(&tx, &d.header.id, "POSTED")?;
     record_request(&tx, &input.request_id, &payload, &d.header.id)?;
+    crate::cloud::replication::inventory_document(&tx, &d.header.id)?;
     let result = repository::detail(&tx, &d.header.id)?;
     tx.commit()?;
     Ok(result)

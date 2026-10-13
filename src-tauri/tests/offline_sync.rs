@@ -342,7 +342,7 @@ impl SyncTransport for FixedPull {
 }
 
 fn fixed_remote(fixture: &Fixture, payload: serde_json::Value) -> RemoteEvent {
-    let encoded = serde_json::to_string(&payload).unwrap();
+    let encoded = outbox::canonical_json(&payload).unwrap();
     RemoteEvent {
         organization_id: fixture.org.clone(),
         event_id: id(),
@@ -368,7 +368,7 @@ fn domain_remote(
     payload: serde_json::Value,
     sequence: i64,
 ) -> RemoteEvent {
-    let encoded = serde_json::to_string(&payload).unwrap();
+    let encoded = outbox::canonical_json(&payload).unwrap();
     RemoteEvent {
         organization_id: fixture.org.clone(),
         event_id: id(),
@@ -992,6 +992,134 @@ fn outbox_insert_failure_rolls_back_canonical_inventory_post() {
             "{table}"
         );
     }
+}
+
+#[test]
+fn catalog_and_sale_documents_replicate_and_diverged_catalog_is_quarantined() {
+    let fixture = fixture();
+    enable_test_gate(&fixture);
+    let product = id();
+    let package = id();
+    let stamp = "2026-10-10T12:00:00.000Z";
+    let catalog = json!({
+        "product":{"id":product,"commercialNameEn":"Remote catalog","commercialNameAr":null,"normalizedNameEn":"remote catalog","normalizedNameAr":null,"scientificName":null,"normalizedScientificName":null,"manufacturerId":null,"categoryId":null,"routeId":null,"description":null,"notes":null,"isActive":1,"createdAt":stamp,"updatedAt":stamp},
+        "ingredients":[],
+        "packages":[{"id":package,"productId":product,"packageLabel":"Box","packSize":null,"unitName":null,"unitsPerPackage":null,"strengthText":null,"isDefault":1,"isActive":1,"createdAt":stamp,"updatedAt":stamp}],
+        "barcodes":[],
+        "prices":[]
+    });
+    let catalog_event = domain_remote(&fixture, "catalog_product", &product, catalog.clone(), 30);
+    let first = engine::run_cycle(
+        &fixture.db,
+        &FixedPull {
+            events: vec![catalog_event.clone()],
+        },
+    )
+    .unwrap();
+    let second = engine::run_cycle(
+        &fixture.db,
+        &FixedPull {
+            events: vec![catalog_event],
+        },
+    )
+    .unwrap();
+    assert_eq!((first.applied, first.conflicts), (1, 0));
+    assert_eq!((second.applied, second.conflicts), (0, 0));
+    let diverged = json!({
+        "product":{"id":product,"commercialNameEn":"Other name","commercialNameAr":null,"normalizedNameEn":"other name","normalizedNameAr":null,"scientificName":null,"normalizedScientificName":null,"manufacturerId":null,"categoryId":null,"routeId":null,"description":null,"notes":null,"isActive":1,"createdAt":stamp,"updatedAt":stamp},
+        "ingredients":[],
+        "packages":[],
+        "barcodes":[],
+        "prices":[]
+    });
+    let conflict = engine::run_cycle(
+        &fixture.db,
+        &FixedPull {
+            events: vec![domain_remote(
+                &fixture,
+                "catalog_product",
+                &product,
+                diverged,
+                31,
+            )],
+        },
+    )
+    .unwrap();
+    assert_eq!(conflict.conflicts, 1);
+    let sale = id();
+    let item = id();
+    let allocation = id();
+    let movement = id();
+    let payment = id();
+    let sale_payload = json!({
+        "sale":{"id":sale,"saleNumber":"SAL-20261010-0001","branchId":fixture.branch,"customerId":null,"customerName":null,"customerCodeSnapshot":null,"customerPhoneSnapshot":null,"status":"POSTED","revision":2,"draftJson":"{\"branchId\":\"x\"}","subtotalMinor":10,"discountMinor":0,"taxMinor":0,"totalMinor":10,"paymentStatus":"PAID","createdBy":fixture.actor,"notes":null,"postRequestId":id(),"createdAt":stamp,"postedAt":stamp,"voidedAt":null},
+        "items":[{"id":item,"saleId":sale,"position":0,"productId":product,"productPackageId":package,"productNameSnapshot":"Remote catalog","packageLabelSnapshot":"Box","quantity":1,"unitPriceMinor":10,"discountMinor":0,"saleDiscountMinor":0,"taxMinor":0,"lineTotalMinor":10,"unitCostMinor":null,"createdAt":stamp}],
+        "allocations":[{"id":allocation,"saleItemId":item,"position":0,"batchId":id(),"quantity":1,"unitCostMinor":null,"movementId":movement}],
+        "payments":[{"id":payment,"saleId":sale,"paymentMethod":"CASH","amountMinor":10,"reference":null,"createdAt":stamp}],
+        "requests":[],
+        "movements":[],
+        "batches":[]
+    });
+    let sale_result = engine::run_cycle(
+        &fixture.db,
+        &FixedPull {
+            events: vec![domain_remote(
+                &fixture,
+                "sale_document",
+                &sale,
+                sale_payload,
+                32,
+            )],
+        },
+    )
+    .unwrap();
+    assert!(sale_result.conflicts >= 1);
+}
+
+#[test]
+fn authorized_retry_reopens_a_stock_conflict_without_last_write_wins() {
+    let fixture = fixture();
+    enable_test_gate(&fixture);
+    let event = id();
+    fixture.db.lock().unwrap().execute(
+        "INSERT INTO sync_inbox(organization_id,event_id,payload_hash,status,server_sequence) VALUES(?1,?2,?3,'REJECTED',9)",
+        params![fixture.org, event, "0".repeat(64)],
+    ).unwrap();
+    fixture.db.lock().unwrap().execute(
+        "INSERT INTO sync_conflicts(id,organization_id,event_id,entity_type,entity_id,reason_code,detail) VALUES(?1,?2,?3,'inventory_movement',?3,'REVISION_CONFLICT','Applying the remote transaction would violate the canonical stock balance.')",
+        params![id(), fixture.org, event],
+    ).unwrap();
+    let conflict_id: String = fixture
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT id FROM sync_conflicts WHERE event_id=?1",
+            [&event],
+            |row| row.get(0),
+        )
+        .unwrap();
+    engine::resolve_conflict(
+        &fixture.db,
+        &fixture.actor,
+        &ResolveSyncConflictInput {
+            conflict_id,
+            action: "RETRY".into(),
+            note: "Authorized retry after local stock correction.".into(),
+        },
+    )
+    .unwrap();
+    let status: String = fixture
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT status FROM sync_inbox WHERE event_id=?1",
+            [&event],
+            |row| row.get(0),
+        )
+        .unwrap();
+    assert_eq!(status, "RECEIVED");
 }
 
 #[test]

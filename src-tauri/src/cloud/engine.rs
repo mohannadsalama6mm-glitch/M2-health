@@ -3,6 +3,7 @@ use super::{
         PushReceipt, RemoteEvent, ResolveSyncConflictInput, SyncConflict, SyncCycleResult,
         SyncEvent,
     },
+    replication,
     transport::SyncTransport,
 };
 use crate::{
@@ -700,10 +701,14 @@ fn apply_received(
                     apply_transfer(connection, branch.as_deref(), &entity, payload)
                 }
                 "finance_journal" => apply_finance(connection, branch.as_deref(), &entity, payload),
-                _ => Err(ApplyFailure {
-                    reason: "UNSUPPORTED_ENTITY",
-                    detail: "No verified domain handler exists for this remote entity type.",
-                }),
+                other => {
+                    replication::apply(connection, other, &entity, payload).map_err(|failure| {
+                        ApplyFailure {
+                            reason: failure.reason,
+                            detail: failure.detail,
+                        }
+                    })
+                }
             }
         } else {
             Err(invalid_payload())

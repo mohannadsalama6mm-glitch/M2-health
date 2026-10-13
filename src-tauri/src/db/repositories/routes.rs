@@ -1,4 +1,5 @@
 use crate::{
+    cloud::replication,
     db::{catalog_validation::*, connection::AppDb, models::catalog::*},
     error::{AppError, ErrorCode},
 };
@@ -32,6 +33,7 @@ pub fn create(db: &AppDb, input: &CreateRoute) -> Result<Route, AppError> {
         "INSERT INTO routes(id,name,normalized_name) VALUES (?1,?2,?3)",
         params![id, input.name, normalize(&input.name)],
     )?;
+    replication::catalog_lookup(&c, "routes", &id)?;
     get(&c, &id)
 }
 pub fn list(db: &AppDb, include_inactive: bool) -> Result<Vec<Route>, AppError> {

@@ -14,7 +14,7 @@ fn hash(value: &str) -> String {
     format!("{:x}", Sha256::digest(value.as_bytes()))
 }
 
-pub(crate) fn canonical_json(value: &serde_json::Value) -> Result<String, AppError> {
+pub fn canonical_json(value: &serde_json::Value) -> Result<String, AppError> {
     fn canonical(value: &serde_json::Value) -> serde_json::Value {
         match value {
             serde_json::Value::Object(map) => serde_json::Value::Object(
@@ -36,6 +36,31 @@ pub(crate) fn canonical_json(value: &serde_json::Value) -> Result<String, AppErr
             "The synchronization payload is invalid.",
         )
     })
+}
+
+pub(crate) fn enrolled_actor(connection: &Connection) -> Option<String> {
+    connection
+        .query_row(
+            "SELECT m.user_id FROM organization_memberships m JOIN cloud_device_enrollments d ON d.organization_id=m.organization_id AND d.status='ENROLLED' JOIN cloud_identity_links l ON l.organization_id=m.organization_id AND l.local_user_id=m.user_id AND l.status='ACTIVE' WHERE m.status='ACTIVE' ORDER BY m.user_id LIMIT 1",
+            [],
+            |row| row.get(0),
+        )
+        .optional()
+        .ok()
+        .flatten()
+}
+
+fn document_owned(reference_type: Option<&str>) -> bool {
+    matches!(
+        reference_type,
+        Some("inventory_transfer")
+            | Some("sale_item_allocation")
+            | Some("sale_return_allocation")
+            | Some("purchase_receipt")
+            | Some("purchase_return")
+            | Some("stock_count_line")
+            | Some("inventory_document")
+    )
 }
 
 pub fn enqueue<T: Serialize>(
@@ -96,7 +121,7 @@ pub fn inventory_movement(
     // A transfer is one cross-branch business transaction. Its two ledger legs
     // are emitted only by `inventory_transfer`, never as independently
     // applicable movement events.
-    if movement.transfer_id.is_some() {
+    if movement.transfer_id.is_some() || document_owned(movement.reference_type.as_deref()) {
         return Ok(None);
     }
     #[derive(Serialize)]
