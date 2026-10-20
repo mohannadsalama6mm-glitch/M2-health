@@ -6,8 +6,11 @@ playwright-report/
 config/cloud.local.json
 supabase/.temp/
 src-tauri/target/
+src-tauri/target-*/
 src-tauri/gen/
 *.db
 *.db-wal
 *.db-shm
 backups/
+config/license-signing.private.local.pem
+*.license.local

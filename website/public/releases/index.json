@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "current": "0.4.0-beta.1",
+  "releases": [
+    {
+      "version": "0.4.0-beta.1",
+      "buildId": "20261020.1",
+      "channel": "EARLY_ACCESS",
+      "platform": "windows-x64",
+      "file": "/releases/0.4.0-beta.1/M2-Health_0.4.0-beta.1_x64-setup.exe",
+      "sha256": "0C9F6A7F0BA431EFEBECF358A3DB85CD92CCD3E88AE87BA4BE8377DAA5BF4F4A",
+      "sizeBytes": 6386168,
+      "authenticode": "UNSIGNED",
+      "publishedAt": "2026-10-21"
+    }
+  ]
+}

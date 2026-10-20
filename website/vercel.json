@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/((?!releases/|images/|assets/).*)", "destination": "/index.html" }
+  ]
+}
