@@ -13,7 +13,7 @@ if (!secret.startsWith("sb_secret_") || /\s/.test(secret)) throw new Error("Set 
 async function rpc(name, body = {}) {
   const response = await globalThis.fetch(`${baseUrl}/rest/v1/rpc/${name}`, {
     method: "POST",
-    headers: { apikey: secret, Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+    headers: { apikey: secret, "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   const payload = await response.json().catch(() => null);
