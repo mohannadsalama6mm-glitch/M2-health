@@ -28,7 +28,7 @@ describe("portal server boundaries", () => {
   it("requests a signed envelope only through the authenticated Edge Function", async () => {
     invoke.mockResolvedValue({ data: { status: "TRIAL", activationCode: "payload.signature", expiresAt: 42, revalidateAfter: 40 }, error: null });
     const result = await issueDeviceEnvelope("93000000-0000-4000-8000-000000000001", "Counter A");
-    expect(invoke).toHaveBeenCalledWith("license-state", { body: expect.objectContaining({ deviceId: "93000000-0000-4000-8000-000000000001", buildId: "20261020.1" }) });
+    expect(invoke).toHaveBeenCalledWith("license-state", { body: expect.objectContaining({ deviceId: "93000000-0000-4000-8000-000000000001", appVersion: "0.4.0-beta.2", buildId: "20261022.1" }) });
     expect(result.activationCode).toBe("payload.signature");
   });
 });

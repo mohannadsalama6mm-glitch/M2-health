@@ -49,6 +49,7 @@ export async function installPurchasingDouble(page: Page) {
     if (stored) orders.splice(0, orders.length, ...JSON.parse(stored));
     w.__TAURI_INTERNALS__.invoke = async (command, args = {}) => {
       w.purchasingCalls.push({ command, args: structuredClone(args) });
+      if (command === "get_license_status") return { state: "ACTIVE", daysRemaining: null, canOperate: true, readOnly: false, deviceId: "purchasing-test-device", activatedAt: 1800000000, expiresAt: null, lastValidatedAt: 1800000000, nextRevalidationAt: null, offlineGraceEndsAt: null, requiresActivation: false, reason: "Focused purchasing test license." };
       if (command === "recovery_status") return { laterWorkflowsEnabled: false, inventoryWorkflowsEnabled: true, stockCountsEnabled: true, inventoryAlertsEnabled: true, inventoryUiEnabled: true, salesEnabled: true, partnersEnabled: true, purchasingEnabled: true };
       if (command === w.purchasingFailCommand) throw { code: command.includes("update") || command.includes("order") || command === "create_purchase_return" ? "conflict" : "validation", message: command.includes("update") || command === "receive_purchase_order" || command === "create_purchase_return" ? "Purchase order changed. Reload before continuing." : "Controlled backend rejection" };
       if ((command === "list_purchase_orders" || command === "search_purchase_packages") && w.purchasingDelay) await new Promise((resolve) => setTimeout(resolve, w.purchasingDelay));

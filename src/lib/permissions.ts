@@ -8,7 +8,8 @@ export type Permission =
   | "purchasing.read" | "purchasing.manage" | "purchasing.receive" | "purchasing.return"
   | "suppliers.read" | "suppliers.manage" | "customers.read" | "customers.manage"
   | "reports.operational.read" | "reports.finance.read" | "reports.export"
-  | "finance.read" | "finance.expense.manage" | "dashboard.read";
+  | "finance.read" | "finance.expense.manage" | "dashboard.read"
+  | "settings.read" | "settings.manage" | "audit.read" | "backup.manage";
 
 const grants: Record<string, Set<Permission>> = {
   PHARMACIST: new Set(["dashboard.read", "sales.read", "sales.create", "sales.return", "catalog.read", "inventory.read", "inventory.adjust", "inventory.alert.manage", "customers.read", "customers.manage", "reports.operational.read", "branches.read"]),

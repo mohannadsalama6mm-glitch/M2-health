@@ -3,10 +3,11 @@ import { MemoryRouter } from "react-router-dom";
 import { DownloadPage, HomePage, PricingPage } from "../pages/PublicPages";
 
 describe("public Early Access website", () => {
-  it("renders the landing value proposition and trial CTA", () => {
+  it("renders the landing value proposition and truthful account CTA", () => {
     render(<MemoryRouter><HomePage /></MemoryRouter>);
     expect(screen.getByRole("heading", { name: /pharmacy stays moving/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /start 7-day free trial/i })).toHaveAttribute("href", "/register");
+    expect(screen.getAllByRole("link", { name: /create early access account/i })[0]).toHaveAttribute("href", "/register");
+    expect(screen.queryByRole("link", { name: /start.*trial/i })).not.toBeInTheDocument();
     expect(screen.getByText(/local pharmacy data/i)).toBeInTheDocument();
   });
 
@@ -19,9 +20,9 @@ describe("public Early Access website", () => {
 
   it("renders immutable release metadata and unsigned warning", () => {
     render(<MemoryRouter><DownloadPage /></MemoryRouter>);
-    expect(screen.getByText("20261020.1")).toBeInTheDocument();
+    expect(screen.getByText("20261022.1")).toBeInTheDocument();
     expect(screen.getByText(/unsigned early access build/i)).toBeInTheDocument();
-    expect(screen.getByText(/0C9F6A7F0BA431EF/)).toBeInTheDocument();
+    expect(screen.getByText(/3EF9F2190B64B760/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /download installer/i })).toHaveAttribute("download");
   });
 });

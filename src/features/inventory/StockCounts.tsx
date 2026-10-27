@@ -19,7 +19,9 @@ import {
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import { useBranch } from "../../app/BranchContext";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 import { listCategories } from "../../lib/tauri/catalog";
 import {
   listStockCounts,
@@ -43,7 +45,8 @@ const countStatusLabel = (status: string) =>
   })[status] ?? status;
 export function StockCounts() {
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
+  const { t } = useLocalization();
   const { branchId } = useBranch();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
@@ -157,19 +160,20 @@ export function StockCounts() {
   return (
     <div className="feature-page">
       <PageHeader
-        title="Stock counts"
-        description="Count, compare, and review differences before a stock correction."
+        title={t("page.stockCountsTitle")}
+        description={t("page.stockCountsCopy")}
         actions={
           <Button
             variant="primary"
             onClick={() => setNewOpen(true)}
             disabled={!desktop}
           >
-            New count session
+            {t("page.newCount")}
           </Button>
         }
       />
       <RouteTabs items={inventoryTabs} />
+      <ScopeNotice />
       {!desktop && (
         <Alert title="Desktop app required" tone="warning">
           Stock counts run against the local database. Open M² Health as the
@@ -223,6 +227,14 @@ export function StockCounts() {
             <div className="stack" role="status">
               <Alert title="Loading count sessions…" tone="info" />
             </div>
+          ) : data && data.items.length === 0 ? (
+            <EmptyState
+              title={search || status ? t("empty.countsFilteredTitle") : t("empty.countsTitle")}
+              description={search || status ? t("empty.countsFilteredCopy") : t("empty.countsCopy")}
+              action={search || status
+                ? <Button onClick={() => { setSearch(""); setStatus(""); setPage(1); }}>{t("common.clearFilters")}</Button>
+                : <Button variant="primary" onClick={() => setNewOpen(true)}>{t("empty.countsAction")}</Button>}
+            />
           ) : (
             <Table
               label="Count sessions"
@@ -317,9 +329,9 @@ function NewCountDialog({
   const { branchName } = useBranch();
   const [scope, setScope] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<
-    { id: string; name: string }[]
-  >([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     let active = true;

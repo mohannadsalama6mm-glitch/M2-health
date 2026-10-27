@@ -9,6 +9,7 @@ import {
   DetailList,
   EmptyState,
   Input,
+  LinkButton,
   Modal,
   PageHeader,
   SearchInput,
@@ -32,6 +33,8 @@ import {
   type PurchaseStatus,
 } from "../../lib/tauri/canonical-purchasing";
 import { useBranch } from "../../app/BranchContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 import "./canonical-purchases.css";
 
 const size = 20;
@@ -74,6 +77,7 @@ export function CanonicalPurchases() {
 }
 
 function PurchaseList() {
+  const { t } = useLocalization();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(0);
@@ -113,12 +117,13 @@ function PurchaseList() {
   return (
     <div className="feature-page canonical-purchases">
       <PageHeader
-        title="Purchases"
-        description="Create, receive and trace purchase orders and supplier returns."
+        title={t("page.purchasesTitle")}
+        description={t("page.purchasesCopy")}
         actions={
-          <><Button onClick={() => (window.location.hash = "#/purchases/returns")}>Return history</Button><Button variant="primary" onClick={() => (window.location.hash = "#/purchases/new")}><Plus size={16} /> Create purchase</Button></>
+          <><Button onClick={() => (window.location.hash = "#/purchases/returns")}>{t("page.returnHistory")}</Button><Button variant="primary" onClick={() => (window.location.hash = "#/purchases/new")}><Plus size={16} /> {t("page.createPurchase")}</Button></>
         }
       />
+      <ScopeNotice kind="purchasing" />
       {error && (
         <Alert title="Purchases could not be loaded" tone="danger">
           {error} <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>Retry</Button>
@@ -147,8 +152,11 @@ function PurchaseList() {
         <Card><p role="status">Loading purchases…</p></Card>
       ) : current.items.length === 0 ? (
         <EmptyState
-          title={search || status ? "No purchases match these filters" : "No purchase orders yet"}
-          description={search || status ? "Change the search or status filter." : "Create a draft purchase order to begin."}
+          title={search || status ? t("empty.purchasesFilteredTitle") : t("empty.purchasesTitle")}
+          description={search || status ? t("empty.purchasesFilteredCopy") : t("empty.purchasesCopy")}
+          action={search || status
+            ? <Button onClick={() => { setSearch(""); setStatus(""); setPage(0); }}>{t("common.clearFilters")}</Button>
+            : <Button variant="primary" onClick={() => (window.location.hash = "#/purchases/new")}>{t("empty.purchasesAction")}</Button>}
         />
       ) : (
         <Card>
@@ -184,6 +192,7 @@ type EditableLine = {
 };
 
 function Editor({ id }: { id?: string }) {
+  const { t } = useLocalization();
   const navigate = useNavigate();
   const [loaded, setLoaded] = useState(!id);
   const [revision, setRevision] = useState(0);
@@ -196,6 +205,7 @@ function Editor({ id }: { id?: string }) {
   const [lines, setLines] = useState<EditableLine[]>([]);
   const [supplierSearch, setSupplierSearch] = useState("");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [suppliersLoaded, setSuppliersLoaded] = useState(false);
   const [packageSearch, setPackageSearch] = useState("");
   const [packages, setPackages] = useState<PurchasePackage[]>([]);
   const [error, setError] = useState("");
@@ -231,7 +241,7 @@ function Editor({ id }: { id?: string }) {
   useEffect(() => {
     let active = true;
     const timer = setTimeout(() => canonicalPartners.listSuppliers({ search: supplierSearch || null, isActive: true, limit: 20, offset: 0 })
-      .then((result) => { if (active) setSuppliers(result.items); })
+      .then((result) => { if (active) { setSuppliers(result.items); setSuppliersLoaded(true); } })
       .catch((e) => { if (active) setError(errorText(e)); }), supplierSearch ? 180 : 0);
     return () => { active = false; clearTimeout(timer); };
   }, [supplierSearch]);
@@ -306,6 +316,7 @@ function Editor({ id }: { id?: string }) {
         <Card>
           <h2>Supplier and terms</h2>
           <SearchInput label="Search active suppliers" placeholder="Supplier code or name" value={supplierSearch} onChange={(e) => setSupplierSearch(e.target.value)} />
+          {suppliersLoaded && suppliers.length === 0 && !supplierSearch && <EmptyState title={t("empty.supplierNeededTitle")} description={t("empty.supplierNeededCopy")} action={<LinkButton primary to="/suppliers">{t("empty.supplierNeededAction")}</LinkButton>} />}
           <Select label="Supplier" showLabel required value={supplierId} onChange={(e) => setSupplierId(e.target.value)}>
             <option value="">Select an active supplier</option>
             {suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.code} · {supplier.displayName}</option>)}
@@ -577,12 +588,13 @@ function ReturnDetails({id}:{id:string}) {
 }
 
 function ReturnHistory() {
+  const { t } = useLocalization();
   const [search,setSearch]=useState(""),[page,setPage]=useState(0),[attempt,setAttempt]=useState(0),[data,setData]=useState<{key:string;items:PurchaseReturnSummary[];total:number}|null>(null),[error,setError]=useState("");
   const key=JSON.stringify([search,page,attempt]);
   useEffect(()=>{let active=true;const timer=setTimeout(()=>api.listReturns({search:search||null,limit:size,offset:page*size}).then((result)=>{if(active){setData({key,items:result.items,total:result.total});setError("")}}).catch((e)=>{if(active){setData(null);setError(errorText(e))}}),search?180:0);return()=>{active=false;clearTimeout(timer)}},[attempt,key,page,search]);
   const current=data?.key===key?data:null;
-  return <div className="feature-page canonical-purchases"><BackLink to="/purchases" label="Purchases"/><PageHeader title="Purchase return history" description="Immutable supplier returns posted against canonical receipt batches."/>{error&&<Alert title="Returns could not be loaded" tone="danger">{error} <Button size="sm" onClick={()=>setAttempt((v)=>v+1)}>Retry</Button></Alert>}<TableToolbar><SearchInput label="Search purchase returns" placeholder="Return, purchase, receipt or reason" value={search} onChange={(e)=>{setSearch(e.target.value);setPage(0)}}/></TableToolbar>
-    {!current?<Card><p role="status">Loading purchase returns…</p></Card>:current.items.length===0?<EmptyState title={search?"No returns match this search":"No purchase returns posted"} description={search?"Change the return search.":"Eligible returns begin from posted purchase receipts."}/>:<Card><Table label="Purchase returns" rows={current.items} rowKey={(item)=>item.id} columns={[
+  return <div className="feature-page canonical-purchases"><BackLink to="/purchases" label="Purchases"/><PageHeader title="Purchase return history" description="Immutable supplier returns posted against canonical receipt batches."/><ScopeNotice />{error&&<Alert title="Returns could not be loaded" tone="danger">{error} <Button size="sm" onClick={()=>setAttempt((v)=>v+1)}>Retry</Button></Alert>}<TableToolbar><SearchInput label="Search purchase returns" placeholder="Return, purchase, receipt or reason" value={search} onChange={(e)=>{setSearch(e.target.value);setPage(0)}}/></TableToolbar>
+    {!current?<Card><p role="status">Loading purchase returns…</p></Card>:current.items.length===0?<EmptyState title={search?t("empty.returnsFilteredTitle"):t("empty.returnsTitle")} description={search?t("empty.returnsFilteredCopy"):t("empty.returnsCopy")} action={search?<Button onClick={()=>{setSearch("");setPage(0)}}>{t("common.clearFilters")}</Button>:<Button variant="primary" onClick={()=>(window.location.hash="#/purchases")}>{t("empty.returnsAction")}</Button>}/>:<Card><Table label="Purchase returns" rows={current.items} rowKey={(item)=>item.id} columns={[
       {key:"number",header:"Return",render:(item)=><Link className="text-link" to={`/purchases/returns/${item.id}`}>{item.returnNumber}<span className="cell-secondary">{stamp(item.postedAt)}</span></Link>},{key:"purchase",header:"Purchase / receipt",render:(item)=><>{item.purchaseNumber}<span className="cell-secondary">{item.receiptNumber}</span></>},{key:"supplier",header:"Supplier",render:(item)=><>{item.supplierName}<span className="cell-secondary">{item.supplierCode}</span></>},{key:"branch",header:"Branch",render:(item)=>item.branchName},{key:"quantity",header:"Quantity",render:(item)=>item.totalQuantity},{key:"reason",header:"Reason",render:(item)=>item.reason},
     ]}/><div className="grid-footer"><Button disabled={page===0} onClick={()=>setPage((v)=>v-1)}>Previous</Button><span>{current.total} total · Page {page+1}</span><Button disabled={(page+1)*size>=current.total} onClick={()=>setPage((v)=>v+1)}>Next</Button></div></Card>}
   </div>;

@@ -23,13 +23,15 @@ import {
   ArrowUpRight,
   type LucideIcon,
 } from "lucide-react";
+import { useLocalization } from "../../localization/LocalizationContext";
 export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export function Spinner() {
+  const { t } = useLocalization();
   return (
     <LoaderCircle
       size={16}
       className="spinner"
-      aria-label="Loading"
+      aria-label={t("common.loading")}
       role="status"
     />
   );
@@ -330,11 +332,12 @@ export function Table<T>({
   rowKey: (row: T) => string;
   label: string;
 }) {
+  const { t } = useLocalization();
   return (
     <div
       className="table-scroll"
       tabIndex={0}
-      aria-label={`${label} scroll area`}
+      aria-label={t("common.tableScroll", { label })}
     >
       <table>
         <caption className="sr-only">{label}</caption>
@@ -359,8 +362,8 @@ export function Table<T>({
       </table>
       {rows.length === 0 && (
         <EmptyState
-          title="No matching results"
-          description="Try another search term."
+          title={t("common.noResults")}
+          description={t("common.trySearch")}
         />
       )}
     </div>
@@ -378,6 +381,7 @@ export function Pagination({
   pages: number;
   onChange: (page: number) => void;
 }) {
+  const { direction, t } = useLocalization();
   const visible = Array.from(
     new Set([1, pages, ...Array.from({ length: 5 }, (_, i) => page + i - 2)]),
   )
@@ -389,13 +393,13 @@ export function Pagination({
     steps.push(n);
   });
   return (
-    <nav className="pagination" aria-label="Pagination">
+    <nav className="pagination" aria-label={t("common.pagination")}>
       <IconButton
-        label="Previous page"
+        label={t("common.previousPage")}
         disabled={page <= 1}
         onClick={() => onChange(page - 1)}
       >
-        <ChevronLeft size={16} />
+        {direction === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
       </IconButton>
       {steps.map((n) =>
         typeof n === "string" ? (
@@ -415,11 +419,11 @@ export function Pagination({
         ),
       )}
       <IconButton
-        label="Next page"
+        label={t("common.nextPage")}
         disabled={page >= pages}
         onClick={() => onChange(page + 1)}
       >
-        <ChevronRight size={16} />
+        {direction === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </IconButton>
     </nav>
   );
@@ -429,11 +433,12 @@ export function Tabs({
 }: {
   items: { label: string; content: ReactNode }[];
 }) {
+  const { direction, t } = useLocalization();
   const [active, setActive] = useState(0);
   const id = useId();
   return (
     <div>
-      <div role="tablist" className="tabs" aria-label="Detail tabs">
+      <div role="tablist" className="tabs" aria-label={t("common.detailTabs")}>
         {items.map((item, i) => (
           <button
             key={item.label}
@@ -446,9 +451,9 @@ export function Tabs({
             onKeyDown={(e) => {
               const next =
                 e.key === "ArrowRight"
-                  ? (i + 1) % items.length
+                  ? (i + (direction === "rtl" ? -1 : 1) + items.length) % items.length
                   : e.key === "ArrowLeft"
-                    ? (i - 1 + items.length) % items.length
+                    ? (i + (direction === "rtl" ? 1 : -1) + items.length) % items.length
                     : e.key === "Home"
                       ? 0
                       : e.key === "End"
@@ -493,6 +498,7 @@ export function Modal({
   drawer?: boolean;
   size?: "md" | "lg";
 }) {
+  const { t } = useLocalization();
   const returnFocus = useRef<HTMLElement | null>(null);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -511,7 +517,7 @@ export function Modal({
           <Dialog.Title>{title}</Dialog.Title>
           <Dialog.Description>{description}</Dialog.Description>
           <Dialog.Close asChild>
-            <IconButton label="Close dialog" className="modal-close">
+            <IconButton label={t("common.closeDialog")} className="modal-close">
               <X size={18} />
             </IconButton>
           </Dialog.Close>
@@ -528,10 +534,11 @@ export function ConfirmationModal({
   onConfirm,
   ...props
 }: Omit<Parameters<typeof Modal>[0], "children"> & { onConfirm: () => void }) {
+  const { t } = useLocalization();
   return (
     <Modal {...props}>
       <div className="row end">
-        <Button onClick={() => props.onOpenChange(false)}>Cancel</Button>
+        <Button onClick={() => props.onOpenChange(false)}>{t("common.cancel")}</Button>
         <Button
           variant="danger"
           onClick={() => {
@@ -539,7 +546,7 @@ export function ConfirmationModal({
             props.onOpenChange(false);
           }}
         >
-          Confirm
+          {t("common.confirm")}
         </Button>
       </div>
     </Modal>
@@ -619,19 +626,21 @@ export function Toast({
   message: string;
   onClose: () => void;
 }) {
+  const { t } = useLocalization();
   return (
     <div className="toast" role="status">
       <Check size={18} />
       <span>{message}</span>
-      <IconButton label="Dismiss notification" onClick={onClose}>
+      <IconButton label={t("common.dismissNotification")} onClick={onClose}>
         <X size={16} />
       </IconButton>
     </div>
   );
 }
 export function Skeleton() {
+  const { t } = useLocalization();
   return (
-    <div className="skeleton" aria-label="Loading content">
+    <div className="skeleton" aria-label={t("common.loadingContent")}>
       <span />
       <span />
       <span />
@@ -675,11 +684,12 @@ export function EmptyState({
   );
 }
 export function Breadcrumbs({ items }: { items: string[] }) {
+  const { direction, t } = useLocalization();
   return (
-    <nav aria-label="Breadcrumb" className="breadcrumbs">
+    <nav aria-label={t("common.breadcrumb")} className="breadcrumbs">
       {items.map((item, i) => (
         <span key={item}>
-          {i > 0 && <ChevronRight size={12} />}
+          {i > 0 && (direction === "rtl" ? <ChevronLeft size={12} /> : <ChevronRight size={12} />)}
           <span aria-current={i === items.length - 1 ? "page" : undefined}>
             {item}
           </span>

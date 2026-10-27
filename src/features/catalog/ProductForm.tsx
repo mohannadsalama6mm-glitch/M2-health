@@ -26,7 +26,7 @@ import {
   updateProductFull,
   toMinor,
 } from "../../lib/tauri/catalog";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
 import type {
   ActiveIngredient,
   Category,
@@ -85,7 +85,7 @@ export function ProductForm() {
 function ProductEditor({ id }: { id?: string }) {
   const desktop = isDesktopRuntime();
   const navigate = useNavigate();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [routes, setRoutes] = useState<Route[]>([]);

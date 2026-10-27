@@ -3,20 +3,42 @@ use m2_health_lib::{
         engine,
         models::ResolveSyncConflictInput,
         models::{PushReceipt, RemoteEvent, SyncEvent},
-        outbox,
+        outbox, replication,
         transport::SyncTransport,
     },
     db::{
         connection::AppDb,
-        models::catalog::{CreateProduct, CreateProductPackage},
-        repositories::{product_packages, products},
+        models::catalog::{CreateProduct, CreateProductPackage, SetPackagePrice},
+        repositories::{price_history, product_packages, products},
     },
     error::{AppError, ErrorCode},
     inventory::{
+        counts::{
+            self,
+            models::{Complete as CompleteCount, Create as CreateCount, Entry as CountEntry},
+            models::{Status as CountStatus, Transition as CountTransition},
+        },
+        documents::{
+            self,
+            models::{
+                Action as DocumentAction, Kind as DocumentKind, LineInput as DocumentLineInput,
+                PostDocument, SaveDocument, Transition as DocumentTransition,
+            },
+        },
         models::{CreateBatch, OpeningStock, TransferStock},
         models::{InventoryBatch, InventoryMovement, MovementType},
         movements, transfers,
     },
+    partners::{self, models::SupplierFields},
+    purchasing::{
+        self,
+        models::{
+            CreatePurchaseDraft, CreatePurchaseReturn, PurchaseAction, PurchaseDraftFields,
+            PurchaseLineInput, PurchaseReceiptLineInput, PurchaseReturnLineInput, ReceivePurchase,
+        },
+        receiving, returns as purchase_returns,
+    },
+    sales::{self, models as sale_models},
 };
 use rusqlite::params;
 use serde_json::json;
@@ -1077,7 +1099,7 @@ fn catalog_and_sale_documents_replicate_and_diverged_catalog_is_quarantined() {
 }
 
 #[test]
-fn remote_stock_count_is_quarantined_without_replaying_corrections() {
+fn malformed_remote_stock_count_is_quarantined_without_replaying_corrections() {
     let fixture = fixture();
     enable_test_gate(&fixture);
     let session = id();
@@ -1115,7 +1137,7 @@ fn remote_stock_count_is_quarantined_without_replaying_corrections() {
             |r| r.get(0),
         )
         .unwrap();
-    assert_eq!(reason, "UNSUPPORTED_ENTITY");
+    assert_eq!(reason, "INVALID_PAYLOAD");
     let after: i64 = connection
         .query_row("SELECT count(*) FROM inventory_movements", [], |r| r.get(0))
         .unwrap();
@@ -1166,6 +1188,768 @@ fn authorized_retry_reopens_a_stock_conflict_without_last_write_wins() {
         )
         .unwrap();
     assert_eq!(status, "RECEIVED");
+}
+
+#[test]
+fn purchase_receipt_and_return_reconstruct_canonical_documents_idempotently() {
+    let source = fixture();
+    let supplier = partners::create_supplier(
+        &source.db,
+        &SupplierFields {
+            display_name: "Replicated supplier".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let product_id: String = source
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT product_id FROM product_packages WHERE id=?1",
+            [&source.package],
+            |row| row.get(0),
+        )
+        .unwrap();
+    replication::catalog_product(&source.db.lock().unwrap(), &product_id).unwrap();
+
+    let draft = purchasing::create_draft(
+        &source.db,
+        &CreatePurchaseDraft {
+            id: id(),
+            request_id: id(),
+            fields: PurchaseDraftFields {
+                supplier_id: supplier.id.clone(),
+                supplier_reference: Some("SYNC-PO".into()),
+                expected_date: None,
+                notes: Some("Replicated purchase".into()),
+                discount_minor: 0,
+                tax_minor: 0,
+                lines: vec![PurchaseLineInput {
+                    product_package_id: source.package.clone(),
+                    ordered_quantity: 2,
+                    unit_cost_minor: 125,
+                }],
+            },
+        },
+    )
+    .unwrap();
+    let ordered = purchasing::order(
+        &source.db,
+        &PurchaseAction {
+            id: draft.id,
+            expected_revision: draft.revision,
+            request_id: id(),
+        },
+    )
+    .unwrap();
+    let receipt = receiving::receive(
+        &source.db,
+        &ReceivePurchase {
+            id: id(),
+            purchase_order_id: ordered.id.clone(),
+            expected_revision: ordered.revision,
+            request_id: id(),
+            branch_id: source.branch.clone(),
+            created_by: Some(source.actor.clone()),
+            lines: vec![PurchaseReceiptLineInput {
+                purchase_order_line_id: ordered.lines[0].id.clone(),
+                quantity: 2,
+                lot_number: Some("SYNC-RECEIPT".into()),
+                expiry_date: Some("2030-01-01".into()),
+                acquisition_cost_minor: None,
+            }],
+        },
+    )
+    .unwrap();
+    let current = purchasing::detail(&source.db, &ordered.id).unwrap();
+    let returned = purchase_returns::create(
+        &source.db,
+        &CreatePurchaseReturn {
+            id: id(),
+            purchase_order_id: ordered.id.clone(),
+            receipt_id: receipt.id.clone(),
+            expected_revision: current.revision,
+            request_id: id(),
+            reason: "Damaged on arrival".into(),
+            created_by: Some(source.actor.clone()),
+            lines: vec![PurchaseReturnLineInput {
+                receipt_line_id: receipt.lines[0].id.clone(),
+                quantity: 1,
+            }],
+        },
+    )
+    .unwrap();
+
+    let payload = |kind: &str| -> serde_json::Value {
+        let encoded: String = source
+            .db
+            .lock()
+            .unwrap()
+            .query_row(
+                "SELECT payload_json FROM sync_outbox WHERE entity_type=?1 ORDER BY local_sequence DESC LIMIT 1",
+                [kind],
+                |row| row.get(0),
+            )
+            .unwrap();
+        serde_json::from_str(&encoded).unwrap()
+    };
+    let catalog = payload("catalog_product");
+    let partner = payload("partner_record");
+    let received = payload("purchase_receipt");
+    let returned_payload = payload("purchase_return");
+
+    let replica = AppDb::in_memory().unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO users(id,username,username_normalized,display_name) VALUES(?1,'replica-admin','replica-admin','Replica Admin')",
+            [&source.actor],
+        )
+        .unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO branches(id,code,name) VALUES(?1,'SYNC','Sync Branch')",
+            [&source.branch],
+        )
+        .unwrap();
+    {
+        let connection = replica.lock().unwrap();
+        replication::apply(&connection, "catalog_product", &product_id, &catalog).unwrap();
+        replication::apply(&connection, "partner_record", &supplier.id, &partner).unwrap();
+        replication::apply(&connection, "purchase_receipt", &receipt.id, &received).unwrap();
+        replication::apply(
+            &connection,
+            "purchase_return",
+            &returned.id,
+            &returned_payload,
+        )
+        .unwrap();
+        replication::apply(&connection, "purchase_receipt", &receipt.id, &received).unwrap();
+        replication::apply(
+            &connection,
+            "purchase_return",
+            &returned.id,
+            &returned_payload,
+        )
+        .unwrap();
+        assert_eq!(
+            connection
+                .query_row(
+                    "SELECT count(*) FROM purchase_receipts WHERE id=?1 AND status='POSTED'",
+                    [&receipt.id],
+                    |row| row.get::<_, i64>(0),
+                )
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            connection
+                .query_row(
+                    "SELECT count(*) FROM purchase_returns WHERE id=?1 AND status='POSTED'",
+                    [&returned.id],
+                    |row| row.get::<_, i64>(0),
+                )
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            connection
+                .query_row(
+                    "SELECT coalesce(sum(quantity_delta),0) FROM inventory_movements WHERE batch_id=?1",
+                    [&receipt.lines[0].batch_id],
+                    |row| row.get::<_, i64>(0),
+                )
+                .unwrap(),
+            1
+        );
+    }
+}
+
+#[test]
+fn inventory_document_reconstructs_canonical_receipt_idempotently() {
+    let source = fixture();
+    let product_id: String = source
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT product_id FROM product_packages WHERE id=?1",
+            [&source.package],
+            |row| row.get(0),
+        )
+        .unwrap();
+    replication::catalog_product(&source.db.lock().unwrap(), &product_id).unwrap();
+    let draft = documents::save(
+        &source.db,
+        &SaveDocument {
+            document_id: None,
+            expected_revision: None,
+            kind: DocumentKind::Receipt,
+            branch_id: source.branch.clone(),
+            destination_branch_id: None,
+            reference_text: Some("SYNC-INVENTORY-RECEIPT".into()),
+            supplier_reference: None,
+            notes: Some("Replicated inventory receipt".into()),
+            created_by: Some(source.actor.clone()),
+            lines: vec![DocumentLineInput {
+                product_package_id: source.package.clone(),
+                batch_id: None,
+                action: DocumentAction::Receive,
+                quantity: 4,
+                reason: "Initial synchronized receipt".into(),
+                lot_number: Some("SYNC-DOC".into()),
+                expiry_date: Some("2030-01-01".into()),
+                cost_price_minor: Some(175),
+                supplier_reference: None,
+            }],
+        },
+    )
+    .unwrap();
+    let ready = documents::ready(
+        &source.db,
+        &DocumentTransition {
+            document_id: draft.header.id.clone(),
+            expected_revision: draft.header.revision,
+        },
+    )
+    .unwrap();
+    let posted = documents::post(
+        &source.db,
+        &PostDocument {
+            document_id: ready.header.id.clone(),
+            expected_revision: ready.header.revision,
+            request_id: id(),
+        },
+    )
+    .unwrap();
+    let payload = |kind: &str| -> serde_json::Value {
+        let encoded: String = source
+            .db
+            .lock()
+            .unwrap()
+            .query_row(
+                "SELECT payload_json FROM sync_outbox WHERE entity_type=?1 ORDER BY local_sequence DESC LIMIT 1",
+                [kind],
+                |row| row.get(0),
+            )
+            .unwrap();
+        serde_json::from_str(&encoded).unwrap()
+    };
+    let catalog = payload("catalog_product");
+    let document_payload = payload("inventory_document");
+    let replica = AppDb::in_memory().unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO users(id,username,username_normalized,display_name) VALUES(?1,'document-admin','document-admin','Document Admin')",
+            [&source.actor],
+        )
+        .unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO branches(id,code,name) VALUES(?1,'SYNC','Sync Branch')",
+            [&source.branch],
+        )
+        .unwrap();
+    let connection = replica.lock().unwrap();
+    replication::apply(&connection, "catalog_product", &product_id, &catalog).unwrap();
+    replication::apply(
+        &connection,
+        "inventory_document",
+        &posted.header.id,
+        &document_payload,
+    )
+    .unwrap();
+    replication::apply(
+        &connection,
+        "inventory_document",
+        &posted.header.id,
+        &document_payload,
+    )
+    .unwrap();
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM inventory_documents WHERE id=?1 AND status='POSTED'",
+                [&posted.header.id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM inventory_document_movements WHERE document_id=?1",
+                [&posted.header.id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT coalesce(sum(quantity_delta),0) FROM inventory_movements WHERE product_package_id=?1 AND branch_id=?2",
+                params![source.package, source.branch],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        4
+    );
+}
+
+#[test]
+fn sale_and_return_reconstruct_canonical_documents_and_stock_idempotently() {
+    let source = fixture();
+    price_history::set(
+        &source.db,
+        &SetPackagePrice {
+            product_package_id: source.package.clone(),
+            selling_price_minor: 250,
+            cost_price_minor: Some(125),
+            reason: Some("Cross-device sale price".into()),
+        },
+    )
+    .unwrap();
+    let product_id: String = source
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT product_id FROM product_packages WHERE id=?1",
+            [&source.package],
+            |row| row.get(0),
+        )
+        .unwrap();
+    replication::catalog_product(&source.db.lock().unwrap(), &product_id).unwrap();
+    let receipt = documents::save(
+        &source.db,
+        &SaveDocument {
+            document_id: None,
+            expected_revision: None,
+            kind: DocumentKind::Receipt,
+            branch_id: source.branch.clone(),
+            destination_branch_id: None,
+            reference_text: Some("SALE-BASELINE".into()),
+            supplier_reference: None,
+            notes: None,
+            created_by: Some(source.actor.clone()),
+            lines: vec![DocumentLineInput {
+                product_package_id: source.package.clone(),
+                batch_id: None,
+                action: DocumentAction::Receive,
+                quantity: 5,
+                reason: "Sale replication baseline".into(),
+                lot_number: Some("SALE-SYNC".into()),
+                expiry_date: Some("2030-01-01".into()),
+                cost_price_minor: Some(125),
+                supplier_reference: None,
+            }],
+        },
+    )
+    .unwrap();
+    let receipt = documents::ready(
+        &source.db,
+        &DocumentTransition {
+            document_id: receipt.header.id,
+            expected_revision: receipt.header.revision,
+        },
+    )
+    .unwrap();
+    let receipt = documents::post(
+        &source.db,
+        &PostDocument {
+            document_id: receipt.header.id,
+            expected_revision: receipt.header.revision,
+            request_id: id(),
+        },
+    )
+    .unwrap();
+    let draft = sales::save(
+        &source.db,
+        &sale_models::Save {
+            id: id(),
+            expected_revision: None,
+            cart: sale_models::Cart {
+                branch_id: source.branch.clone(),
+                lines: vec![sale_models::Line {
+                    product_package_id: source.package.clone(),
+                    quantity: 2,
+                    ..Default::default()
+                }],
+                ..Default::default()
+            },
+        },
+    )
+    .unwrap();
+    let sale = sales::post(
+        &source.db,
+        &sale_models::Post {
+            id: draft["id"].as_str().unwrap().into(),
+            expected_revision: draft["revision"].as_i64().unwrap(),
+            request_id: id(),
+            payments: vec![sale_models::Payment {
+                payment_method: sale_models::Method::Cash,
+                amount_minor: draft["totalMinor"].as_i64().unwrap(),
+                reference: None,
+            }],
+        },
+    )
+    .unwrap();
+    let return_id = id();
+    sales::create_return(
+        &source.db,
+        &sale_models::ReturnDraft {
+            id: return_id.clone(),
+            sale_id: sale["id"].as_str().unwrap().into(),
+            reason: "Cross-device customer return".into(),
+            lines: vec![sale_models::ReturnLine {
+                sale_item_id: sale["items"][0]["id"].as_str().unwrap().into(),
+                quantity: 1,
+            }],
+        },
+    )
+    .unwrap();
+    sales::post_return(
+        &source.db,
+        &sale_models::ReturnPost {
+            id: return_id.clone(),
+            request_id: id(),
+        },
+    )
+    .unwrap();
+
+    let payload = |kind: &str| -> serde_json::Value {
+        let encoded: String = source
+            .db
+            .lock()
+            .unwrap()
+            .query_row(
+                "SELECT payload_json FROM sync_outbox WHERE entity_type=?1 ORDER BY local_sequence DESC LIMIT 1",
+                [kind],
+                |row| row.get(0),
+            )
+            .unwrap();
+        serde_json::from_str(&encoded).unwrap()
+    };
+    let catalog = payload("catalog_product");
+    let inventory = payload("inventory_document");
+    let sale_payload = payload("sale_document");
+    let return_payload = payload("sale_return");
+    let replica = AppDb::in_memory().unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO users(id,username,username_normalized,display_name) VALUES(?1,'sale-admin','sale-admin','Sale Admin')",
+            [&source.actor],
+        )
+        .unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO branches(id,code,name) VALUES(?1,'SYNC','Sync Branch')",
+            [&source.branch],
+        )
+        .unwrap();
+    let connection = replica.lock().unwrap();
+    replication::apply(&connection, "catalog_product", &product_id, &catalog).unwrap();
+    replication::apply(
+        &connection,
+        "inventory_document",
+        &receipt.header.id,
+        &inventory,
+    )
+    .unwrap();
+    replication::apply(
+        &connection,
+        "sale_document",
+        sale["id"].as_str().unwrap(),
+        &sale_payload,
+    )
+    .unwrap();
+    replication::apply(&connection, "sale_return", &return_id, &return_payload).unwrap();
+    replication::apply(
+        &connection,
+        "sale_document",
+        sale["id"].as_str().unwrap(),
+        &sale_payload,
+    )
+    .unwrap();
+    replication::apply(&connection, "sale_return", &return_id, &return_payload).unwrap();
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM sales WHERE id=?1 AND status='POSTED'",
+                [sale["id"].as_str().unwrap()],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM sale_returns WHERE id=?1 AND status='POSTED'",
+                [&return_id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM sale_return_items WHERE return_id=?1",
+                [&return_id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM sale_refunds WHERE return_id=?1",
+                [&return_id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT coalesce(sum(quantity_delta),0) FROM inventory_movements WHERE product_package_id=?1 AND branch_id=?2",
+                params![source.package, source.branch],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        4
+    );
+}
+
+#[test]
+fn stock_count_reconstructs_document_and_correction_once_on_matching_snapshot() {
+    let source = fixture();
+    let product_id: String = source
+        .db
+        .lock()
+        .unwrap()
+        .query_row(
+            "SELECT product_id FROM product_packages WHERE id=?1",
+            [&source.package],
+            |row| row.get(0),
+        )
+        .unwrap();
+    replication::catalog_product(&source.db.lock().unwrap(), &product_id).unwrap();
+    let opening = movements::opening(
+        &source.db,
+        &OpeningStock {
+            batch: CreateBatch {
+                branch_id: source.branch.clone(),
+                product_package_id: source.package.clone(),
+                lot_number: Some("COUNT-SYNC".into()),
+                ..Default::default()
+            },
+            request_id: id(),
+            quantity: 5,
+            reason: "Count replication baseline".into(),
+            created_by: Some(source.actor.clone()),
+        },
+    )
+    .unwrap();
+    let created = counts::create(
+        &source.db,
+        &CreateCount {
+            branch_id: source.branch.clone(),
+            notes: Some("Cross-device count".into()),
+            created_by: Some(source.actor.clone()),
+        },
+    )
+    .unwrap();
+    let started = counts::start(
+        &source.db,
+        &CountTransition {
+            session_id: created.session.id.clone(),
+            expected_revision: created.session.revision,
+        },
+    )
+    .unwrap();
+    let entered = counts::record(
+        &source.db,
+        &CountEntry {
+            session_id: started.session.id.clone(),
+            expected_revision: started.session.revision,
+            line_id: started.lines[0].id.clone(),
+            line_revision: started.lines[0].revision,
+            counted_quantity: Some(3),
+            notes: Some("Verified by pharmacist".into()),
+            excluded_reason: None,
+        },
+    )
+    .unwrap();
+    let reviewed = counts::transition(
+        &source.db,
+        &CountTransition {
+            session_id: entered.session.id.clone(),
+            expected_revision: entered.session.revision,
+        },
+        CountStatus::Review,
+    )
+    .unwrap();
+    let completed = counts::complete(
+        &source.db,
+        &CompleteCount {
+            session_id: reviewed.session.id.clone(),
+            expected_revision: reviewed.session.revision,
+            request_id: id(),
+            review_token: reviewed.review_token.clone(),
+        },
+    )
+    .unwrap();
+
+    let payload = |kind: &str| -> serde_json::Value {
+        let encoded: String = source
+            .db
+            .lock()
+            .unwrap()
+            .query_row(
+                "SELECT payload_json FROM sync_outbox WHERE entity_type=?1 ORDER BY local_sequence DESC LIMIT 1",
+                [kind],
+                |row| row.get(0),
+            )
+            .unwrap();
+        serde_json::from_str(&encoded).unwrap()
+    };
+    let catalog = payload("catalog_product");
+    let baseline = payload("inventory_movement");
+    let count_payload = payload("stock_count");
+    let replica = AppDb::in_memory().unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO users(id,username,username_normalized,display_name) VALUES(?1,'count-admin','count-admin','Count Admin')",
+            [&source.actor],
+        )
+        .unwrap();
+    replica
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO branches(id,code,name) VALUES(?1,'SYNC','Sync Branch')",
+            [&source.branch],
+        )
+        .unwrap();
+    let connection = replica.lock().unwrap();
+    replication::apply(&connection, "catalog_product", &product_id, &catalog).unwrap();
+    let batch = baseline.get("batch").unwrap();
+    let movement = baseline.get("movement").unwrap();
+    connection.execute("INSERT INTO inventory_batches(id,branch_id,product_package_id,lot_number,expiry_date,received_at,cost_price_minor,supplier_reference,is_active,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)", params![batch["id"].as_str(),batch["branchId"].as_str(),batch["productPackageId"].as_str(),batch["lotNumber"].as_str(),batch["expiryDate"].as_str(),batch["receivedAt"].as_str(),batch["costPriceMinor"].as_i64(),batch["supplierReference"].as_str(),batch["isActive"].as_bool(),batch["createdAt"].as_str(),batch["updatedAt"].as_str()]).unwrap();
+    connection.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reference_type,reference_id,reason,created_by,transfer_id,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)", params![movement["id"].as_str(),movement["branchId"].as_str(),movement["productPackageId"].as_str(),movement["batchId"].as_str(),movement["movementType"].as_str(),movement["quantityDelta"].as_i64(),movement["referenceType"].as_str(),movement["referenceId"].as_str(),movement["reason"].as_str(),movement["createdBy"].as_str(),movement["transferId"].as_str(),movement["createdAt"].as_str()]).unwrap();
+    replication::apply(
+        &connection,
+        "stock_count",
+        &completed.session.id,
+        &count_payload,
+    )
+    .unwrap();
+    replication::apply(
+        &connection,
+        "stock_count",
+        &completed.session.id,
+        &count_payload,
+    )
+    .unwrap();
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM stock_count_sessions WHERE id=?1 AND status='COMPLETED'",
+                [&completed.session.id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT count(*) FROM inventory_movements WHERE reference_type='stock_count_line'",
+                [],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        1
+    );
+    assert_eq!(
+        connection
+            .query_row(
+                "SELECT coalesce(sum(quantity_delta),0) FROM inventory_movements WHERE batch_id=?1",
+                [&opening.batch_id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        3
+    );
+    drop(connection);
+
+    let divergent = AppDb::in_memory().unwrap();
+    divergent
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO users(id,username,username_normalized,display_name) VALUES(?1,'divergent-admin','divergent-admin','Divergent Admin')",
+            [&source.actor],
+        )
+        .unwrap();
+    divergent
+        .lock()
+        .unwrap()
+        .execute(
+            "INSERT INTO branches(id,code,name) VALUES(?1,'DIVERGED','Diverged Branch')",
+            [&source.branch],
+        )
+        .unwrap();
+    let mut divergent_connection = divergent.lock().unwrap();
+    replication::apply(
+        &divergent_connection,
+        "catalog_product",
+        &product_id,
+        &catalog,
+    )
+    .unwrap();
+    divergent_connection.execute("INSERT INTO inventory_batches(id,branch_id,product_package_id,lot_number,expiry_date,received_at,cost_price_minor,supplier_reference,is_active,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)", params![batch["id"].as_str(),batch["branchId"].as_str(),batch["productPackageId"].as_str(),batch["lotNumber"].as_str(),batch["expiryDate"].as_str(),batch["receivedAt"].as_str(),batch["costPriceMinor"].as_i64(),batch["supplierReference"].as_str(),batch["isActive"].as_bool(),batch["createdAt"].as_str(),batch["updatedAt"].as_str()]).unwrap();
+    divergent_connection.execute("INSERT INTO inventory_movements(id,branch_id,product_package_id,batch_id,movement_type,quantity_delta,reference_type,reference_id,reason,created_by,transfer_id,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)", params![movement["id"].as_str(),movement["branchId"].as_str(),movement["productPackageId"].as_str(),movement["batchId"].as_str(),movement["movementType"].as_str(),6,movement["referenceType"].as_str(),movement["referenceId"].as_str(),movement["reason"].as_str(),movement["createdBy"].as_str(),movement["transferId"].as_str(),movement["createdAt"].as_str()]).unwrap();
+    let transaction = divergent_connection.transaction().unwrap();
+    let conflict = replication::apply(
+        &transaction,
+        "stock_count",
+        &completed.session.id,
+        &count_payload,
+    )
+    .unwrap_err();
+    assert!(format!("{conflict:?}").contains("REVISION_CONFLICT"));
+    transaction.rollback().unwrap();
+    assert_eq!(
+        divergent_connection
+            .query_row(
+                "SELECT count(*) FROM stock_count_sessions WHERE id=?1",
+                [&completed.session.id],
+                |row| row.get::<_, i64>(0),
+            )
+            .unwrap(),
+        0
+    );
 }
 
 #[test]

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useBranch } from "../../app/BranchContext";
+import { useAuth } from "../../app/AuthContext";
+import { useFeedback } from "../../app/FeedbackContext";
+import { useLocalization } from "../../localization/LocalizationContext";
 import {
   Alert,
   Button,
@@ -11,7 +14,9 @@ import {
   Table,
   LinkButton,
   Modal,
+  EmptyState,
 } from "../../design-system";
+import { AddStockDialog } from "./Inventory";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import {
   listProducts,
@@ -89,6 +94,10 @@ const message = (e: unknown) =>
   e instanceof Error ? e.message : "Inventory request failed.";
 function Workspace({ mode }: { mode: string }) {
   const { branchId, branchName, branches, select, loading } = useBranch();
+  const auth = useAuth();
+  const notify = useFeedback();
+  const { t } = useLocalization();
+  const navigate = useNavigate();
   const [url] = useSearchParams();
   const [packageId, setPackageId] = useState(url.get("package"));
   const [batchId, setBatchId] = useState(url.get("batch"));
@@ -108,6 +117,7 @@ function Workspace({ mode }: { mode: string }) {
   ]);
   const [page, setPage] = useState(0);
   const [attempt, setAttempt] = useState(0);
+  const [addStockOpen, setAddStockOpen] = useState(false);
   const [error, setError] = useState("");
   const [data, setData] = useState<{
     key: string;
@@ -239,6 +249,13 @@ function Workspace({ mode }: { mode: string }) {
           }[mode] || "Inventory"
         }
         description="Canonical SQLite inventory. Quantities are derived from the immutable stock ledger."
+        actions={
+          mode === "overview" && auth.hasPermission("inventory.adjust") ? (
+            <Button onClick={() => setAddStockOpen(true)}>
+              {t("inventory.addStock")}
+            </Button>
+          ) : undefined
+        }
       />
       <InventoryNavigation />
       <Select
@@ -304,24 +321,34 @@ function Workspace({ mode }: { mode: string }) {
                   </Select>
                 ))}
               </div>
-              <div className="row wrap">
-                {[
-                  ["RECEIPT", "Receive Stock"],
-                  ["ADJUSTMENT", "Adjust Stock"],
-                  ["WRITE_OFF", "Damage / Expiry Write-Off"],
-                  ["TRANSFER", "Transfer Stock"],
-                ].map(([kind, label]) => (
-                  <LinkButton
-                    key={kind}
-                    to={`/inventory/documents?new=${kind}`}
-                  >
-                    {label}
-                  </LinkButton>
-                ))}
-                <LinkButton to="/inventory/levels">
-                  Configure reorder level
-                </LinkButton>
-              </div>
+              <Card>
+                <div className="stack">
+                  <div>
+                    <h2>{t("inventory.actionGroupTitle")}</h2>
+                    <p className="muted">{t("inventory.actionGroupCopy")}</p>
+                  </div>
+                  <div className="row wrap">
+                    <LinkButton to="/purchases/new">
+                      {t("inventory.purchaseStock")}
+                    </LinkButton>
+                    <LinkButton to="/inventory/documents?new=RECEIPT">
+                      {t("inventory.receiveSupplierStock")}
+                    </LinkButton>
+                    <LinkButton to="/inventory/documents?new=ADJUSTMENT">
+                      {t("inventory.adjustStock")}
+                    </LinkButton>
+                    <LinkButton to="/inventory/documents?new=TRANSFER">
+                      {t("inventory.transferStock")}
+                    </LinkButton>
+                    <LinkButton to="/inventory/documents?new=WRITE_OFF">
+                      {t("inventory.writeOff")}
+                    </LinkButton>
+                    <LinkButton to="/inventory/levels">
+                      {t("inventory.configureReorder")}
+                    </LinkButton>
+                  </div>
+                </div>
+              </Card>
             </>
           )}
           {mode === "movements" && (
@@ -646,12 +673,25 @@ function Workspace({ mode }: { mode: string }) {
                 ]}
               />
             )}
-            {current && !error && current.total === 0 && (
-              <p>
-                No matching inventory records. Packages appear after a batch,
-                level, movement or document introduces them to this branch.
-              </p>
-            )}
+            {current && !error && current.total === 0 &&
+              (mode === "overview" ? (
+                <EmptyState
+                  title={t("empty.inventoryTitle")}
+                  description={t("empty.inventoryCopy")}
+                  action={
+                    <div className="row wrap">
+                      <Button onClick={() => setAddStockOpen(true)}>
+                        {t("empty.inventoryAction")}
+                      </Button>
+                      <LinkButton to="/catalog/new">
+                        {t("inventory.createProduct")}
+                      </LinkButton>
+                    </div>
+                  }
+                />
+              ) : (
+                <p>No matching inventory records.</p>
+              ))}
             <div className="grid-footer">
               <Button
                 disabled={!current || page === 0}
@@ -675,6 +715,22 @@ function Workspace({ mode }: { mode: string }) {
           </Card>
         </>
       )}
+      <AddStockDialog
+        key={addStockOpen ? `workspace-add-stock-${branchId}` : "workspace-add-stock-closed"}
+        open={addStockOpen}
+        onOpenChange={setAddStockOpen}
+        branchId={branchId}
+        branchName={branchName}
+        canCreateProduct={auth.hasPermission("catalog.manage")}
+        canAdjust={(current?.total ?? 0) > 0}
+        notify={notify}
+        onAdjust={() => navigate("/inventory/documents?new=ADJUSTMENT")}
+        onDone={() => {
+          setAddStockOpen(false);
+          setAttempt((value) => value + 1);
+        }}
+        onError={(failure) => setError(failure)}
+      />
     </div>
   );
 }

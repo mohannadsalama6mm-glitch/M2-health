@@ -1,6 +1,6 @@
 [package]
 name = "m2-health"
-version = "0.3.0"
+version = "0.4.0-beta.2"
 description = "M² Health local desktop foundation"
 edition = "2021"
 rust-version = "1.85"
@@ -22,6 +22,8 @@ sha2 = "0.10"
 uuid = { version = "1", features = ["v4"] }
 argon2 = "0.6"
 reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "rustls"] }
+base64 = "0.22"
+ring = "0.17"
 
 [dev-dependencies]
 tempfile = "3"

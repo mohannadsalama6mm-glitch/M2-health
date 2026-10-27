@@ -30,20 +30,36 @@ async function nativeBoundary(
             };
           if (command === "ensure_default_branch") return branch;
           if (command === "list_branches") return [branch];
-          if (command === "get_cloud_foundation_status") return {
-            mode: "LOCAL_ONLY", configured: false,
-            endpointConfigured: false,
-            deviceId: "11111111-1111-4111-a111-111111111111", deviceStatus: "LOCAL_ONLY",
-            organizationId: null, organizationName: null, cloudIdentityLinked: false,
-            transportEnabled: false, syncAvailable: false, setupRequired: true,
-            outboxPending: 0, inboxApplied: 0, lastAcknowledgedAt: null,
-            inboxRejected: 0, openConflicts: 0, lastSyncAt: null,
-            lastSuccessfulSyncAt: null, lastSyncOutcome: null,
-            retryScheduled: 0, nextRetryAt: null,
-          };
-          if (command === "get_cloud_session_status") return {
-            authenticated: false, subjectId: null, expiresAt: null,
-          };
+          if (command === "get_cloud_foundation_status")
+            return {
+              mode: "LOCAL_ONLY",
+              configured: false,
+              endpointConfigured: false,
+              deviceId: "11111111-1111-4111-a111-111111111111",
+              deviceStatus: "LOCAL_ONLY",
+              organizationId: null,
+              organizationName: null,
+              cloudIdentityLinked: false,
+              transportEnabled: false,
+              syncAvailable: false,
+              setupRequired: true,
+              outboxPending: 0,
+              inboxApplied: 0,
+              lastAcknowledgedAt: null,
+              inboxRejected: 0,
+              openConflicts: 0,
+              lastSyncAt: null,
+              lastSuccessfulSyncAt: null,
+              lastSyncOutcome: null,
+              retryScheduled: 0,
+              nextRetryAt: null,
+            };
+          if (command === "get_cloud_session_status")
+            return {
+              authenticated: false,
+              subjectId: null,
+              expiresAt: null,
+            };
           if (command === "list_sync_conflicts") return [];
           throw new Error(`Unexpected native command: ${command}`);
         },
@@ -57,7 +73,9 @@ test("desktop boundary supplies local branches and a real catalog", async ({
 }) => {
   await installCatalogDouble(page);
   await page.goto("/dashboard");
-  const selector = page.getByRole("combobox", { name: "Branch", exact: true });
+  const selector = page
+    .getByRole("banner")
+    .getByLabel("Branch", { exact: true });
   await expect(selector).toHaveValue("424b25b8-3c75-4d7a-87cd-988397081194");
   await expect(selector.locator("option:checked")).toHaveText("Main Pharmacy");
   await page.goto("/catalog");
@@ -82,7 +100,9 @@ test("branch loading does not block the application shell", async ({
 }) => {
   await nativeBoundary(page, "loading");
   await page.goto("/dashboard");
-  const selector = page.getByRole("combobox", { name: "Branch", exact: true });
+  const selector = page
+    .getByRole("banner")
+    .getByLabel("Branch", { exact: true });
   await expect(selector).toBeDisabled();
   await expect(selector).toContainText("Loading local branches");
   await expect(
@@ -99,7 +119,7 @@ test("database errors stay local and the branch connection can be retried", asyn
     "Local database could not be opened.",
   );
   await expect(
-    page.getByRole("combobox", { name: "Branch", exact: true }),
+    page.getByRole("banner").getByLabel("Branch", { exact: true }),
   ).toBeDisabled();
   await page.evaluate(() => {
     Object.assign(window, {
@@ -119,7 +139,7 @@ test("database errors stay local and the branch connection can be retried", asyn
     .getByRole("button", { name: "Retry local branch connection" })
     .click();
   await expect(
-    page.getByRole("combobox", { name: "Branch", exact: true }),
+    page.getByRole("banner").getByLabel("Branch", { exact: true }),
   ).toHaveValue("recovered-test-id");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
@@ -131,22 +151,35 @@ test("browser preview keeps the original demo branches", async ({ page }) => {
   await expect(selector.locator("option")).toHaveCount(3);
 });
 
-test("desktop system routes never render Phase 1 fixture records", async ({ page }) => {
+test("desktop system routes render canonical unavailable states without fixture records", async ({
+  page,
+}) => {
   await nativeBoundary(page, "success");
   for (const [path, heading] of [
-    ["/notifications", "Notifications unavailable"],
-    ["/audit-log", "Audit log unavailable"],
-    ["/backup", "Backup and restore unavailable"],
-    ["/settings", "Settings unavailable"],
+    ["/notifications", "Notifications"],
+    ["/audit-log", "Security audit log"],
+    ["/backup", "Backup and restore"],
+    ["/settings", "Settings"],
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
-    await expect(page.getByText("This workspace is a design preview and is not connected to persisted desktop data.")).toBeVisible();
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(
+      page.getByText(
+        "This workspace is a design preview and is not connected to persisted desktop data.",
+      ),
+    ).toHaveCount(0);
   }
   await page.goto("/sync");
-  await expect(page.getByRole("heading", { name: "Sync / cloud status" })).toBeVisible();
-  await expect(page.getByText("Cloud endpoint setup is required.", { exact: false })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Sync / cloud status" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Cloud endpoint setup is required.", { exact: false }),
+  ).toBeVisible();
   await expect(page.getByText("Not enrolled", { exact: true })).toBeVisible();
   await expect(page.getByText("Pending events", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Synchronize now" })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Synchronize now" }),
+  ).toBeDisabled();
 });

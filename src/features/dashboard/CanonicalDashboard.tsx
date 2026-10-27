@@ -1,30 +1,114 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Alert, Button, Card, Input, PageHeader, Select, StatCard } from "../../design-system";
+import { Alert, Button, Card, EmptyState, Input, PageHeader, Select, StatCard } from "../../design-system";
 import { BarChart3, Boxes, CircleDollarSign, PackageCheck } from "lucide-react";
 import { useBranch } from "../../app/BranchContext";
 import { phase6, type Phase6Dashboard } from "../../lib/tauri/phase6";
+import { useLocalization } from "../../localization/LocalizationContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
 import "./canonical-dashboard.css";
 
-const money=(n:number|null|undefined)=>n==null?"Unavailable":`${(n/100).toFixed(2)} EGP`;
-const errorText=(e:unknown)=>e instanceof Error?e.message:typeof e==="object"&&e&&"message" in e?String(e.message):"Dashboard data could not be loaded.";
+const errorText = (error: unknown) => error instanceof Error
+  ? error.message
+  : typeof error === "object" && error && "message" in error
+    ? String(error.message)
+    : "Dashboard data could not be loaded.";
 
-export function CanonicalDashboard(){
- const {branches,branchId}=useBranch();
- const [dateFrom,setDateFrom]=useState(""),[dateTo,setDateTo]=useState(""),[branch,setBranch]=useState(""),[applied,setApplied]=useState({dateFrom:"",dateTo:"",branch:""}),[value,setValue]=useState<Phase6Dashboard|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(""),[attempt,setAttempt]=useState(0);
- const filter=useMemo(()=>({dateFrom:applied.dateFrom||null,dateTo:applied.dateTo||null,branchId:applied.branch||null}),[applied]);
- useEffect(()=>{let active=true;Promise.resolve().then(()=>{if(active){setLoading(true);setError("")}});phase6.dashboard(filter).then(v=>active&&setValue(v)).catch(e=>active&&setError(errorText(e))).finally(()=>active&&setLoading(false));return()=>{active=false}},[filter,attempt]);
- const reset=()=>{setDateFrom("");setDateTo("");setBranch("");setApplied({dateFrom:"",dateTo:"",branch:""})};
- return <div className="stack canonical-dashboard">
-  <PageHeader title="Dashboard" description="Canonical operational and limited Finance results from the local pharmacy database." actions={<Link className="button button--primary" to="/sales">New sale</Link>}/>
-  <Card><div className="dashboard-filters"><Input label="From date" type="date" value={dateFrom} max={dateTo||undefined} onChange={e=>setDateFrom(e.target.value)}/><Input label="To date" type="date" value={dateTo} min={dateFrom||undefined} onChange={e=>setDateTo(e.target.value)}/><Select label="Branch" showLabel value={branch} onChange={e=>setBranch(e.target.value)}><option value="">All branches</option>{branches.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}</Select><Button variant="primary" onClick={()=>setApplied({dateFrom,dateTo,branch})}>Apply filters</Button><Button onClick={reset}>Reset filters</Button></div><p className="muted">Dates are inclusive. Current branch: {branches.find(b=>b.id===branchId)?.name??branchId}. Stock is the current ledger balance; period filters apply to dated activity.</p></Card>
-  {error&&<Alert title="Dashboard could not be loaded" tone="danger">{error} <Button onClick={()=>setAttempt(v=>v+1)}>Retry</Button></Alert>}
-  {loading&&<p role="status">Loading Dashboard…</p>}
-  {!loading&&!error&&value&&<DashboardBody value={value}/>} 
- </div>;
+export function CanonicalDashboard() {
+  const { branches, branchId } = useBranch();
+  const { t } = useLocalization();
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [branch, setBranch] = useState("");
+  const [applied, setApplied] = useState({ dateFrom: "", dateTo: "", branch: "" });
+  const [value, setValue] = useState<Phase6Dashboard | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
+  const filter = useMemo(() => ({
+    dateFrom: applied.dateFrom || null,
+    dateTo: applied.dateTo || null,
+    branchId: applied.branch || null,
+  }), [applied]);
+  useEffect(() => {
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) {
+        setLoading(true);
+        setError("");
+      }
+    });
+    phase6.dashboard(filter)
+      .then((result) => active && setValue(result))
+      .catch((reason) => active && setError(errorText(reason)))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, [attempt, filter]);
+  const reset = () => {
+    setDateFrom("");
+    setDateTo("");
+    setBranch("");
+    setApplied({ dateFrom: "", dateTo: "", branch: "" });
+  };
+  const branchName = branches.find((item) => item.id === branchId)?.name ?? branchId;
+  return <div className="stack canonical-dashboard">
+    <PageHeader title={t("dashboard.title")} description={t("dashboard.description")} actions={<Link className="button button--primary" to="/sales">{t("dashboard.newSale")}</Link>} />
+    <Card>
+      <div className="dashboard-filters">
+        <Input label={t("dashboard.fromDate")} type="date" value={dateFrom} max={dateTo || undefined} onChange={(event) => setDateFrom(event.target.value)} />
+        <Input label={t("dashboard.toDate")} type="date" value={dateTo} min={dateFrom || undefined} onChange={(event) => setDateTo(event.target.value)} />
+        <Select label={t("dashboard.branch")} showLabel value={branch} onChange={(event) => setBranch(event.target.value)}>
+          <option value="">{t("dashboard.allBranches")}</option>
+          {branches.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+        </Select>
+        <Button variant="primary" onClick={() => setApplied({ dateFrom, dateTo, branch })}>{t("dashboard.apply")}</Button>
+        <Button onClick={reset}>{t("dashboard.reset")}</Button>
+      </div>
+      <p className="muted">{t("dashboard.filterHelp", { branch: branchName })}</p>
+    </Card>
+    <ScopeNotice kind="report" reportScope={applied.branch ? branches.find((item) => item.id === applied.branch)?.name ?? applied.branch : t("scope.allBranches")} />
+    {error && <Alert title={t("dashboard.loadError")} tone="danger">{error} <Button onClick={() => setAttempt((current) => current + 1)}>{t("common.retry")}</Button></Alert>}
+    {loading && <p role="status">{t("dashboard.loading")}</p>}
+    {!loading && !error && value && <DashboardBody value={value} />}
+  </div>;
 }
-function DashboardBody({value:v}:{value:Phase6Dashboard}){const o=v.operational,f=v.financial,c=v.coverage;return <>
- <section><h2>Operational overview</h2><div className="canonical-dashboard__stats"><StatCard label="Net posted sales" value={money(o.netSalesMinor)} detail={`${o.postedSalesCount} posted sales · ${o.netUnitsSold} net units`} icon={CircleDollarSign}/><StatCard label="Current stock" value={String(o.currentStockUnits)} detail={`${o.lowStockPackageCount} low/out-of-stock thresholds`} icon={Boxes}/><StatCard label="Received" value={String(o.receivedQuantity)} detail={`${o.purchaseOrderCount} purchase orders`} icon={PackageCheck}/><StatCard label="Supplier returns" value={String(o.purchaseReturnQuantity)} detail="Posted purchase return units" icon={PackageCheck}/></div></section>
- <section><div className="canonical-dashboard__heading"><h2>Finance overview</h2><Link to="/finance">Open Finance</Link></div><div className="canonical-dashboard__stats"><StatCard label="Net sales revenue" value={money(f.netSalesRevenueMinor)} detail="Posted Finance journals" icon={CircleDollarSign}/><StatCard label="Net COGS" value={money(f.netCogsMinor)} detail="Posted Finance journals" icon={BarChart3}/><StatCard label="Gross margin" value={money(f.grossMarginMinor)} detail={f.grossMarginMinor==null?"Unavailable: incomplete allocation cost":"Limited Finance scope"} icon={CircleDollarSign}/><StatCard label="Operating result" value={money(f.operatingResultMinor)} detail="Gross margin less recorded expenses" icon={CircleDollarSign}/></div></section>
- <Alert title={c.coverageComplete?"Finance coverage is complete for this filter":"Finance coverage is partial"} tone={c.coverageComplete?"success":"warning"}>{c.scopeNote} {c.representedSaleCount} of {c.eligibleSaleCount} Sales, {c.representedReturnCount} of {c.postedReturnCount} Returns, and {c.representedVoidCount} of {c.voidCount} Voids are represented. <Link to="/reports">Compare operational reports</Link>.</Alert>
- </>}
+
+function DashboardBody({ value }: { value: Phase6Dashboard }) {
+  const { currencyMinor, locale, number, t } = useLocalization();
+  const operational = value.operational;
+  const financial = value.financial;
+  const coverage = value.coverage;
+  const money = (amount: number | null | undefined) => amount == null ? t("common.unavailable") : currencyMinor(amount);
+  const empty = operational.postedSalesCount === 0 && operational.currentStockUnits === 0 && operational.purchaseOrderCount === 0;
+  return <>
+    {empty && <EmptyState title={t("empty.dashboardTitle")} description={t("empty.dashboardCopy")} />}
+    <section>
+      <h2>{t("dashboard.operational")}</h2>
+      <div className="canonical-dashboard__stats">
+        <StatCard label={t("dashboard.netSales")} value={money(operational.netSalesMinor)} detail={t("dashboard.postedSales", { count: number(operational.postedSalesCount), units: number(operational.netUnitsSold) })} icon={CircleDollarSign} />
+        <StatCard label={t("dashboard.currentStock")} value={number(operational.currentStockUnits)} detail={t("dashboard.lowStock", { count: number(operational.lowStockPackageCount) })} icon={Boxes} />
+        <StatCard label={t("dashboard.received")} value={number(operational.receivedQuantity)} detail={t("dashboard.purchaseOrders", { count: number(operational.purchaseOrderCount) })} icon={PackageCheck} />
+        <StatCard label={t("dashboard.supplierReturns")} value={number(operational.purchaseReturnQuantity)} detail={t("dashboard.returnUnits")} icon={PackageCheck} />
+      </div>
+    </section>
+    <section>
+      <div className="canonical-dashboard__heading"><h2>{t("dashboard.finance")}</h2><Link to="/finance">{t("dashboard.openFinance")}</Link></div>
+      <div className="canonical-dashboard__stats">
+        <StatCard label={t("dashboard.netRevenue")} value={money(financial.netSalesRevenueMinor)} detail={t("dashboard.financeJournals")} icon={CircleDollarSign} />
+        <StatCard label={t("dashboard.netCogs")} value={money(financial.netCogsMinor)} detail={t("dashboard.financeJournals")} icon={BarChart3} />
+        <StatCard label={t("dashboard.grossMargin")} value={money(financial.grossMarginMinor)} detail={financial.grossMarginMinor == null ? t("dashboard.incompleteCost") : t("dashboard.limitedScope")} icon={CircleDollarSign} />
+        <StatCard label={t("dashboard.operatingResult")} value={money(financial.operatingResultMinor)} detail={t("dashboard.resultDetail")} icon={CircleDollarSign} />
+      </div>
+    </section>
+    <Alert title={coverage.coverageComplete ? t("dashboard.coverageComplete") : t("dashboard.coveragePartial")} tone={coverage.coverageComplete ? "success" : "warning"}>
+      {locale === "en" ? `${coverage.scopeNote} ` : ""}{t("dashboard.coverageCounts", {
+        sales: number(coverage.representedSaleCount),
+        eligibleSales: number(coverage.eligibleSaleCount),
+        returns: number(coverage.representedReturnCount),
+        postedReturns: number(coverage.postedReturnCount),
+        voids: number(coverage.representedVoidCount),
+        voidCount: number(coverage.voidCount),
+      })} <Link to="/reports">{t("dashboard.compare")}</Link>.
+    </Alert>
+  </>;
+}

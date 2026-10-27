@@ -397,6 +397,21 @@ export function installInventoryDouble(page: Page) {
       args: Record<string, unknown> = {},
     ): Promise<unknown> => {
       switch (command) {
+        case "get_license_status":
+          return {
+            state: "ACTIVE",
+            daysRemaining: null,
+            canOperate: true,
+            readOnly: false,
+            deviceId: "inventory-test-device",
+            activatedAt: 1_800_000_000,
+            expiresAt: null,
+            lastValidatedAt: 1_800_000_000,
+            nextRevalidationAt: null,
+            offlineGraceEndsAt: null,
+            requiresActivation: false,
+            reason: "Focused inventory test license.",
+          };
         case "get_stock_overview": {
           const query = (args.query ?? {}) as Record<string, unknown>;
           const branchId = String(query.branchId);
@@ -526,6 +541,54 @@ export function installInventoryDouble(page: Page) {
           };
           store.movements.push(m);
           return m;
+        }
+        case "record_opening_stock": {
+          const input = (args.input ?? {}) as {
+            requestId: string;
+            batch: {
+              branchId: string;
+              productPackageId: string;
+              lotNumber?: string | null;
+              expiryDate?: string | null;
+              costPriceMinor?: number | null;
+            };
+            quantity: number;
+            reason: string;
+            createdBy?: string | null;
+          };
+          const batch: Batch = {
+            id: uuid("b"),
+            branchId: input.batch.branchId,
+            productPackageId: input.batch.productPackageId,
+            batchNumber: input.batch.lotNumber ?? "GENERAL",
+            expiryDate: input.batch.expiryDate ?? "",
+            costPriceMinor: input.batch.costPriceMinor ?? null,
+            isActive: true,
+            createdAt: now(),
+            updatedAt: now(),
+          };
+          store.batches.push(batch);
+          const movement: Movement = {
+            id: input.requestId,
+            branchId: input.batch.branchId,
+            productPackageId: input.batch.productPackageId,
+            batchId: batch.id,
+            movementType: "opening",
+            quantityDelta: input.quantity,
+            costPriceMinor: batch.costPriceMinor,
+            referenceType: "opening",
+            referenceId: null,
+            reason: input.reason,
+            user: input.createdBy ?? "",
+            occurredAt: now(),
+            createdAt: now(),
+          };
+          store.movements.push(movement);
+          return {
+            id: movement.id,
+            batchId: batch.id,
+            quantityDelta: movement.quantityDelta,
+          };
         }
         case "adjust_stock": {
           const input = (args.input ?? {}) as {

@@ -1,8 +1,8 @@
 # Phase 8C Legacy Key Deactivation Procedure
 
-Status: **prepared, not executed. Requires explicit owner approval.**
+Status: **owner-authorized and prepared; not executed because the Supabase control is unavailable.**
 
-The legacy JWT-based `service_role` key of the linked development project was exposed in CLI output during the Phase 8C audit and was confirmed active by a redacted HTTP 200 probe. It has not been deactivated. The credential incident remains open until this procedure is executed and verified.
+The legacy JWT-based `service_role` key of the linked development project was exposed in CLI output during the Phase 8C audit and was confirmed active by a redacted HTTP 200 probe. It has not been deactivated. On 2026-10-20, after the user explicitly authorized credential remediation, the dashboard was opened to the exact legacy-key control. Modern publishable/secret keys were present and the current JWT signing key was asymmetric, but **Disable JWT-based API keys** was rendered unavailable. The official Management API fallback returned an insufficient-privilege denial because the current CLI identity lacks API-key write permission. No access change was made. The incident remains open until an authorized owner completes deactivation and verification.
 
 ## Dependency audit summary (read-only)
 
@@ -31,10 +31,10 @@ The legacy JWT-based `service_role` key of the linked development project was ex
 1. Confirm that every client uses `sb_publishable_…` or `sb_secret_…` keys. The desktop and harness already do.
 2. Open the Supabase Dashboard → project **M2-health** → **Project Settings → API Keys**.
 3. Optionally review **API Keys → Legacy API Keys** "last used" indicators where the dashboard shows them.
-4. On the **Legacy API Keys** tab, choose **Disable JWT-based API keys**. This disables the legacy `anon` and `service_role` keys together and is reversible from the same screen.
+4. On the **Legacy API Keys** tab, choose **Disable JWT-based API keys** when Supabase enables the control. This disables the legacy `anon` and `service_role` keys together and is reversible from the same screen. If the dashboard remains unavailable, use the official Management API `PUT /v1/projects/{ref}/api-keys/legacy?enabled=false` only with a credential carrying `api_gateway_keys_write`.
 5. Do **not** rotate the legacy JWT secret as a first step; it also invalidates every issued user session.
 6. Verify with a redacted probe: a request using the legacy `service_role` value must return HTTP 401, printing the status code only.
-7. Verify the desktop sign-in path and the isolated harness still work with the modern keys, then re-run `scripts/admin/phase8c-live-integration.ps1` and the PostgreSQL security script.
+7. Verify the desktop sign-in path and the isolated harness still work with the modern keys, then re-run `scripts/admin/phase8c-live-integration.ps1` and the PostgreSQL security script. Both passed before deactivation on 2026-10-20 and must pass again afterward.
 8. Record the date, operator, and probe result in this file and in `FINAL-REPORT.md`.
 
 ## Rollback

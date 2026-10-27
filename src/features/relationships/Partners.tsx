@@ -21,7 +21,7 @@ import {
   SectionHeader,
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
 import {
   createCustomer,
   listCustomers,
@@ -40,7 +40,7 @@ const formatTime = (iso: string) =>
   iso ? iso.slice(0, 16).replace("T", " ") : "—";
 export function Partners({ kind }: { kind: "suppliers" | "customers" }) {
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [rows, setRows] = useState<Partner[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -117,7 +117,10 @@ export function Partners({ kind }: { kind: "suppliers" | "customers" }) {
         }
       />
       {error && (
-        <Alert title={`The ${title.toLowerCase()} could not be loaded`} tone="danger">
+        <Alert
+          title={`The ${title.toLowerCase()} could not be loaded`}
+          tone="danger"
+        >
           {error}
           <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
             Retry
@@ -165,7 +168,11 @@ export function Partners({ kind }: { kind: "suppliers" | "customers" }) {
               ),
             },
             { key: "email", header: "Email", render: (r) => r.email || "—" },
-            { key: "address", header: "Address", render: (r) => r.address || "—" },
+            {
+              key: "address",
+              header: "Address",
+              render: (r) => r.address || "—",
+            },
             { key: "code", header: "Code", render: (r) => r.code },
             {
               key: "status",
@@ -305,14 +312,10 @@ function PartnerEditorDialog({
     </Modal>
   );
 }
-export function PartnerDetails({
-  kind,
-}: {
-  kind: "suppliers" | "customers";
-}) {
+export function PartnerDetails({ kind }: { kind: "suppliers" | "customers" }) {
   const { id } = useParams();
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [partner, setPartner] = useState<Partner | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -366,7 +369,10 @@ export function PartnerDetails({
   if (error)
     return (
       <>
-        <BackLink to={`/${kind}`} label={kind === "suppliers" ? "Suppliers" : "Customers"} />
+        <BackLink
+          to={`/${kind}`}
+          label={kind === "suppliers" ? "Suppliers" : "Customers"}
+        />
         <Alert title={`The ${label} could not be loaded`} tone="danger">
           {error}
           <Button size="sm" onClick={() => setAttempt((v) => v + 1)}>
@@ -410,7 +416,10 @@ export function PartnerDetails({
   };
   return (
     <>
-      <BackLink to={`/${kind}`} label={kind === "suppliers" ? "Suppliers" : "Customers"} />
+      <BackLink
+        to={`/${kind}`}
+        label={kind === "suppliers" ? "Suppliers" : "Customers"}
+      />
       <div className="feature-page">
         <PageHeader
           title={partner.name}

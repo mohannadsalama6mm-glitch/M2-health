@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Pencil, ArrowLeftRight, ClipboardCheck } from "lucide-react";
+import { Pencil, ArrowLeftRight, ClipboardCheck, PackagePlus } from "lucide-react";
 import {
   PageHeader,
   LinkButton,
@@ -24,7 +24,10 @@ import {
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import { useBranch } from "../../app/BranchContext";
-import { useDemo } from "../../app/DemoContext";
+import { useAuth } from "../../app/AuthContext";
+import { useFeedback } from "../../app/FeedbackContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 import {
   getStockOverview,
   getStockSummary,
@@ -33,8 +36,19 @@ import {
   transferStock,
   setReorderLevel,
   toMajor,
+  toMinor,
   MOVEMENT_TYPES,
 } from "../../lib/tauri/inventory";
+import { opening } from "../../lib/tauri/inventory-inspection";
+import {
+  createProductFull,
+  getProductDetail,
+  listProducts,
+} from "../../lib/tauri/catalog";
+import type {
+  PackageDetail,
+  ProductListItem,
+} from "../../lib/tauri/catalog.types";
 import type {
   StockOverviewPage,
   StockRow,
@@ -107,8 +121,10 @@ function SortHeader({
 }
 export function Inventory() {
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
-  const { branchId } = useBranch();
+  const auth = useAuth();
+  const notify = useFeedback();
+  const { t } = useLocalization();
+  const { branchId, branchName } = useBranch();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [sort, setSort] = useState("name");
@@ -119,6 +135,7 @@ export function Inventory() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [addStockOpen, setAddStockOpen] = useState(false);
   const [adjustOpen, setAdjustOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);
   const [reorderRow, setReorderRow] = useState<StockRow | null>(null);
@@ -296,33 +313,65 @@ export function Inventory() {
   return (
     <div className="feature-page">
       <PageHeader
-        title="Inventory"
-        description="Package and batch-level stock preview, sourced from the movement ledger."
+        title={t("page.inventoryTitle")}
+        description={t("page.inventoryCopy")}
         actions={
           <>
+            {auth.hasPermission("inventory.adjust") && (
+              <Button
+                variant="primary"
+                disabled={!desktop || !branchId}
+                onClick={() => setAddStockOpen(true)}
+              >
+                <PackagePlus size={16} />
+                {t("inventory.addStock")}
+              </Button>
+            )}
             <LinkButton to="/inventory/counts">
               <ClipboardCheck size={16} />
-              Stock count
+              {t("page.stockCountsTitle")}
             </LinkButton>
-            <Button
-              variant="secondary"
-              disabled={!rows.length}
-              onClick={() => setTransferOpen(true)}
-            >
-              <ArrowLeftRight size={16} />
-              Transfer
-            </Button>
-            <Button
-              variant="primary"
-              disabled={!rows.length}
-              onClick={() => setAdjustOpen(true)}
-            >
-              Adjust stock
-            </Button>
           </>
         }
       />
+      <ScopeNotice />
       <RouteTabs items={inventoryTabs} />
+      {desktop && (
+        <Card>
+          <div className="stack">
+            <div>
+              <h2>{t("inventory.actionGroupTitle")}</h2>
+              <p className="muted">{t("inventory.actionGroupCopy")}</p>
+            </div>
+            <div className="row wrap">
+              <LinkButton to="/purchases/new">
+                {t("inventory.purchaseStock")}
+              </LinkButton>
+              <LinkButton to="/inventory/documents?new=RECEIPT">
+                {t("inventory.receiveSupplierStock")}
+              </LinkButton>
+              <Button
+                variant="secondary"
+                disabled={!rows.length}
+                onClick={() => setAdjustOpen(true)}
+              >
+                {t("inventory.adjustStock")}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={!rows.length}
+                onClick={() => setTransferOpen(true)}
+              >
+                <ArrowLeftRight size={16} />
+                {t("inventory.transferStock")}
+              </Button>
+              <LinkButton to="/inventory/levels">
+                {t("inventory.configureReorder")}
+              </LinkButton>
+            </div>
+          </div>
+        </Card>
+      )}
       {!desktop && (
         <Alert title="Desktop app required" tone="warning">
           Inventory reads from the local database. Open M² Health as the desktop
@@ -393,6 +442,19 @@ export function Inventory() {
             <div className="stack" role="status">
               <Alert title="Loading inventory…" tone="info" />
             </div>
+          ) : data && rows.length === 0 ? (
+            <EmptyState
+              title={search || status ? t("empty.inventoryFilteredTitle") : t("empty.inventoryTitle")}
+              description={search || status ? t("empty.inventoryFilteredCopy") : t("empty.inventoryCopy")}
+              action={search || status
+                ? <Button onClick={() => { setSearch(""); setStatus(""); setPage(1); }}>{t("common.clearFilters")}</Button>
+                : <div className="row wrap">
+                    <Button variant="primary" onClick={() => setAddStockOpen(true)}>
+                      {t("empty.inventoryAction")}
+                    </Button>
+                    <LinkButton to="/catalog/new">{t("inventory.createProduct")}</LinkButton>
+                  </div>}
+            />
           ) : (
             <Table
               label="Inventory"
@@ -409,6 +471,25 @@ export function Inventory() {
           </div>
         </Card>
       )}
+      <AddStockDialog
+        key={addStockOpen ? `add-stock-${branchId}` : "add-stock-closed"}
+        open={addStockOpen}
+        onOpenChange={setAddStockOpen}
+        branchId={branchId}
+        branchName={branchName}
+        canCreateProduct={auth.hasPermission("catalog.manage")}
+        canAdjust={rows.length > 0}
+        notify={notify}
+        onAdjust={() => {
+          setAddStockOpen(false);
+          setAdjustOpen(true);
+        }}
+        onDone={() => {
+          setAddStockOpen(false);
+          setAttempt((value) => value + 1);
+        }}
+        onError={(message) => setError(message)}
+      />
       <AdjustStockDialog
         key={adjustOpen ? "adjust-open" : "adjust-closed"}
         open={adjustOpen}
@@ -451,6 +532,385 @@ export function Inventory() {
     </div>
   );
 }
+type StockEntrySource = "opening" | "receipt" | "adjustment";
+
+export function AddStockDialog({
+  open,
+  onOpenChange,
+  branchId,
+  branchName,
+  canCreateProduct,
+  canAdjust,
+  notify,
+  onAdjust,
+  onDone,
+  onError,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  branchId: string;
+  branchName: string;
+  canCreateProduct: boolean;
+  canAdjust: boolean;
+  notify: (message: string) => void;
+  onAdjust: () => void;
+  onDone: () => void;
+  onError: (message: string) => void;
+}) {
+  const { locale, t } = useLocalization();
+  const [source, setSource] = useState<StockEntrySource>("opening");
+  const [creating, setCreating] = useState(false);
+  const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<ProductListItem[]>([]);
+  const [productId, setProductId] = useState("");
+  const [packages, setPackages] = useState<PackageDetail[]>([]);
+  const [packageId, setPackageId] = useState("");
+  const [productNameInput, setProductNameInput] = useState("");
+  const [packageLabel, setPackageLabel] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [reason, setReason] = useState("");
+  const [lotNumber, setLotNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cost, setCost] = useState("");
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [dialogError, setDialogError] = useState("");
+
+  useEffect(() => {
+    if (!open || source !== "opening" || creating) return;
+    let active = true;
+    const timer = window.setTimeout(() => {
+      setLoadingProducts(true);
+      listProducts({
+        search: search || null,
+        limit: 50,
+        offset: 0,
+        includeInactive: false,
+      })
+        .then((page) => {
+          if (!active) return;
+          setProducts(page.items);
+          setLoadingProducts(false);
+        })
+        .catch(() => {
+          if (!active) return;
+          setDialogError(t("inventory.loadFailed"));
+          setLoadingProducts(false);
+        });
+    }, search ? 200 : 0);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [creating, open, search, source, t]);
+
+  useEffect(() => {
+    if (!open || creating || !productId) return;
+    let active = true;
+    getProductDetail(productId)
+      .then((detail) => {
+        if (!active) return;
+        const activePackages = detail.packages.filter(
+          (entry) => entry.package.isActive,
+        );
+        setPackages(activePackages);
+        const preferred =
+          activePackages.find((entry) => entry.package.isDefault) ??
+          activePackages[0];
+        setPackageId(preferred?.package.id ?? "");
+      })
+      .catch(() => {
+        if (active) setDialogError(t("inventory.loadFailed"));
+      });
+    return () => {
+      active = false;
+    };
+  }, [creating, open, productId, t]);
+
+  const selectedProductLabel = (product: ProductListItem) =>
+    product.nameEn ?? product.nameAr ?? product.scientificName ?? product.id;
+
+  async function submit() {
+    setDialogError("");
+    const parsedQuantity = Number(quantity);
+    if (!Number.isInteger(parsedQuantity) || parsedQuantity <= 0) {
+      setDialogError(t("inventory.quantityRequired"));
+      return;
+    }
+    if (!reason.trim()) {
+      setDialogError(t("inventory.reasonRequired"));
+      return;
+    }
+    const costMinor = cost.trim() ? toMinor(cost) : null;
+    if (cost.trim() && costMinor === null) {
+      setDialogError(t("inventory.costInvalid"));
+      return;
+    }
+    let targetPackageId = packageId;
+    setSubmitting(true);
+    try {
+      if (creating) {
+        if (!productNameInput.trim())
+          throw new Error(t("inventory.nameRequired"));
+        if (!packageLabel.trim())
+          throw new Error(t("inventory.packageRequired"));
+        const saved = await createProductFull({
+          commercialNameEn:
+            locale === "en" ? productNameInput.trim() : null,
+          commercialNameAr:
+            locale === "ar" ? productNameInput.trim() : null,
+          packages: [
+            {
+              packageLabel: packageLabel.trim(),
+              isDefault: true,
+              isActive: true,
+              costPriceMinor: costMinor,
+            },
+          ],
+        });
+        const detail = await getProductDetail(saved.id);
+        targetPackageId =
+          detail.packages.find((entry) => entry.package.isDefault)?.package.id ??
+          detail.packages[0]?.package.id ??
+          "";
+        setCreating(false);
+        setProductId(saved.id);
+        setPackages(detail.packages);
+        setPackageId(targetPackageId);
+        notify(t("inventory.productCreated"));
+      }
+      if (!targetPackageId) throw new Error(t("inventory.productRequired"));
+      await opening({
+        requestId: crypto.randomUUID(),
+        batch: {
+          branchId,
+          productPackageId: targetPackageId,
+          lotNumber: lotNumber.trim() || null,
+          expiryDate: expiryDate || null,
+          costPriceMinor: costMinor,
+        },
+        quantity: parsedQuantity,
+        reason: reason.trim(),
+        createdBy: null,
+      });
+      notify(t("inventory.stockAdded", { branch: branchName }));
+      onDone();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : t("inventory.saveFailed");
+      setDialogError(message);
+      onError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t("inventory.addStockTitle")}
+      description={t("inventory.addStockCopy")}
+    >
+      <div className="stack">
+        <Alert title={t("inventory.activeBranch", { branch: branchName })} tone="info" />
+        <Select
+          label={t("inventory.stockSource")}
+          value={source}
+          onChange={(event) => {
+            setSource(event.target.value as StockEntrySource);
+            setDialogError("");
+          }}
+        >
+          <option value="opening">{t("inventory.initialStock")}</option>
+          <option value="receipt">{t("inventory.supplierReceipt")}</option>
+          <option value="adjustment">{t("inventory.adjustment")}</option>
+        </Select>
+
+        {source === "receipt" ? (
+          <div className="stack">
+            <p>{t("inventory.supplierReceiptCopy")}</p>
+            <LinkButton primary to="/inventory/documents?new=RECEIPT">
+              {t("inventory.openReceipt")}
+            </LinkButton>
+          </div>
+        ) : source === "adjustment" ? (
+          <div className="stack">
+            <p>{t("inventory.adjustmentCopy")}</p>
+            <Button variant="primary" disabled={!canAdjust} onClick={onAdjust}>
+              {t("inventory.openAdjustment")}
+            </Button>
+          </div>
+        ) : (
+          <form
+            className="stack"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void submit();
+            }}
+          >
+            <p>{t("inventory.initialStockCopy")}</p>
+            {dialogError && (
+              <Alert title={t("inventory.saveFailed")} tone="danger">
+                {dialogError}
+              </Alert>
+            )}
+            <div className="row wrap" role="group" aria-label={t("inventory.entryType")}>
+              <Button
+                type="button"
+                variant={!creating ? "primary" : "secondary"}
+                onClick={() => {
+                  setCreating(false);
+                  setPackages([]);
+                  setPackageId("");
+                }}
+              >
+                {t("inventory.existingProduct")}
+              </Button>
+              {canCreateProduct && (
+                <Button
+                  type="button"
+                  variant={creating ? "primary" : "secondary"}
+                  onClick={() => {
+                    setCreating(true);
+                    setProductId("");
+                    setPackages([]);
+                    setPackageId("");
+                  }}
+                >
+                  {t("inventory.newProduct")}
+                </Button>
+              )}
+            </div>
+            {creating ? (
+              <>
+                <Input
+                  label={t("inventory.productName")}
+                  required
+                  value={productNameInput}
+                  onChange={(event) => setProductNameInput(event.target.value)}
+                />
+                <Input
+                  label={t("inventory.packageLabel")}
+                  required
+                  placeholder={t("inventory.packageExample")}
+                  value={packageLabel}
+                  onChange={(event) => setPackageLabel(event.target.value)}
+                />
+              </>
+            ) : (
+              <>
+                <Input
+                  label={t("inventory.searchProducts")}
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                />
+                <Select
+                  label={t("inventory.selectProduct")}
+                  value={productId}
+                  disabled={loadingProducts}
+                  onChange={(event) => {
+                    setProductId(event.target.value);
+                    setPackages([]);
+                    setPackageId("");
+                  }}
+                >
+                  <option value="">{t("inventory.chooseProduct")}</option>
+                  {products.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {selectedProductLabel(product)}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  label={t("inventory.selectPackage")}
+                  value={packageId}
+                  disabled={!productId}
+                  onChange={(event) => setPackageId(event.target.value)}
+                >
+                  <option value="">{t("inventory.choosePackage")}</option>
+                  {packages.map((entry) => (
+                    <option key={entry.package.id} value={entry.package.id}>
+                      {entry.package.packageLabel}
+                    </option>
+                  ))}
+                </Select>
+              </>
+            )}
+            <Input
+              label={t("inventory.quantity")}
+              required
+              type="number"
+              min="1"
+              step="1"
+              value={quantity}
+              onChange={(event) => setQuantity(event.target.value)}
+            />
+            <Input
+              label={t("inventory.reason")}
+              required
+              placeholder={t("inventory.reasonExample")}
+              value={reason}
+              onChange={(event) => setReason(event.target.value)}
+            />
+            <details>
+              <summary>{t("inventory.advancedDetails")}</summary>
+              <div className="stack">
+                <Input
+                  label={t("inventory.batchNumber")}
+                  value={lotNumber}
+                  onChange={(event) => setLotNumber(event.target.value)}
+                />
+                <Input
+                  label={t("inventory.expiryDate")}
+                  type="date"
+                  value={expiryDate}
+                  onChange={(event) => setExpiryDate(event.target.value)}
+                />
+                <Input
+                  label={t("inventory.purchaseCost")}
+                  inputMode="decimal"
+                  value={cost}
+                  onChange={(event) => setCost(event.target.value)}
+                />
+              </div>
+            </details>
+            <p className="muted">{t("inventory.requiredHelp")}</p>
+            <div className="row end">
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={submitting}
+                onClick={() => onOpenChange(false)}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={submitting}
+                disabled={
+                  submitting ||
+                  !branchId ||
+                  !quantity ||
+                  !reason.trim() ||
+                  (creating
+                    ? !productNameInput.trim() || !packageLabel.trim()
+                    : !productId || !packageId)
+                }
+              >
+                {creating
+                  ? t("inventory.createAndAdd")
+                  : t("inventory.saveStock")}
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 function AdjustStockDialog({
   open,
   onOpenChange,
@@ -468,9 +928,7 @@ function AdjustStockDialog({
   onDone: () => void;
   onError: (message: string) => void;
 }) {
-  const [packageId, setPackageId] = useState(
-    rows[0] ? rows[0].packageId : "",
-  );
+  const [packageId, setPackageId] = useState(rows[0] ? rows[0].packageId : "");
   const [quantity, setQuantity] = useState("");
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -576,9 +1034,7 @@ function TransferStockDialog({
   onError: (message: string) => void;
 }) {
   const { branches } = useBranch();
-  const [packageId, setPackageId] = useState(
-    rows[0] ? rows[0].packageId : "",
-  );
+  const [packageId, setPackageId] = useState(rows[0] ? rows[0].packageId : "");
   const [batchId, setBatchId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [toBranchId, setToBranchId] = useState("");
@@ -589,9 +1045,7 @@ function TransferStockDialog({
   const batches = selected ? selected.batches : [];
   const effectiveBatchId = batchId || (batches[0] ? batches[0].batchId : "");
   const selectedBatch = batches.find((b) => b.batchId === effectiveBatchId);
-  const destinations = branches.filter(
-    (b) => b.id !== branchId && b.isActive,
-  );
+  const destinations = branches.filter((b) => b.id !== branchId && b.isActive);
   return (
     <Modal
       open={open}

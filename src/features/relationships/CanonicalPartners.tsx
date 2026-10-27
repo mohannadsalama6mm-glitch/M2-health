@@ -30,6 +30,8 @@ import {
 import * as salesApi from "../../lib/tauri/canonical-sales";
 import { canonicalPurchasing } from "../../lib/tauri/canonical-purchasing";
 import { useBranch } from "../../app/BranchContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 
 type Kind = "suppliers" | "customers";
 type Partner = Supplier | Customer;
@@ -57,8 +59,9 @@ export function CanonicalPartners() {
 }
 
 function List({ kind }: { kind: Kind }) {
+  const { t } = useLocalization();
   const supplier = kind === "suppliers";
-  const title = supplier ? "Suppliers" : "Customers";
+  const title = t(supplier ? "page.suppliersTitle" : "page.customersTitle");
   const [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
     [page, setPage] = useState(0),
@@ -116,18 +119,15 @@ function List({ kind }: { kind: Kind }) {
     <div className="feature-page canonical-partners">
       <PageHeader
         title={title}
-        description={
-          supplier
-            ? "Canonical supplier identities for future purchasing references."
-            : "Canonical business customer identities for future sale linking."
-        }
+        description={t(supplier ? "page.suppliersCopy" : "page.customersCopy")}
         actions={
           <Button variant="primary" onClick={() => setEditor(true)}>
             <Plus size={16} />
-            Add {supplier ? "supplier" : "customer"}
+            {t(supplier ? "page.addSupplier" : "page.addCustomer")}
           </Button>
         }
       />
+      <ScopeNotice kind="partners" />
       {message && (
         <Alert title="Saved" tone="success">
           {message}
@@ -170,14 +170,17 @@ function List({ kind }: { kind: Kind }) {
         <EmptyState
           title={
             search || status
-              ? `No ${title.toLowerCase()} match these filters`
-              : `No ${title.toLowerCase()} yet`
+              ? t("empty.partnersFilteredTitle")
+              : t(supplier ? "empty.suppliersTitle" : "empty.customersTitle")
           }
           description={
             search || status
-              ? "Change the search or status filter."
-              : `Add the first ${supplier ? "supplier" : "customer"} when ready.`
+              ? t("empty.partnersFilteredCopy")
+              : t(supplier ? "empty.suppliersCopy" : "empty.customersCopy")
           }
+          action={search || status
+            ? <Button onClick={() => { setSearch(""); setStatus(""); setPage(0); }}>{t("common.clearFilters")}</Button>
+            : <Button variant="primary" onClick={() => setEditor(true)}>{t(supplier ? "empty.suppliersAction" : "empty.customersAction")}</Button>}
         />
       ) : (
         <Card>

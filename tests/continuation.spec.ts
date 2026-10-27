@@ -2,7 +2,6 @@ import { installAlertsDouble } from "./inventory-alerts-double";
 import { test, expect } from "@playwright/test";
 import { installCatalogDouble } from "./catalog-double";
 import { installInventoryDouble } from "./inventory-double";
-import { installSalesDouble } from "./sales-double";
 test("catalog retains multiple packages ingredients barcodes and pricing through edit", async ({
   page,
 }) => {
@@ -71,36 +70,14 @@ for (const [width, height] of [
     page,
   }) => {
     await page.setViewportSize({ width, height });
-    await installCatalogDouble(page);
-    await installInventoryDouble(page);
-    await installSalesDouble(page);
     await page.goto("/sales");
-    for (const name of [
-      "Panadol 500 mg",
-      "Amoxicillin 500 mg",
-      "Vitamin C 1000 mg",
-      "Cetirizine 10 mg",
-    ])
-      await page
-        .getByRole("button", { name: `Add ${name} to cart`, exact: true })
-        .click();
-    await page
-      .locator(".cart-lines")
-      .evaluate((e) => (e.scrollTop = e.scrollHeight));
-    const button = await page
-      .getByRole("button", { name: "Complete sale" })
-      .boundingBox();
+    const state = page.getByRole("heading", {
+      name: "Connect to the desktop app to use the POS.",
+    });
+    await expect(state).toBeVisible();
+    const box = await state.boundingBox();
     const main = await page.locator("main").boundingBox();
-    expect(button!.y + button!.height).toBeLessThanOrEqual(
-      main!.y + main!.height,
-    );
-    expect(button!.y).toBeGreaterThan(main!.y);
-    await expect(page.getByText("Grand total", { exact: true })).toBeVisible();
-    expect(
-      await page
-        .locator(".cart-lines")
-        .evaluate((e) => e.scrollHeight > e.clientHeight),
-    ).toBe(true);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(main!.y + main!.height);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -108,137 +85,46 @@ for (const [width, height] of [
     ).toBe(true);
     await page.screenshot({ path: `test-results/pos-cart-${width}.png` });
   });
-test("POS quantity discount customer card and void confirmation", async ({
+test("browser POS exposes no mutable payment or void workflow", async ({
   page,
 }) => {
-  await installCatalogDouble(page);
-  await installInventoryDouble(page);
-  await installSalesDouble(page);
   await page.goto("/sales");
-  await page.getByLabel("Barcode input").fill("6221001000011");
-  await page.getByLabel("Barcode input").press("Enter");
-  await page.getByRole("button", { name: "Increase quantity" }).click();
-  await page.getByLabel("Sale discount (EGP)").fill("4");
-  await page.getByLabel("Sale customer").selectOption("Sara Mohamed");
-  await page.getByLabel("Payment method", { exact: true }).selectOption("Card");
-  await expect(page.getByLabel("Cash received (EGP)")).toBeDisabled();
-  await page.getByRole("button", { name: "Complete sale" }).click();
-  await expect(
-    page.getByRole("dialog").getByText("Sara Mohamed", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("dialog").getByText("73.00", { exact: false }),
-  ).toBeVisible();
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "Cancel / void" }).click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Cancel", exact: true })
-    .click();
-  await expect(
-    page.getByRole("spinbutton", { name: "Quantity", exact: true }),
-  ).toHaveValue("2");
-  await page.getByRole("button", { name: "Cancel / void" }).click();
-  await page.getByRole("button", { name: "Confirm", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Ready for your next sale" }),
-  ).toBeVisible();
+  await expect(page.getByLabel("Barcode input")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Complete sale" })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole("button", { name: "Cancel / void" })).toHaveCount(
+    0,
+  );
 });
-test("completed purchase posts stock and opens its detail page", async ({
-  page,
-}) => {
-  await installCatalogDouble(page);
-  await installInventoryDouble(page);
-  await installSalesDouble(page);
+test("browser purchase editor cannot post stock", async ({ page }) => {
   await page.goto("/purchases/new");
-  await page.getByLabel("Supplier").selectOption("Nile Medical Supplies");
-  await page.getByLabel("Search products").fill("Vitamin C 1000 mg");
-  const results = page.getByRole("table", { name: "Product search results" });
-  await expect(results).toContainText("Vitamin C 1000 mg");
-  await results
-    .getByRole("row")
-    .filter({ hasText: "Vitamin C 1000 mg" })
-    .getByRole("button", { name: "Add", exact: true })
-    .click();
-  await expect(
-    page.getByRole("table", { name: "Purchase lines" }),
-  ).toContainText("Vitamin C 1000 mg");
-  await page.getByLabel("Quantity pkg-3").fill("4");
-  await page.getByLabel("Paid amount (EGP)").fill("48");
-  await page.getByRole("button", { name: "Complete purchase" }).click();
-  await expect(page.getByRole("heading", { name: "00002" })).toBeVisible();
-  await expect(
-    page.getByRole("table", { name: "Purchase items" }),
-  ).toContainText("Vitamin C 1000 mg");
-});
-test("contacts management reports finance and system controls", async ({
-  page,
-}) => {
-  test.setTimeout(90000);
-  await installCatalogDouble(page);
-  await installInventoryDouble(page);
-  await installSalesDouble(page);
-  await page.goto("/suppliers");
-  await page
-    .getByRole("link", { name: "United Pharma Distribution Karim Adel" })
-    .click();
   await expect(
     page.getByRole("heading", {
-      name: "United Pharma Distribution Karim Adel",
+      name: "Connect to the desktop app to complete a purchase.",
     }),
   ).toBeVisible();
-  await expect(page.getByText("Code", { exact: true })).toBeVisible();
-  await page.goto("/customers/c1");
-  await page.getByRole("button", { name: "Edit customer" }).click();
-  await page.getByLabel("Name", { exact: true }).fill("Ahmed UI review");
-  await page.getByRole("button", { name: "Save changes" }).click();
   await expect(
-    page.getByRole("heading", { name: "Ahmed UI review" }),
-  ).toBeVisible();
-  await page.goto("/roles");
-  await page.getByRole("button", { name: "Cashier", exact: true }).click();
-  const permission = page
-    .getByRole("switch", { name: "View", exact: true })
-    .first();
-  await permission.click();
-  await expect(permission).toHaveAttribute("aria-checked", "false");
-  await page.goto("/branches/b1");
-  await page.getByRole("tab", { name: "Devices", exact: true }).click();
+    page.getByRole("button", { name: "Complete purchase" }),
+  ).toHaveCount(0);
+});
+test("browser partner and system routes never imply local persistence", async ({
+  page,
+}) => {
+  await page.goto("/suppliers");
   await expect(
-    page.getByRole("table", { name: "Branch devices" }),
+    page.getByRole("heading", {
+      name: "Connect to the desktop app to manage suppliers.",
+    }),
   ).toBeVisible();
   for (const [path, heading] of [
-    ["/audit-log", "Audit log unavailable"],
-    ["/settings", "Settings unavailable"],
+    ["/audit-log", "Security audit log requires the desktop app"],
+    ["/settings", "Settings requires the desktop app"],
+    ["/backup", "Backup and restore requires the desktop app"],
   ]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
   }
-  await page.goto("/sync");
-  await expect(page.getByRole("heading", { name: "Sync / cloud status" })).toBeVisible();
-  await expect(page.getByText("Local-only mode", { exact: true })).toBeVisible();
-  await page.goto("/reports");
-  await page.getByRole("button", { name: "Inventory", exact: true }).click();
-  await expect(
-    page.getByRole("table", { name: "Inventory report" }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Export", exact: true }).click();
-  await expect(
-    page
-      .getByRole("dialog")
-      .getByRole("button", { name: "Export (not connected)" }),
-  ).toBeDisabled();
-  await page.keyboard.press("Escape");
-  await page.goto("/finance");
-  await page.getByRole("button", { name: "Expenses", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Record expense", exact: true })
-    .click();
-  await page.getByLabel("Amount (EGP)").fill("50");
-  await page.getByLabel("Reference", { exact: true }).fill("UI");
-  await page.getByLabel("Description", { exact: true }).fill("Preview");
-  await page.getByRole("button", { name: "Review preview" }).click();
-  await expect(page.getByRole("dialog")).not.toBeVisible();
 });
 for (const [width, height] of [
   [1366, 768],

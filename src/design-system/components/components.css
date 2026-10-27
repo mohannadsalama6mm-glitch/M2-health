@@ -230,6 +230,18 @@ select {
   margin-bottom: var(--space-5);
   gap: var(--space-3);
 }
+.page-header > div:first-child {
+  min-width: 0;
+  max-width: 76ch;
+}
+.page-header h1 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.page-header > .row {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
 .page-header p {
   color: var(--color-text-muted);
   margin-top: var(--space-1);
@@ -345,6 +357,10 @@ td {
   justify-content: space-between;
   gap: var(--space-2);
   margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+.table-toolbar > * {
+  min-width: min(220px, 100%);
 }
 .pagination {
   display: flex;
@@ -450,10 +466,18 @@ td {
 }
 .alert {
   display: flex;
+  align-items: flex-start;
   gap: var(--space-2);
   padding: var(--space-3);
   border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  line-height: 1.45;
 }
+.alert.success { border-color: color-mix(in srgb, var(--color-success) 24%, transparent); }
+.alert.warning { border-color: color-mix(in srgb, var(--color-warning) 24%, transparent); }
+.alert.danger { border-color: color-mix(in srgb, var(--color-danger) 24%, transparent); }
+.alert.info { border-color: color-mix(in srgb, var(--color-info) 24%, transparent); }
+.alert > div { min-width: 0; }
 .alert p {
   font-size: var(--text-small);
 }
@@ -542,6 +566,8 @@ progress::-webkit-progress-value {
   text-align: center;
   padding: var(--space-6);
   color: var(--color-text-muted);
+  max-width: 620px;
+  margin-inline: auto;
 }
 .empty-state h3 {
   color: var(--color-text);
@@ -549,6 +575,28 @@ progress::-webkit-progress-value {
 }
 .empty-state p {
   margin-bottom: var(--space-3);
+  line-height: 1.55;
+}
+@media (max-width: 700px) {
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .page-header > .row {
+    justify-content: flex-start;
+  }
+  .page-header > .row > * {
+    flex: 1 1 auto;
+  }
+  .table-toolbar {
+    align-items: stretch;
+  }
+  .table-toolbar > * {
+    width: 100%;
+  }
+  .modal {
+    padding: var(--space-5);
+  }
 }
 .breadcrumbs,
 .breadcrumbs > span {

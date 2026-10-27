@@ -37,7 +37,9 @@ import type {
   ProductListItem,
   ProductPage,
 } from "../../lib/tauri/catalog.types";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 const PAGE_SIZE = 10;
 function SortHeader({
   label,
@@ -70,7 +72,8 @@ function SortHeader({
 }
 export function Catalog() {
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
+  const { t } = useLocalization();
   const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [routes, setRoutes] = useState<Route[]>([]);
@@ -260,18 +263,19 @@ export function Catalog() {
   return (
     <div className="feature-page">
       <PageHeader
-        title="Products"
-        description="Your pharmacy catalog, from active ingredients to package pricing."
+        title={t("page.catalogTitle")}
+        description={t("page.catalogCopy")}
         actions={
           <div className="row">
-            <LinkButton to="/catalog/import">Import Products</LinkButton>
+            <LinkButton to="/catalog/import">{t("page.importProducts")}</LinkButton>
             <LinkButton primary to="/catalog/new">
               <Plus size={16} />
-              Add product
+              {t("page.addProduct")}
             </LinkButton>
           </div>
         }
       />
+      <ScopeNotice kind="catalog" />
       {!desktop && (
         <Alert title="Desktop app required" tone="warning">
           The catalog reads from the local database. Open M² Health as the
@@ -376,6 +380,14 @@ export function Catalog() {
             <div className="stack" role="status">
               <Alert title="Loading products…" tone="info" />
             </div>
+          ) : data && data.items.length === 0 ? (
+            <EmptyState
+              title={search || manufacturerId || categoryId || routeId || includeInactive ? t("empty.catalogFilteredTitle") : t("empty.catalogTitle")}
+              description={search || manufacturerId || categoryId || routeId || includeInactive ? t("empty.catalogFilteredCopy") : t("empty.catalogCopy")}
+              action={search || manufacturerId || categoryId || routeId || includeInactive
+                ? <Button onClick={() => { setSearch(""); setManufacturerId(""); setCategoryId(""); setRouteId(""); setIncludeInactive(false); setPage(1); }}>{t("common.clearFilters")}</Button>
+                : <LinkButton primary to="/catalog/new">{t("empty.catalogAction")}</LinkButton>}
+            />
           ) : (
             <Table
               label="Products"

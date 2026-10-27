@@ -26,7 +26,7 @@ import {
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import { useBranch } from "../../app/BranchContext";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
 import {
   completeSale,
   voidSale,
@@ -54,7 +54,7 @@ interface CartLine {
 export function Sales() {
   const desktop = isDesktopRuntime();
   const { branchId } = useBranch();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [query, setQuery] = useState("");
   const [barcode, setBarcode] = useState("");
   const [customer, setCustomer] = useState("Walk-in customer");
@@ -300,9 +300,7 @@ export function Sales() {
                     render: (p) => (
                       <>
                         {p.productName}
-                        <span className="cell-secondary">
-                          {p.packageLabel}
-                        </span>
+                        <span className="cell-secondary">{p.packageLabel}</span>
                       </>
                     ),
                   },
@@ -314,9 +312,7 @@ export function Sales() {
                         {p.quantity}
                         <Badge
                           dot
-                          tone={
-                            p.status === "in_stock" ? "success" : "danger"
-                          }
+                          tone={p.status === "in_stock" ? "success" : "danger"}
                         >
                           {p.status === "in_stock" ? "In stock" : "Out"}
                         </Badge>
@@ -397,9 +393,7 @@ export function Sales() {
                       size="sm"
                       aria-label={`Remove ${l.productName}`}
                       onClick={() =>
-                        setCart(
-                          cart.filter((c) => c.packageId !== l.packageId),
-                        )
+                        setCart(cart.filter((c) => c.packageId !== l.packageId))
                       }
                     >
                       <Trash2 size={14} />
@@ -608,7 +602,9 @@ export function Sales() {
             { label: "Customer", value: receipt?.customerName },
             {
               label: "Total",
-              value: <PriceDisplay amount={toMajor(receipt?.totalMinor ?? 0)} />,
+              value: (
+                <PriceDisplay amount={toMajor(receipt?.totalMinor ?? 0)} />
+              ),
             },
             { label: "Payment", value: receipt?.paymentMethod },
           ]}
@@ -647,7 +643,7 @@ export function Sales() {
 export function SaleDetails() {
   const { id } = useParams();
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [print, setPrint] = useState(false);
   const [detail, setDetail] = useState<SaleDetail | null>(null);
   const [loading, setLoading] = useState(true);

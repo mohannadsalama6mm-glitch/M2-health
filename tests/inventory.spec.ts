@@ -9,6 +9,19 @@ async function seed(page: import("@playwright/test").Page) {
   await installInventoryDouble(page);
 }
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "m2-health.onboarding.desktop.v1",
+      JSON.stringify({ dismissed: true }),
+    );
+    localStorage.setItem(
+      "m2-health.tutorial.desktop.v1",
+      JSON.stringify({ dismissed: true, completed: false }),
+    );
+  });
+});
+
 test("overview lists packages with branch ledgers and summary", async ({
   page,
 }) => {
@@ -42,7 +55,7 @@ test("adjust stock posts a movement and updates the overview", async ({
 }) => {
   await seed(page);
   await page.goto("/inventory");
-  await page.getByRole("button", { name: "Adjust stock", exact: true }).click();
+  await page.getByRole("button", { name: "Correct stock", exact: true }).click();
   await page.getByLabel("Product / package").selectOption({ value: "pkg-1" });
   await page.getByLabel("New stock quantity").fill("50");
   await page.getByLabel("Reason / reference").fill("Count review");
@@ -68,7 +81,7 @@ test("adjust stock posts a movement and updates the overview", async ({
 test("transfer moves stock between branches", async ({ page }) => {
   await seed(page);
   await page.goto("/inventory");
-  await page.getByRole("button", { name: "Transfer", exact: true }).click();
+  await page.getByRole("button", { name: "Transfer stock", exact: true }).click();
   await page.getByLabel("Product / package").selectOption({ value: "pkg-1" });
   await page.getByLabel("Transfer quantity").fill("3");
   await page
@@ -113,6 +126,7 @@ test("expiry alert navigates to explicit canonical write-off with immutable move
 }) => {
   await installDocumentsDouble(page);
   await installAlertsDouble(page, { catalog: false });
+  await installInventoryDouble(page);
   await page.goto("/inventory/alerts");
   await page
     .getByRole("link", { name: "Open expiry write-off workflow" })

@@ -4,9 +4,12 @@ pub mod catalog_import;
 pub mod cloud;
 pub mod commands;
 pub mod db;
+pub mod desktop;
+pub mod diagnostics;
 pub mod error;
 pub mod finance;
 pub mod inventory;
+pub mod licensing;
 pub mod partners;
 pub mod phase6;
 pub mod purchasing;
@@ -31,11 +34,11 @@ fn initialize(app: &tauri::App) -> Result<AppDb, AppError> {
     #[cfg(debug_assertions)]
     eprintln!("[M² Health] Local SQLite database: {}", path.display());
     let db = AppDb::open(&path)?;
-    let branch = branches::ensure_default_branch(&db)?;
+    let _branch = branches::ensure_default_branch(&db)?;
     #[cfg(debug_assertions)]
     eprintln!(
         "[M² Health] Schema ready; local branch {} ({})",
-        branch.code, branch.id
+        _branch.code, _branch.id
     );
     inventory::alerts::refresh_all(&db);
     Ok(db)
@@ -43,7 +46,20 @@ fn initialize(app: &tauri::App) -> Result<AppDb, AppError> {
 pub fn run() {
     let result = tauri::Builder::default()
         .setup(|app| {
-            app.manage(DatabaseState(initialize(app)));
+            let data_dir = app.path().app_local_data_dir()?;
+            app.manage(desktop::DesktopState::new(data_dir.join("backups")));
+            let database = initialize(app);
+            let diagnostics = diagnostics::DiagnosticsState::new(data_dir);
+            diagnostics.record(
+                "application_started",
+                if database.is_ok() {
+                    "database ready"
+                } else {
+                    "database unavailable"
+                },
+            );
+            app.manage(diagnostics);
+            app.manage(DatabaseState(database));
             app.manage(auth::AuthState::default());
             app.manage(authorization::AuthorizationState::default());
             app.manage(cloud::config::CloudConfigState::default());
@@ -55,6 +71,12 @@ pub fn run() {
             auth::commands::get_auth_status,
             auth::commands::bootstrap_admin,
             auth::commands::login,
+            licensing::get_license_status,
+            licensing::start_license_trial,
+            licensing::activate_manual_license,
+            licensing::revalidate_manual_license,
+            diagnostics::get_release_info,
+            diagnostics::export_diagnostics,
             auth::commands::current_session,
             auth::commands::logout,
             cloud::commands::get_cloud_foundation_status,
@@ -74,6 +96,13 @@ pub fn run() {
             auth::commands::assign_user_role,
             auth::commands::remove_user_role,
             auth::commands::set_user_branches,
+            desktop::get_local_settings,
+            desktop::update_local_settings,
+            desktop::list_security_audit_events,
+            desktop::get_local_backup_status,
+            desktop::create_local_backup,
+            desktop::validate_local_backup,
+            desktop::restore_local_backup,
             phase6::commands::get_phase6_dashboard,
             phase6::commands::get_phase6_reconciliation,
             phase6::commands::get_sale_finance_trace,

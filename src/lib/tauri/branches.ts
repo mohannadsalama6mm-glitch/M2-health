@@ -21,6 +21,5 @@ export const ensureDefaultBranch = () =>
 export const listBranches = () => nativeRequest<LocalBranch[]>("list_branches");
 export const getBranch = (id: string) =>
   nativeRequest<LocalBranch>("get_branch", { id });
-// Available for future foundation consumers; no Phase 1 branch form is connected.
 export const createBranch = (input: CreateLocalBranch) =>
   nativeRequest<LocalBranch>("create_branch", { input });

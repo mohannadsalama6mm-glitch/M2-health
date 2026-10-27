@@ -1,7 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { installCatalogDouble } from "./catalog-double";
-import { installInventoryDouble } from "./inventory-double";
-import { installSalesDouble } from "./sales-double";
 const routes = [
   "/dashboard",
   "/sales",
@@ -115,73 +112,62 @@ test("catalog add edit and detail routes require the desktop app", async ({
   page,
 }) => {
   await page.goto("/catalog/new");
-  await expect(page.getByRole("heading", { name: "Add product" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Add product" }),
+  ).toBeVisible();
   await expect(page.getByText("Desktop app required")).toBeVisible();
   await page.goto("/catalog/p1");
   await expect(
     page.getByRole("heading", { name: "Product details" }),
   ).toBeVisible();
   await page.goto("/catalog/p1/edit");
-  await expect(page.getByRole("heading", { name: "Edit product" })).toBeVisible();
   await expect(
-    page.getByText("Desktop app required").first(),
+    page.getByRole("heading", { name: "Edit product" }),
   ).toBeVisible();
+  await expect(page.getByText("Desktop app required").first()).toBeVisible();
 });
-test("POS keyboard search hold resume complete and receipt", async ({
+test("browser POS is honest and never simulates a persisted sale", async ({
   page,
 }) => {
-  await installCatalogDouble(page);
-  await installInventoryDouble(page);
-  await installSalesDouble(page);
   await page.goto("/sales");
-  await page
-    .getByRole("searchbox", { name: "POS product search" })
-    .fill("Panadol");
-  await page
-    .getByRole("searchbox", { name: "POS product search" })
-    .press("Enter");
   await expect(
-    page.getByRole("spinbutton", { name: "Quantity", exact: true }),
-  ).toHaveValue("1");
-  await page.getByRole("button", { name: "Hold sale", exact: true }).click();
-  await page.getByRole("button", { name: "Held sales (1)" }).click();
-  await page.getByRole("button", { name: "Resume", exact: true }).click();
-  await page.getByLabel("Cash received (EGP)").fill("100");
-  await page.getByRole("button", { name: "Complete sale" }).click();
-  await page.getByRole("button", { name: "Confirm sale" }).click();
-  await expect(
-    page.getByRole("heading", { name: "Receipt preview" }),
+    page.getByRole("heading", {
+      name: "Connect to the desktop app to use the POS.",
+    }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(
-    page.getByRole("heading", { name: "Ready for your next sale" }),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Complete sale" })).toHaveCount(
+    0,
+  );
 });
 test("catalog create and edit flows stay read-only until the desktop app", async ({
   page,
 }) => {
   await page.goto("/catalog");
   await page.getByRole("link", { name: "Add product", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Add product" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Add product" }),
+  ).toBeVisible();
   await expect(page.getByText("Desktop app required").first()).toBeVisible();
 });
-test("purchase receiving and notification state", async ({ page }) => {
-  await installCatalogDouble(page);
-  await installInventoryDouble(page);
-  await installSalesDouble(page);
+test("browser purchase receiving and notifications require the desktop app", async ({
+  page,
+}) => {
   await page.goto("/purchases/PO-1048/receive");
-  await expect(page.getByText("No separate receiving step")).toBeVisible();
-  await page.getByRole("link", { name: "View purchase", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "00001" })).toBeVisible();
-  await page
-    .getByRole("navigation", { name: "Pharmacy navigation" })
-    .getByRole("link", { name: "Notifications", exact: true })
-    .click();
   await expect(
-    page.getByRole("heading", { name: "Notifications unavailable" }),
+    page.getByRole("heading", {
+      name: "Connect to the desktop app to receive a purchase.",
+    }),
+  ).toBeVisible();
+  await page.goto("/notifications");
+  await expect(
+    page.getByRole("heading", {
+      name: "Notifications requires the desktop app",
+    }),
   ).toBeVisible();
 });
-test("stock counts and backup destructive preview", async ({ page }) => {
+test("browser stock counts and backup never simulate local writes", async ({
+  page,
+}) => {
   await page.goto("/inventory/counts");
   await expect(
     page.getByRole("heading", {
@@ -189,17 +175,12 @@ test("stock counts and backup destructive preview", async ({ page }) => {
     }),
   ).toBeVisible();
   await page.goto("/backup");
-  await page
-    .getByRole("button", { name: "Restore", exact: true })
-    .first()
-    .click();
-  await expect(page.getByText("Review this action carefully")).toBeVisible();
-  await page
-    .getByLabel("Type RESTORE to review this destructive workflow")
-    .fill("RESTORE");
-  await page.getByLabel("Restore reason").fill("UI verification");
-  await page
-    .getByRole("button", { name: "Review restore", exact: true })
-    .click();
-  await expect(page.getByText("Restore preview reviewed")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Backup and restore requires the desktop app",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Restore", exact: true }),
+  ).toHaveCount(0);
 });

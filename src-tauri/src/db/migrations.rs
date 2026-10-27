@@ -113,6 +113,16 @@ pub const MIGRATIONS: &[Migration] = &[
         name: "sync_conflict_resolution",
         sql: include_str!("../../migrations/021_sync_conflict_resolution.sql"),
     },
+    Migration {
+        version: 22,
+        name: "desktop_product_closure",
+        sql: include_str!("../../migrations/022_desktop_product_closure.sql"),
+    },
+    Migration {
+        version: 23,
+        name: "early_access_licensing",
+        sql: include_str!("../../migrations/023_early_access_licensing.sql"),
+    },
 ];
 
 pub fn run(connection: &mut Connection) -> Result<(), AppError> {

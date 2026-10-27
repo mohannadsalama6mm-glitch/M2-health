@@ -5,6 +5,7 @@ use m2_health_lib::{
     },
     db::{connection::AppDb, models::branch::CreateBranch, repositories::branches},
     error::ErrorCode,
+    licensing,
 };
 use serde_json::json;
 use std::collections::HashSet;
@@ -13,6 +14,7 @@ use tauri::ipc::InvokeBody;
 
 fn setup() -> (AppDb, AuthState, LoginResult, String, String) {
     let db = AppDb::in_memory().unwrap();
+    licensing::start_trial(&db).unwrap();
     let state = AuthState::default();
     let admin = auth::bootstrap(
         &db,
@@ -82,8 +84,8 @@ fn registered_commands() -> Vec<&'static str> {
 fn every_registered_command_has_exactly_one_explicit_policy() {
     let source = include_str!("../src/lib.rs");
     let commands = registered_commands();
-    assert_eq!(commands.len(), 169);
-    assert_eq!(commands.iter().copied().collect::<HashSet<_>>().len(), 169);
+    assert_eq!(commands.len(), 182);
+    assert_eq!(commands.iter().copied().collect::<HashSet<_>>().len(), 182);
     for command in commands {
         assert!(
             policy(command).is_some(),
@@ -103,6 +105,11 @@ fn public_surface_is_limited_and_unknown_commands_fail_closed() {
         "bootstrap_admin",
         "login",
         "recovery_status",
+        "get_license_status",
+        "start_license_trial",
+        "activate_manual_license",
+        "revalidate_manual_license",
+        "get_release_info",
     ];
     for command in expected {
         assert_eq!(policy(command).unwrap().scope, Scope::Public);
@@ -120,6 +127,47 @@ fn public_surface_is_limited_and_unknown_commands_fail_closed() {
     ] {
         assert_ne!(policy(command).unwrap().scope, Scope::Public);
     }
+}
+
+#[test]
+fn desktop_closure_commands_and_branch_details_are_enforced_at_ipc() {
+    let (db, state, admin, viewer, other_branch) = setup();
+    for command in [
+        "get_local_settings",
+        "update_local_settings",
+        "list_security_audit_events",
+        "get_local_backup_status",
+        "create_local_backup",
+        "validate_local_backup",
+        "restore_local_backup",
+    ] {
+        authorize_json(
+            command,
+            &json!({ "sessionToken": &admin.token }),
+            &db,
+            &state,
+        )
+        .unwrap();
+        assert_eq!(
+            authorize_json(command, &json!({ "sessionToken": &viewer }), &db, &state,)
+                .unwrap_err()
+                .code,
+            ErrorCode::Forbidden,
+            "{command} must remain administrator-only"
+        );
+    }
+
+    assert_eq!(
+        authorize_json(
+            "get_branch",
+            &json!({ "sessionToken": &viewer, "id": other_branch }),
+            &db,
+            &state,
+        )
+        .unwrap_err()
+        .code,
+        ErrorCode::Forbidden
+    );
 }
 
 #[test]
@@ -450,6 +498,44 @@ fn protected_dispatch_boundary_denies_before_operation_and_allows_authorized_ope
     .unwrap_err();
     assert_eq!(denied.code, ErrorCode::Forbidden);
     assert_eq!(mutations, 1);
+}
+
+#[test]
+fn expired_license_blocks_operational_writes_but_keeps_reads_and_backup_available() {
+    let (db, state, admin, _, _) = setup();
+    db.lock()
+        .unwrap()
+        .execute(
+            "UPDATE local_license_state SET expires_at=0 WHERE singleton=1",
+            [],
+        )
+        .unwrap();
+    let boundary = AuthorizationState::default();
+    let mut entered = 0;
+    let denied = enforce_protected(
+        "create_branch",
+        &InvokeBody::Json(json!({"sessionToken": admin.token.clone(), "input": {"code": "DENIED", "name": "Denied"}})),
+        &db,
+        &state,
+        &boundary,
+        || entered += 1,
+    )
+    .unwrap_err();
+    assert_eq!(denied.code, ErrorCode::Forbidden);
+    assert_eq!(entered, 0);
+
+    for command in ["list_products", "create_local_backup"] {
+        enforce_protected(
+            command,
+            &InvokeBody::Json(json!({"sessionToken": admin.token})),
+            &db,
+            &state,
+            &boundary,
+            || entered += 1,
+        )
+        .unwrap();
+    }
+    assert_eq!(entered, 2);
 }
 
 #[test]

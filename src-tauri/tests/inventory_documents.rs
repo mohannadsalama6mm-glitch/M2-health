@@ -626,7 +626,7 @@ fn restart_preserves_documents_and_post_keys() {
             .quantity,
         12
     );
-    assert_eq!(count(&db, "_schema_version"), 21);
+    assert_eq!(count(&db, "_schema_version"), 22);
 }
 #[test]
 fn stale_save_and_ready_rejected() {

@@ -1,11 +1,11 @@
 {
   "name": "m2-health-website",
-  "version": "0.4.0-beta.1",
+  "version": "0.4.0-beta.2",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc -p tsconfig.build.json --noEmit && vite build",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview"

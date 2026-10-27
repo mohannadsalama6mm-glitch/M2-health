@@ -3,6 +3,7 @@ use crate::error::AppError;
 use rusqlite::{params, Connection, OptionalExtension};
 use serde_json::{json, Value};
 
+#[derive(Debug)]
 pub struct Failure {
     pub reason: &'static str,
     pub detail: &'static str,
@@ -184,6 +185,7 @@ pub fn sale_return(connection: &Connection, return_id: &str) -> Result<(), AppEr
         "header": json_query(connection, "SELECT json_object('id',id,'saleId',sale_id,'status',status,'reason',reason,'linesJson',lines_json,'refundMinor',refund_minor,'createdAt',created_at,'postedAt',posted_at) FROM sale_returns WHERE id=?1", return_id)?,
         "items": json_rows(connection, "SELECT json_object('id',id,'returnId',return_id,'saleItemId',sale_item_id,'quantity',quantity,'refundMinor',refund_minor) FROM sale_return_items WHERE return_id=?1", return_id)?,
         "allocations": json_rows(connection, "SELECT json_object('id',a.id,'returnItemId',a.return_item_id,'originalAllocationId',a.original_allocation_id,'quantity',a.quantity,'movementId',a.movement_id) FROM sale_return_allocations a JOIN sale_return_items i ON i.id=a.return_item_id WHERE i.return_id=?1", return_id)?,
+        "refunds": json_rows(connection, "SELECT json_object('id',id,'saleId',sale_id,'returnId',return_id,'voidId',void_id,'amountMinor',amount_minor,'createdAt',created_at) FROM sale_refunds WHERE return_id=?1", return_id)?,
         "movements": json_rows(connection, "SELECT json_object('id',m.id,'branchId',m.branch_id,'productPackageId',m.product_package_id,'batchId',m.batch_id,'movementType',m.movement_type,'quantityDelta',m.quantity_delta,'referenceType',m.reference_type,'referenceId',m.reference_id,'reason',m.reason,'createdBy',m.created_by,'transferId',m.transfer_id,'createdAt',m.created_at) FROM inventory_movements m JOIN sale_return_allocations a ON a.movement_id=m.id JOIN sale_return_items i ON i.id=a.return_item_id WHERE i.return_id=?1", return_id)?,
     });
     emit(
@@ -203,10 +205,10 @@ pub fn purchase_receipt(connection: &Connection, receipt_id: &str) -> Result<(),
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     let payload = json!({
-        "receipt": json_query(connection, "SELECT json_object('id',id,'receiptNumber',receipt_number,'purchaseOrderId',purchase_order_id,'branchId',branch_id,'requestId',request_id,'requestPayload',request_payload,'totalQuantity',total_quantity,'status',status,'createdBy',created_by,'postedAt',posted_at) FROM purchase_receipts WHERE id=?1", receipt_id)?,
-        "order": json_query(connection, "SELECT json_object('id',o.id,'purchaseNumber',o.purchase_number,'supplierId',o.supplier_id,'status',o.status,'revision',o.revision,'supplierCodeSnapshot',o.supplier_code_snapshot,'supplierNameSnapshot',o.supplier_name_snapshot) FROM purchase_orders o JOIN purchase_receipts r ON r.purchase_order_id=o.id WHERE r.id=?1", receipt_id)?,
-        "orderLines": json_rows(connection, "SELECT json_object('id',l.id,'purchaseOrderId',l.purchase_order_id,'position',l.position,'productPackageId',l.product_package_id,'orderedQuantity',l.ordered_quantity) FROM purchase_order_lines l JOIN purchase_receipts r ON r.purchase_order_id=l.purchase_order_id WHERE r.id=?1 ORDER BY l.position", receipt_id)?,
-        "lines": json_rows(connection, "SELECT json_object('id',id,'receiptId',receipt_id,'purchaseOrderId',purchase_order_id,'branchId',branch_id,'purchaseOrderLineId',purchase_order_line_id,'position',position,'productPackageId',product_package_id,'productNameSnapshot',product_name_snapshot,'packageLabelSnapshot',package_label_snapshot,'quantity',quantity,'lotNumber',lot_number,'expiryDate',expiry_date,'acquisitionCostMinor',acquisition_cost_minor,'batchId',batch_id,'movementId',movement_id) FROM purchase_receipt_lines WHERE receipt_id=?1 ORDER BY position", receipt_id)?,
+        "receipt": json_query(connection, "SELECT json_object('id',id,'receiptNumber',receipt_number,'purchaseOrderId',purchase_order_id,'branchId',branch_id,'requestId',request_id,'requestPayload',request_payload,'totalQuantity',total_quantity,'status',status,'createdBy',created_by,'createdAt',created_at,'postedAt',posted_at) FROM purchase_receipts WHERE id=?1", receipt_id)?,
+        "order": json_query(connection, "SELECT json_object('id',o.id,'purchaseNumber',o.purchase_number,'supplierId',o.supplier_id,'supplierCodeSnapshot',o.supplier_code_snapshot,'supplierNameSnapshot',o.supplier_name_snapshot,'status',o.status,'revision',o.revision,'supplierReference',o.supplier_reference,'expectedDate',o.expected_date,'notes',o.notes,'subtotalMinor',o.subtotal_minor,'discountMinor',o.discount_minor,'taxMinor',o.tax_minor,'totalMinor',o.total_minor,'createRequestId',o.create_request_id,'createdAt',o.created_at,'updatedAt',o.updated_at,'orderedAt',o.ordered_at) FROM purchase_orders o JOIN purchase_receipts r ON r.purchase_order_id=o.id WHERE r.id=?1", receipt_id)?,
+        "orderLines": json_rows(connection, "SELECT json_object('id',l.id,'purchaseOrderId',l.purchase_order_id,'position',l.position,'productId',l.product_id,'productPackageId',l.product_package_id,'productNameSnapshot',l.product_name_snapshot,'packageLabelSnapshot',l.package_label_snapshot,'orderedQuantity',l.ordered_quantity,'unitCostMinor',l.unit_cost_minor,'lineTotalMinor',l.line_total_minor,'createdAt',l.created_at,'updatedAt',l.updated_at) FROM purchase_order_lines l JOIN purchase_receipts r ON r.purchase_order_id=l.purchase_order_id WHERE r.id=?1 ORDER BY l.position", receipt_id)?,
+        "lines": json_rows(connection, "SELECT json_object('id',id,'receiptId',receipt_id,'purchaseOrderId',purchase_order_id,'branchId',branch_id,'purchaseOrderLineId',purchase_order_line_id,'position',position,'productPackageId',product_package_id,'productNameSnapshot',product_name_snapshot,'packageLabelSnapshot',package_label_snapshot,'quantity',quantity,'lotNumber',lot_number,'expiryDate',expiry_date,'acquisitionCostMinor',acquisition_cost_minor,'batchId',batch_id,'movementId',movement_id,'createdAt',created_at) FROM purchase_receipt_lines WHERE receipt_id=?1 ORDER BY position", receipt_id)?,
         "movements": json_rows(connection, "SELECT json_object('id',m.id,'branchId',m.branch_id,'productPackageId',m.product_package_id,'batchId',m.batch_id,'movementType',m.movement_type,'quantityDelta',m.quantity_delta,'referenceType',m.reference_type,'referenceId',m.reference_id,'reason',m.reason,'createdBy',m.created_by,'transferId',m.transfer_id,'createdAt',m.created_at) FROM inventory_movements m JOIN purchase_receipt_lines l ON l.movement_id=m.id WHERE l.receipt_id=?1", receipt_id)?,
         "batches": json_rows(connection, "SELECT json_object('id',b.id,'branchId',b.branch_id,'productPackageId',b.product_package_id,'lotNumber',b.lot_number,'expiryDate',b.expiry_date,'receivedAt',b.received_at,'costPriceMinor',b.cost_price_minor,'supplierReference',b.supplier_reference,'isActive',b.is_active,'createdAt',b.created_at,'updatedAt',b.updated_at) FROM inventory_batches b JOIN purchase_receipt_lines l ON l.batch_id=b.id WHERE l.receipt_id=?1", receipt_id)?,
     });
@@ -227,8 +229,8 @@ pub fn purchase_return(connection: &Connection, return_id: &str) -> Result<(), A
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     let payload = json!({
-        "header": json_query(connection, "SELECT json_object('id',id,'returnNumber',return_number,'purchaseOrderId',purchase_order_id,'receiptId',receipt_id,'branchId',branch_id,'supplierId',supplier_id,'totalQuantity',total_quantity,'reason',reason,'status',status,'createdBy',created_by,'postedAt',posted_at) FROM purchase_returns WHERE id=?1", return_id)?,
-        "lines": json_rows(connection, "SELECT json_object('id',id,'returnId',return_id,'receiptLineId',receipt_line_id,'quantity',quantity,'batchId',batch_id,'movementId',movement_id) FROM purchase_return_lines WHERE return_id=?1", return_id)?,
+        "header": json_query(connection, "SELECT json_object('id',id,'returnNumber',return_number,'purchaseOrderId',purchase_order_id,'receiptId',receipt_id,'branchId',branch_id,'supplierId',supplier_id,'requestId',request_id,'requestPayload',request_payload,'sourcePurchaseRevision',source_purchase_revision,'totalQuantity',total_quantity,'reason',reason,'status',status,'createdBy',created_by,'createdAt',created_at,'postedAt',posted_at) FROM purchase_returns WHERE id=?1", return_id)?,
+        "lines": json_rows(connection, "SELECT json_object('id',id,'returnId',return_id,'purchaseOrderId',purchase_order_id,'receiptId',receipt_id,'branchId',branch_id,'receiptLineId',receipt_line_id,'purchaseOrderLineId',purchase_order_line_id,'position',position,'productPackageId',product_package_id,'productNameSnapshot',product_name_snapshot,'packageLabelSnapshot',package_label_snapshot,'previouslyReturnedQuantity',previously_returned_quantity,'quantity',quantity,'lotNumber',lot_number,'expiryDate',expiry_date,'acquisitionCostMinor',acquisition_cost_minor,'batchId',batch_id,'movementId',movement_id,'createdAt',created_at) FROM purchase_return_lines WHERE return_id=?1 ORDER BY position", return_id)?,
         "movements": json_rows(connection, "SELECT json_object('id',m.id,'branchId',m.branch_id,'productPackageId',m.product_package_id,'batchId',m.batch_id,'movementType',m.movement_type,'quantityDelta',m.quantity_delta,'referenceType',m.reference_type,'referenceId',m.reference_id,'reason',m.reason,'createdBy',m.created_by,'transferId',m.transfer_id,'createdAt',m.created_at) FROM inventory_movements m JOIN purchase_return_lines l ON l.movement_id=m.id WHERE l.return_id=?1", return_id)?,
     });
     emit(
@@ -248,8 +250,8 @@ pub fn stock_count(connection: &Connection, session_id: &str) -> Result<(), AppE
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     let payload = json!({
-        "session": json_query(connection, "SELECT json_object('id',id,'sessionNumber',session_number,'branchId',branch_id,'status',status,'revision',revision,'createdBy',created_by,'completedAt',completed_at) FROM stock_count_sessions WHERE id=?1", session_id)?,
-        "lines": json_rows(connection, "SELECT json_object('id',id,'sessionId',session_id,'productPackageId',product_package_id,'batchId',batch_id,'expectedQuantity',expected_quantity,'countedQuantity',counted_quantity,'notes',notes,'excludedReason',excluded_reason) FROM stock_count_lines WHERE session_id=?1", session_id)?,
+        "session": json_query(connection, "SELECT json_object('id',id,'sessionNumber',session_number,'branchId',branch_id,'status',status,'scopeType',scope_type,'notes',notes,'createdBy',created_by,'revision',revision,'snapshotWatermark',snapshot_watermark,'createdAt',created_at,'startedAt',started_at,'reviewedAt',reviewed_at,'completedAt',completed_at) FROM stock_count_sessions WHERE id=?1", session_id)?,
+        "lines": json_rows(connection, "SELECT json_object('id',id,'sessionId',session_id,'branchId',branch_id,'productPackageId',product_package_id,'batchId',batch_id,'expectedQuantity',expected_quantity,'countedQuantity',counted_quantity,'notes',notes,'excludedReason',excluded_reason,'countedAt',counted_at,'revision',revision,'productLabel',product_label,'packageLabel',package_label) FROM stock_count_lines WHERE session_id=?1", session_id)?,
         "results": json_rows(connection, "SELECT json_object('lineId',r.line_id,'liveBaseline',r.live_baseline,'correctionDelta',r.correction_delta,'interveningMovements',r.intervening_movements,'movementId',r.movement_id) FROM stock_count_results r JOIN stock_count_lines l ON l.id=r.line_id WHERE l.session_id=?1", session_id)?,
         "movements": json_rows(connection, "SELECT json_object('id',m.id,'branchId',m.branch_id,'productPackageId',m.product_package_id,'batchId',m.batch_id,'movementType',m.movement_type,'quantityDelta',m.quantity_delta,'referenceType',m.reference_type,'referenceId',m.reference_id,'reason',m.reason,'createdBy',m.created_by,'transferId',m.transfer_id,'createdAt',m.created_at) FROM inventory_movements m JOIN stock_count_results r ON r.movement_id=m.id JOIN stock_count_lines l ON l.id=r.line_id WHERE l.session_id=?1", session_id)?,
     });
@@ -270,7 +272,9 @@ pub fn inventory_document(connection: &Connection, document_id: &str) -> Result<
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     let payload = json!({
-        "document": json_query(connection, "SELECT json_object('id',id,'documentNumber',document_number,'branchId',branch_id,'status',status,'createdBy',created_by) FROM inventory_documents WHERE id=?1", document_id)?,
+        "document": json_query(connection, "SELECT json_object('id',id,'documentNumber',document_number,'kind',kind,'branchId',branch_id,'destinationBranchId',destination_branch_id,'status',status,'revision',revision,'referenceText',reference_text,'supplierReference',supplier_reference,'notes',notes,'createdBy',created_by,'reversalOf',reversal_of,'reversalReason',reversal_reason,'createdAt',created_at,'updatedAt',updated_at,'postedAt',posted_at) FROM inventory_documents WHERE id=?1", document_id)?,
+        "lines": json_rows(connection, "SELECT json_object('id',id,'documentId',document_id,'position',position,'productPackageId',product_package_id,'batchId',batch_id,'action',action,'quantity',quantity,'reason',reason,'lotNumber',lot_number,'expiryDate',expiry_date,'costPriceMinor',cost_price_minor,'supplierReference',supplier_reference,'productLabel',product_label,'packageLabel',package_label) FROM inventory_document_lines WHERE document_id=?1 ORDER BY position", document_id)?,
+        "links": json_rows(connection, "SELECT json_object('movementId',movement_id,'documentId',document_id,'lineId',line_id,'reversesMovementId',reverses_movement_id) FROM inventory_document_movements WHERE document_id=?1 ORDER BY line_id,movement_id", document_id)?,
         "movements": json_rows(connection, "SELECT json_object('id',m.id,'branchId',m.branch_id,'productPackageId',m.product_package_id,'batchId',m.batch_id,'movementType',m.movement_type,'quantityDelta',m.quantity_delta,'referenceType',m.reference_type,'referenceId',m.reference_id,'reason',m.reason,'createdBy',m.created_by,'transferId',m.transfer_id,'createdAt',m.created_at) FROM inventory_movements m WHERE m.reference_type='inventory_document' AND m.reference_id=?1", document_id)?,
         "batches": json_rows(connection, "SELECT json_object('id',b.id,'branchId',b.branch_id,'productPackageId',b.product_package_id,'lotNumber',b.lot_number,'expiryDate',b.expiry_date,'receivedAt',b.received_at,'costPriceMinor',b.cost_price_minor,'supplierReference',b.supplier_reference,'isActive',b.is_active,'createdAt',b.created_at,'updatedAt',b.updated_at) FROM inventory_batches b WHERE b.id IN (SELECT m.batch_id FROM inventory_movements m WHERE m.reference_type='inventory_document' AND m.reference_id=?1)", document_id)?,
     });
@@ -492,7 +496,12 @@ fn apply_catalog_product(
 
 fn apply_sale(connection: &Connection, entity: &str, payload: &Value) -> Result<(), Failure> {
     let sale = payload.get("sale").ok_or_else(invalid)?;
-    if text(sale, "id")? != entity {
+    let target_status = text(sale, "status")?;
+    let target_revision = sale
+        .get("revision")
+        .and_then(Value::as_i64)
+        .ok_or_else(invalid)?;
+    if text(sale, "id")? != entity || target_status != "POSTED" || target_revision < 2 {
         return Err(invalid());
     }
     if exists(
@@ -523,7 +532,7 @@ fn apply_sale(connection: &Connection, entity: &str, payload: &Value) -> Result<
     {
         insert_movement(connection, row)?;
     }
-    connection.execute("INSERT INTO sales(id,sale_number,branch_id,customer_id,customer_name,customer_code_snapshot,customer_phone_snapshot,status,revision,draft_json,subtotal_minor,discount_minor,tax_minor,total_minor,payment_status,created_by,notes,post_request_id,created_at,posted_at,voided_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)", params![entity, text(sale,"saleNumber")?, text(sale,"branchId")?, sale.get("customerId").and_then(Value::as_str), sale.get("customerName").and_then(Value::as_str), sale.get("customerCodeSnapshot").and_then(Value::as_str), sale.get("customerPhoneSnapshot").and_then(Value::as_str), text(sale,"status")?, sale.get("revision").and_then(Value::as_i64).unwrap_or(1), text(sale,"draftJson")?, sale.get("subtotalMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("discountMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("taxMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("totalMinor").and_then(Value::as_i64).unwrap_or(0), text(sale,"paymentStatus")?, sale.get("createdBy").and_then(Value::as_str), sale.get("notes").and_then(Value::as_str), sale.get("postRequestId").and_then(Value::as_str), text(sale,"createdAt")?, sale.get("postedAt").and_then(Value::as_str), sale.get("voidedAt").and_then(Value::as_str)]).map_err(|_| missing())?;
+    connection.execute("INSERT INTO sales(id,sale_number,branch_id,customer_id,customer_name,customer_code_snapshot,customer_phone_snapshot,status,revision,draft_json,subtotal_minor,discount_minor,tax_minor,total_minor,payment_status,created_by,notes,post_request_id,created_at,posted_at,voided_at) VALUES(?1,?2,?3,?4,?5,?6,?7,'DRAFT',?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,NULL,NULL)", params![entity, text(sale,"saleNumber")?, text(sale,"branchId")?, sale.get("customerId").and_then(Value::as_str), sale.get("customerName").and_then(Value::as_str), sale.get("customerCodeSnapshot").and_then(Value::as_str), sale.get("customerPhoneSnapshot").and_then(Value::as_str), target_revision - 1, text(sale,"draftJson")?, sale.get("subtotalMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("discountMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("taxMinor").and_then(Value::as_i64).unwrap_or(0), sale.get("totalMinor").and_then(Value::as_i64).unwrap_or(0), text(sale,"paymentStatus")?, sale.get("createdBy").and_then(Value::as_str), sale.get("notes").and_then(Value::as_str), sale.get("postRequestId").and_then(Value::as_str), text(sale,"createdAt")?]).map_err(|_| missing())?;
     for row in payload
         .get("items")
         .and_then(Value::as_array)
@@ -545,14 +554,87 @@ fn apply_sale(connection: &Connection, entity: &str, payload: &Value) -> Result<
     {
         connection.execute("INSERT INTO sale_payments(id,sale_id,payment_method,amount_minor,reference,created_at) VALUES(?1,?2,?3,?4,?5,?6)", params![text(row,"id")?, entity, text(row,"paymentMethod")?, row.get("amountMinor").and_then(Value::as_i64).unwrap_or(0), row.get("reference").and_then(Value::as_str), text(row,"createdAt")?]).map_err(|_| missing())?;
     }
+    connection
+        .execute(
+            "UPDATE sales SET status='POSTED',revision=revision+1,posted_at=?2 WHERE id=?1",
+            params![entity, text(sale, "postedAt")?],
+        )
+        .map_err(|_| conflict())?;
     Ok(())
 }
 
-fn apply_document_owned(
+fn apply_purchase_receipt(
     connection: &Connection,
+    entity: &str,
     payload: &Value,
-    extra: impl FnOnce(&Connection) -> Result<(), Failure>,
 ) -> Result<(), Failure> {
+    let receipt = payload.get("receipt").ok_or_else(invalid)?;
+    let order = payload.get("order").ok_or_else(invalid)?;
+    if text(receipt, "id")? != entity || text(receipt, "purchaseOrderId")? != text(order, "id")? {
+        return Err(invalid());
+    }
+    if exists(
+        connection,
+        "SELECT EXISTS(SELECT 1 FROM purchase_receipts WHERE id=?1)",
+        entity,
+    )? {
+        let same: bool = connection
+            .query_row(
+                "SELECT receipt_number=?2 AND status=?3 FROM purchase_receipts WHERE id=?1",
+                params![
+                    entity,
+                    text(receipt, "receiptNumber")?,
+                    text(receipt, "status")?
+                ],
+                |row| row.get(0),
+            )
+            .map_err(|_| missing())?;
+        return if same { Ok(()) } else { Err(immutable()) };
+    }
+
+    let order_id = text(order, "id")?;
+    let target_revision = order
+        .get("revision")
+        .and_then(Value::as_i64)
+        .ok_or_else(invalid)?;
+    let target_status = text(order, "status")?;
+    if !exists(
+        connection,
+        "SELECT EXISTS(SELECT 1 FROM purchase_orders WHERE id=?1)",
+        order_id,
+    )? {
+        if target_revision < 3 || !matches!(target_status, "PARTIALLY_RECEIVED" | "RECEIVED") {
+            return Err(invalid());
+        }
+        let initial_revision = target_revision - 2;
+        connection.execute("INSERT INTO purchase_orders(id,purchase_number,supplier_id,supplier_code_snapshot,supplier_name_snapshot,status,revision,supplier_reference,expected_date,notes,subtotal_minor,discount_minor,tax_minor,total_minor,create_request_id,created_at,updated_at,ordered_at) VALUES(?1,?2,?3,?4,?5,'DRAFT',?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17)", params![order_id,text(order,"purchaseNumber")?,text(order,"supplierId")?,order.get("supplierCodeSnapshot").and_then(Value::as_str),order.get("supplierNameSnapshot").and_then(Value::as_str),initial_revision,order.get("supplierReference").and_then(Value::as_str),order.get("expectedDate").and_then(Value::as_str),order.get("notes").and_then(Value::as_str),order.get("subtotalMinor").and_then(Value::as_i64).ok_or_else(invalid)?,order.get("discountMinor").and_then(Value::as_i64).unwrap_or(0),order.get("taxMinor").and_then(Value::as_i64).unwrap_or(0),order.get("totalMinor").and_then(Value::as_i64).ok_or_else(invalid)?,text(order,"createRequestId")?,text(order,"createdAt")?,text(order,"updatedAt")?,order.get("orderedAt").and_then(Value::as_str)]).map_err(|_| missing())?;
+        for row in payload
+            .get("orderLines")
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?
+        {
+            connection.execute("INSERT INTO purchase_order_lines(id,purchase_order_id,position,product_id,product_package_id,product_name_snapshot,package_label_snapshot,ordered_quantity,unit_cost_minor,line_total_minor,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12)", params![text(row,"id")?,order_id,row.get("position").and_then(Value::as_i64).unwrap_or(0),text(row,"productId")?,text(row,"productPackageId")?,text(row,"productNameSnapshot")?,text(row,"packageLabelSnapshot")?,row.get("orderedQuantity").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("unitCostMinor").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("lineTotalMinor").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"createdAt")?,text(row,"updatedAt")?]).map_err(|_| missing())?;
+        }
+        connection
+            .execute(
+                "UPDATE purchase_orders SET status='ORDERED',revision=revision+1 WHERE id=?1",
+                [order_id],
+            )
+            .map_err(|_| missing())?;
+    } else {
+        let current_revision: i64 = connection
+            .query_row(
+                "SELECT revision FROM purchase_orders WHERE id=?1",
+                [order_id],
+                |row| row.get(0),
+            )
+            .map_err(|_| missing())?;
+        if current_revision + 1 != target_revision {
+            return Err(immutable());
+        }
+    }
+
+    connection.execute("INSERT INTO purchase_receipts(id,receipt_number,purchase_order_id,branch_id,request_id,request_payload,status,total_quantity,created_by,created_at) VALUES(?1,?2,?3,?4,?5,?6,'POSTING',?7,?8,?9)", params![entity,text(receipt,"receiptNumber")?,order_id,text(receipt,"branchId")?,text(receipt,"requestId")?,text(receipt,"requestPayload")?,receipt.get("totalQuantity").and_then(Value::as_i64).ok_or_else(invalid)?,receipt.get("createdBy").and_then(Value::as_str),text(receipt,"createdAt")?]).map_err(|_| missing())?;
     for row in payload
         .get("batches")
         .and_then(Value::as_array)
@@ -560,7 +642,192 @@ fn apply_document_owned(
     {
         upsert_batch(connection, row)?;
     }
-    extra(connection)?;
+    for row in payload
+        .get("movements")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        insert_movement(connection, row)?;
+    }
+    for row in payload
+        .get("lines")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        connection.execute("INSERT INTO purchase_receipt_lines(id,receipt_id,purchase_order_id,branch_id,purchase_order_line_id,position,product_package_id,product_name_snapshot,package_label_snapshot,quantity,lot_number,expiry_date,acquisition_cost_minor,batch_id,movement_id,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16)", params![text(row,"id")?,entity,order_id,text(row,"branchId")?,text(row,"purchaseOrderLineId")?,row.get("position").and_then(Value::as_i64).unwrap_or(0),text(row,"productPackageId")?,text(row,"productNameSnapshot")?,text(row,"packageLabelSnapshot")?,row.get("quantity").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("lotNumber").and_then(Value::as_str),row.get("expiryDate").and_then(Value::as_str),row.get("acquisitionCostMinor").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"batchId")?,text(row,"movementId")?,text(row,"createdAt")?]).map_err(|_| missing())?;
+    }
+    connection
+        .execute(
+            "UPDATE purchase_receipts SET status='POSTED',posted_at=?2 WHERE id=?1",
+            params![entity, text(receipt, "postedAt")?],
+        )
+        .map_err(|_| missing())?;
+    connection
+        .execute(
+            "UPDATE purchase_orders SET status=?2,revision=revision+1,updated_at=?3 WHERE id=?1",
+            params![order_id, target_status, text(order, "updatedAt")?],
+        )
+        .map_err(|_| missing())?;
+    Ok(())
+}
+
+fn apply_purchase_return(
+    connection: &Connection,
+    entity: &str,
+    payload: &Value,
+) -> Result<(), Failure> {
+    let header = payload.get("header").ok_or_else(invalid)?;
+    if text(header, "id")? != entity {
+        return Err(invalid());
+    }
+    if exists(
+        connection,
+        "SELECT EXISTS(SELECT 1 FROM purchase_returns WHERE id=?1)",
+        entity,
+    )? {
+        let same: bool = connection
+            .query_row(
+                "SELECT return_number=?2 AND status=?3 FROM purchase_returns WHERE id=?1",
+                params![
+                    entity,
+                    text(header, "returnNumber")?,
+                    text(header, "status")?
+                ],
+                |row| row.get(0),
+            )
+            .map_err(|_| missing())?;
+        return if same { Ok(()) } else { Err(immutable()) };
+    }
+    connection.execute("INSERT INTO purchase_returns(id,return_number,purchase_order_id,receipt_id,branch_id,supplier_id,request_id,request_payload,source_purchase_revision,status,reason,total_quantity,created_by,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,'POSTING',?10,?11,?12,?13)", params![entity,text(header,"returnNumber")?,text(header,"purchaseOrderId")?,text(header,"receiptId")?,text(header,"branchId")?,text(header,"supplierId")?,text(header,"requestId")?,text(header,"requestPayload")?,header.get("sourcePurchaseRevision").and_then(Value::as_i64).ok_or_else(invalid)?,text(header,"reason")?,header.get("totalQuantity").and_then(Value::as_i64).ok_or_else(invalid)?,header.get("createdBy").and_then(Value::as_str),text(header,"createdAt")?]).map_err(|_| missing())?;
+    for row in payload
+        .get("movements")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        insert_movement(connection, row)?;
+    }
+    for row in payload
+        .get("lines")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        connection.execute("INSERT INTO purchase_return_lines(id,return_id,purchase_order_id,receipt_id,branch_id,receipt_line_id,purchase_order_line_id,position,product_package_id,product_name_snapshot,package_label_snapshot,previously_returned_quantity,quantity,lot_number,expiry_date,acquisition_cost_minor,batch_id,movement_id,created_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19)", params![text(row,"id")?,entity,text(row,"purchaseOrderId")?,text(row,"receiptId")?,text(row,"branchId")?,text(row,"receiptLineId")?,text(row,"purchaseOrderLineId")?,row.get("position").and_then(Value::as_i64).unwrap_or(0),text(row,"productPackageId")?,text(row,"productNameSnapshot")?,text(row,"packageLabelSnapshot")?,row.get("previouslyReturnedQuantity").and_then(Value::as_i64).unwrap_or(0),row.get("quantity").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("lotNumber").and_then(Value::as_str),row.get("expiryDate").and_then(Value::as_str),row.get("acquisitionCostMinor").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"batchId")?,text(row,"movementId")?,text(row,"createdAt")?]).map_err(|_| missing())?;
+    }
+    connection
+        .execute(
+            "UPDATE purchase_returns SET status='POSTED',posted_at=?2 WHERE id=?1",
+            params![entity, text(header, "postedAt")?],
+        )
+        .map_err(|_| missing())?;
+    Ok(())
+}
+
+fn apply_stock_count(
+    connection: &Connection,
+    entity: &str,
+    payload: &Value,
+) -> Result<(), Failure> {
+    let session = payload.get("session").ok_or_else(invalid)?;
+    let target_revision = session
+        .get("revision")
+        .and_then(Value::as_i64)
+        .ok_or_else(invalid)?;
+    if text(session, "id")? != entity
+        || text(session, "status")? != "COMPLETED"
+        || target_revision < 4
+    {
+        return Err(invalid());
+    }
+    if exists(
+        connection,
+        "SELECT EXISTS(SELECT 1 FROM stock_count_sessions WHERE id=?1)",
+        entity,
+    )? {
+        let same: bool = connection
+            .query_row(
+                "SELECT session_number=?2 AND status='COMPLETED' FROM stock_count_sessions WHERE id=?1",
+                params![entity, text(session, "sessionNumber")?],
+                |row| row.get(0),
+            )
+            .map_err(|_| missing())?;
+        return if same { Ok(()) } else { Err(immutable()) };
+    }
+
+    let branch = text(session, "branchId")?;
+    let watermark: i64 = connection
+        .query_row(
+            "SELECT coalesce(max(rowid),0) FROM inventory_movements",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|_| missing())?;
+    connection.execute("INSERT INTO stock_count_sessions(id,session_number,branch_id,status,scope_type,notes,created_by,revision,created_at) VALUES(?1,?2,?3,'DRAFT',?4,?5,?6,1,?7)", params![entity,text(session,"sessionNumber")?,branch,text(session,"scopeType")?,session.get("notes").and_then(Value::as_str),session.get("createdBy").and_then(Value::as_str),text(session,"createdAt")?]).map_err(|_| missing())?;
+    connection.execute("UPDATE stock_count_sessions SET status='IN_PROGRESS',revision=revision+1,snapshot_watermark=?2,started_at=?3 WHERE id=?1", params![entity,watermark,text(session,"startedAt")?]).map_err(|_| missing())?;
+
+    for row in payload
+        .get("lines")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        if text(row, "sessionId")? != entity || text(row, "branchId")? != branch {
+            return Err(invalid());
+        }
+        let batch = text(row, "batchId")?;
+        let expected = row
+            .get("expectedQuantity")
+            .and_then(Value::as_i64)
+            .ok_or_else(invalid)?;
+        let local: i64 = connection
+            .query_row(
+                "SELECT coalesce(sum(quantity_delta),0) FROM inventory_movements WHERE batch_id=?1 AND rowid<=?2",
+                params![batch, watermark],
+                |result| result.get(0),
+            )
+            .map_err(|_| missing())?;
+        if local != expected {
+            return Err(Failure {
+                reason: "REVISION_CONFLICT",
+                detail: "The stock-count snapshot does not match the receiving device's live batch balance; operator resolution is required.",
+            });
+        }
+        connection.execute("INSERT INTO stock_count_lines(id,session_id,branch_id,product_package_id,batch_id,expected_quantity,notes,revision,product_label,package_label) VALUES(?1,?2,?3,?4,?5,?6,?7,1,?8,?9)", params![text(row,"id")?,entity,branch,text(row,"productPackageId")?,batch,expected,row.get("notes").and_then(Value::as_str),text(row,"productLabel")?,text(row,"packageLabel")?]).map_err(|_| missing())?;
+        let line_revision = row
+            .get("revision")
+            .and_then(Value::as_i64)
+            .ok_or_else(invalid)?;
+        if line_revision < 2 {
+            return Err(invalid());
+        }
+        for _ in 1..line_revision {
+            connection.execute("UPDATE stock_count_lines SET counted_quantity=?2,notes=?3,excluded_reason=?4,counted_at=?5,revision=revision+1 WHERE id=?1", params![text(row,"id")?,row.get("countedQuantity").and_then(Value::as_i64),row.get("notes").and_then(Value::as_str),row.get("excludedReason").and_then(Value::as_str),row.get("countedAt").and_then(Value::as_str)]).map_err(|_| missing())?;
+            connection
+                .execute(
+                    "UPDATE stock_count_sessions SET revision=revision+1 WHERE id=?1",
+                    [entity],
+                )
+                .map_err(|_| missing())?;
+        }
+    }
+    let current_revision: i64 = connection
+        .query_row(
+            "SELECT revision FROM stock_count_sessions WHERE id=?1",
+            [entity],
+            |row| row.get(0),
+        )
+        .map_err(|_| missing())?;
+    if current_revision > target_revision - 2 {
+        return Err(invalid());
+    }
+    for _ in current_revision..(target_revision - 2) {
+        connection
+            .execute(
+                "UPDATE stock_count_sessions SET revision=revision+1 WHERE id=?1",
+                [entity],
+            )
+            .map_err(|_| missing())?;
+    }
+    connection.execute("UPDATE stock_count_sessions SET status='REVIEW',revision=revision+1,reviewed_at=?2 WHERE id=?1", params![entity,text(session,"reviewedAt")?]).map_err(|_| missing())?;
+
     for row in payload
         .get("movements")
         .and_then(Value::as_array)
@@ -568,6 +835,115 @@ fn apply_document_owned(
     {
         insert_movement(connection, row)?;
     }
+    for row in payload
+        .get("results")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        connection.execute("INSERT INTO stock_count_results(line_id,live_baseline,correction_delta,intervening_movements,movement_id) VALUES(?1,?2,?3,?4,?5)", params![text(row,"lineId")?,row.get("liveBaseline").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("correctionDelta").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("interveningMovements").and_then(Value::as_i64).unwrap_or(0),row.get("movementId").and_then(Value::as_str)]).map_err(|_| conflict())?;
+    }
+    connection.execute("UPDATE stock_count_sessions SET status='COMPLETED',revision=revision+1,completed_at=?2 WHERE id=?1", params![entity,text(session,"completedAt")?]).map_err(|_| conflict())?;
+    Ok(())
+}
+
+fn apply_inventory_document(
+    connection: &Connection,
+    entity: &str,
+    payload: &Value,
+) -> Result<(), Failure> {
+    let document = payload.get("document").ok_or_else(invalid)?;
+    let target_revision = document
+        .get("revision")
+        .and_then(Value::as_i64)
+        .ok_or_else(invalid)?;
+    if text(document, "id")? != entity
+        || text(document, "status")? != "POSTED"
+        || target_revision < 3
+    {
+        return Err(invalid());
+    }
+    if exists(
+        connection,
+        "SELECT EXISTS(SELECT 1 FROM inventory_documents WHERE id=?1)",
+        entity,
+    )? {
+        let same: bool = connection
+            .query_row(
+                "SELECT document_number=?2 AND status='POSTED' FROM inventory_documents WHERE id=?1",
+                params![entity, text(document, "documentNumber")?],
+                |row| row.get(0),
+            )
+            .map_err(|_| missing())?;
+        return if same { Ok(()) } else { Err(immutable()) };
+    }
+    let kind = text(document, "kind")?;
+    connection.execute("INSERT INTO inventory_documents(id,document_number,kind,branch_id,destination_branch_id,status,revision,reference_text,supplier_reference,notes,created_by,reversal_of,reversal_reason,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,'DRAFT',1,?6,?7,?8,?9,?10,?11,?12,?13)", params![entity,text(document,"documentNumber")?,kind,text(document,"branchId")?,document.get("destinationBranchId").and_then(Value::as_str),document.get("referenceText").and_then(Value::as_str),document.get("supplierReference").and_then(Value::as_str),document.get("notes").and_then(Value::as_str),document.get("createdBy").and_then(Value::as_str),document.get("reversalOf").and_then(Value::as_str),document.get("reversalReason").and_then(Value::as_str),text(document,"createdAt")?,text(document,"updatedAt")?]).map_err(|_| missing())?;
+    for row in payload
+        .get("lines")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        if text(row, "documentId")? != entity {
+            return Err(invalid());
+        }
+        connection.execute("INSERT INTO inventory_document_lines(id,document_id,position,product_package_id,batch_id,action,quantity,reason,lot_number,expiry_date,cost_price_minor,supplier_reference,product_label,package_label) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14)", params![text(row,"id")?,entity,row.get("position").and_then(Value::as_i64).unwrap_or(0),text(row,"productPackageId")?,row.get("batchId").and_then(Value::as_str),text(row,"action")?,row.get("quantity").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"reason")?,row.get("lotNumber").and_then(Value::as_str),row.get("expiryDate").and_then(Value::as_str),row.get("costPriceMinor").and_then(Value::as_i64),row.get("supplierReference").and_then(Value::as_str),text(row,"productLabel")?,text(row,"packageLabel")?]).map_err(|_| missing())?;
+    }
+    for _ in 1..(target_revision - 2) {
+        connection
+            .execute(
+                "UPDATE inventory_documents SET revision=revision+1 WHERE id=?1",
+                [entity],
+            )
+            .map_err(|_| missing())?;
+    }
+    connection
+        .execute(
+            "UPDATE inventory_documents SET status='READY',revision=revision+1 WHERE id=?1",
+            [entity],
+        )
+        .map_err(|_| missing())?;
+    for row in payload
+        .get("batches")
+        .and_then(Value::as_array)
+        .unwrap_or(&vec![])
+    {
+        upsert_batch(connection, row)?;
+    }
+    if kind == "TRANSFER" {
+        for row in payload
+            .get("movements")
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?
+        {
+            let transfer = row
+                .get("transferId")
+                .and_then(Value::as_str)
+                .ok_or_else(invalid)?;
+            if !exists(
+                connection,
+                "SELECT EXISTS(SELECT 1 FROM inventory_transfers WHERE id=?1)",
+                transfer,
+            )? {
+                return Err(missing());
+            }
+        }
+    } else {
+        for row in payload
+            .get("movements")
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?
+        {
+            insert_movement(connection, row)?;
+        }
+    }
+    for row in payload
+        .get("links")
+        .and_then(Value::as_array)
+        .ok_or_else(invalid)?
+    {
+        connection.execute("INSERT INTO inventory_document_movements(movement_id,document_id,line_id,reverses_movement_id) VALUES(?1,?2,?3,?4)", params![text(row,"movementId")?,entity,text(row,"lineId")?,row.get("reversesMovementId").and_then(Value::as_str)]).map_err(|_| missing())?;
+    }
+    connection.execute("UPDATE inventory_documents SET status='POSTED',revision=revision+1,posted_at=?2 WHERE id=?1", params![entity,text(document,"postedAt")?]).map_err(|_| conflict())?;
     Ok(())
 }
 
@@ -625,7 +1001,7 @@ pub fn apply(
         "sale_document" => apply_sale(connection, entity, payload),
         "sale_return" => {
             let header = payload.get("header").ok_or_else(invalid)?;
-            if text(header, "id")? != entity {
+            if text(header, "id")? != entity || text(header, "status")? != "POSTED" {
                 return Err(invalid());
             }
             if !exists(
@@ -642,39 +1018,55 @@ pub fn apply(
             )? {
                 return Ok(());
             }
-            apply_document_owned(connection, payload, |connection| {
-                connection.execute("INSERT INTO sale_returns(id,sale_id,status,reason,lines_json,refund_minor,created_at,posted_at) VALUES(?1,?2,?3,?4,?5,?6,?7,?8)", params![entity, text(header,"saleId")?, text(header,"status")?, text(header,"reason")?, text(header,"linesJson")?, header.get("refundMinor").and_then(Value::as_i64).unwrap_or(0), text(header,"createdAt")?, header.get("postedAt").and_then(Value::as_str)]).map_err(|_| missing())?;
-                Ok(())
-            })
-        }
-        "purchase_receipt" => {
-            if exists(
-                connection,
-                "SELECT EXISTS(SELECT 1 FROM purchase_receipts WHERE id=?1)",
-                entity,
-            )? {
-                return Ok(());
+            connection.execute("INSERT INTO sale_returns(id,sale_id,status,reason,lines_json,refund_minor,created_at,posted_at) VALUES(?1,?2,'DRAFT',?3,?4,?5,?6,NULL)", params![entity, text(header,"saleId")?, text(header,"reason")?, text(header,"linesJson")?, header.get("refundMinor").and_then(Value::as_i64).unwrap_or(0), text(header,"createdAt")?]).map_err(|_| missing())?;
+            for row in payload
+                .get("items")
+                .and_then(Value::as_array)
+                .ok_or_else(invalid)?
+            {
+                if text(row, "returnId")? != entity {
+                    return Err(invalid());
+                }
+                connection.execute("INSERT INTO sale_return_items(id,return_id,sale_item_id,quantity,refund_minor) VALUES(?1,?2,?3,?4,?5)", params![text(row,"id")?,entity,text(row,"saleItemId")?,row.get("quantity").and_then(Value::as_i64).ok_or_else(invalid)?,row.get("refundMinor").and_then(Value::as_i64).ok_or_else(invalid)?]).map_err(|_| conflict())?;
             }
-            apply_document_owned(connection, payload, |_| Ok(()))
-        }
-        "purchase_return" => {
-            if exists(
-                connection,
-                "SELECT EXISTS(SELECT 1 FROM purchase_returns WHERE id=?1)",
-                entity,
-            )? {
-                return Ok(());
+            for row in payload
+                .get("movements")
+                .and_then(Value::as_array)
+                .ok_or_else(invalid)?
+            {
+                insert_movement(connection, row)?;
             }
-            apply_document_owned(connection, payload, |_| Ok(()))
+            for row in payload
+                .get("allocations")
+                .and_then(Value::as_array)
+                .ok_or_else(invalid)?
+            {
+                connection.execute("INSERT INTO sale_return_allocations(id,return_item_id,original_allocation_id,quantity,movement_id) VALUES(?1,?2,?3,?4,?5)", params![text(row,"id")?,text(row,"returnItemId")?,text(row,"originalAllocationId")?,row.get("quantity").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"movementId")?]).map_err(|_| conflict())?;
+            }
+            for row in payload
+                .get("refunds")
+                .and_then(Value::as_array)
+                .ok_or_else(invalid)?
+            {
+                if text(row, "saleId")? != text(header, "saleId")?
+                    || row.get("returnId").and_then(Value::as_str) != Some(entity)
+                {
+                    return Err(invalid());
+                }
+                connection.execute("INSERT INTO sale_refunds(id,sale_id,return_id,void_id,amount_minor,created_at) VALUES(?1,?2,?3,NULL,?4,?5)", params![text(row,"id")?,text(row,"saleId")?,entity,row.get("amountMinor").and_then(Value::as_i64).ok_or_else(invalid)?,text(row,"createdAt")?]).map_err(|_| conflict())?;
+            }
+            connection
+                .execute(
+                    "UPDATE sale_returns SET status='POSTED',posted_at=?2 WHERE id=?1",
+                    params![entity, text(header, "postedAt")?],
+                )
+                .map_err(|_| conflict())?;
+            Ok(())
         }
-        "inventory_document" => apply_document_owned(connection, payload, |_| Ok(())),
-        // Count corrections are guarded by a local REVIEW-state session trigger and are
-        // computed against the local live balance; replaying them remotely is not a
-        // verified operation, so the whole count is quarantined for operator review.
-        "stock_count" => Err(Failure {
-            reason: "UNSUPPORTED_ENTITY",
-            detail: "Remote stock-count completion requires operator review; count corrections are not replayed automatically.",
-        }),
+        "purchase_receipt" => apply_purchase_receipt(connection, entity, payload),
+        "purchase_return" => apply_purchase_return(connection, entity, payload),
+        "inventory_document" => apply_inventory_document(connection, entity, payload),
+        "stock_count" => apply_stock_count(connection, entity, payload),
         _ => Err(Failure {
             reason: "UNSUPPORTED_ENTITY",
             detail: "No verified domain handler exists for this remote entity type.",

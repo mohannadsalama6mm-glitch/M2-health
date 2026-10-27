@@ -176,7 +176,7 @@ fn migration_013_applies_once_after_012_with_expected_schema() {
         c.query_row("SELECT max(version) FROM _schema_version", [], |r| r
             .get::<_, i64>(0))
             .unwrap(),
-        21
+        MIGRATIONS.len() as i64
     );
     assert_eq!(
         c.query_row(

@@ -212,7 +212,7 @@ fn migration_015_creates_protected_double_entry_schema() {
             .query_row("SELECT max(version) FROM _schema_version", [], |r| r
                 .get::<_, i64>(0))
             .unwrap(),
-        21
+        m2_health_lib::db::migrations::MIGRATIONS.len() as i64
     );
     assert_eq!(
         connection

@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Boxes, CircleDollarSign, PackageCheck } from "lucide-react";
-import { Alert, Button, Card, Input, PageHeader, Select, StatCard, Table } from "../../design-system";
+import { Alert, Button, Card, EmptyState, Input, LinkButton, PageHeader, Select, StatCard, Table } from "../../design-system";
 import { useBranch } from "../../app/BranchContext";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 import { reporting, type ReportFilter, type ReportPage, type ReportRow, type ReportingOverview } from "../../lib/tauri/reporting";
 import { downloadCsv, phase6 } from "../../lib/tauri/phase6";
 import "./reports.css";
@@ -24,7 +26,8 @@ const groups = {
 } as const;
 
 export function CanonicalReports(){
- const {branchId,branches}=useBranch();
+ const {t}=useLocalization();
+ const {branches}=useBranch();
  const [kind,setKind]=useState<Kind>("overview"), [dateFrom,setDateFrom]=useState(""), [dateTo,setDateTo]=useState(""), [branch,setBranch]=useState(""), [search,setSearch]=useState(""), [status,setStatus]=useState(""), [applied,setApplied]=useState({dateFrom:"",dateTo:"",branch:"",search:"",status:""}), [page,setPage]=useState(0), [attempt,setAttempt]=useState(0);
  const [overview,setOverview]=useState<ReportingOverview|null>(null), [result,setResult]=useState<ReportPage<ReportRow>|null>(null), [error,setError]=useState(""), [loading,setLoading]=useState(true),[exporting,setExporting]=useState(false);
  const filter=useMemo<ReportFilter>(()=>({dateFrom:applied.dateFrom||null,dateTo:applied.dateTo||null,branchId:applied.branch||null,search:applied.search||null,status:applied.status||null,expiryDays:90,limit:PAGE_SIZE,offset:page*PAGE_SIZE}),[applied,page]);
@@ -34,7 +37,7 @@ export function CanonicalReports(){
  const exportKind=kind==="sales"?"SALES":kind==="stock"?"INVENTORY_STOCK":null;
  const exportReport=async()=>{if(!exportKind)return;setExporting(true);setError("");try{downloadCsv(await phase6.exportCsv(exportKind,{...filter,limit:undefined,offset:undefined}))}catch(e){setError(errorText(e))}finally{setExporting(false)}};
  return <div className="stack reports-workspace">
-  <PageHeader title="Reports & Analytics" description="Read-only operational reporting from canonical sales, inventory, purchasing, customer, and supplier records." />
+  <PageHeader title={t("page.reportsTitle")} description={t("page.reportsCopy")} />
   <nav className="report-tabs" aria-label="Report categories">
    <Button variant={kind==="overview"?"primary":"secondary"} onClick={()=>choose("overview")}>Overview</Button>
    {Object.entries(groups).map(([group,kinds])=><Select key={group} label={`${group} reports`} value={kinds.includes(kind as never)?kind:""} onChange={e=>choose(e.target.value as Kind)}><option value="">{group}</option>{kinds.map(k=><option key={k} value={k}>{reports[k].label}</option>)}</Select>)}
@@ -47,11 +50,12 @@ export function CanonicalReports(){
    {(kind==="sales"||kind==="purchases")&&<Select label="Status" showLabel value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option>{(kind==="sales"?["POSTED","VOIDED"]:["DRAFT","ORDERED","PARTIALLY_RECEIVED","RECEIVED","CANCELLED"]).map(s=><option key={s}>{s}</option>)}</Select>}
    <Button variant="primary" onClick={()=>{setApplied({dateFrom,dateTo,branch,search,status});setPage(0)}}>Apply filters</Button>
    <Button onClick={()=>{setDateFrom("");setDateTo("");setBranch("");setSearch("");setStatus("");setApplied({dateFrom:"",dateTo:"",branch:"",search:"",status:""});setPage(0)}}>Reset filters</Button>
-  </div><p className="muted">Dates are inclusive. {applied.branch ? `Limited to ${branches.find(b=>b.id===applied.branch)?.name??applied.branch}.` : "All branches are included."} Current branch: {branches.find(b=>b.id===branchId)?.name??branchId}.</p></Card>
+  </div></Card>
+  <ScopeNotice kind="report" reportScope={applied.branch ? branches.find(b=>b.id===applied.branch)?.name??applied.branch : t("scope.allBranches")} />
   {error&&<Alert title="Report could not be loaded" tone="danger">{error} <Button onClick={()=>setAttempt(v=>v+1)}>Retry</Button></Alert>}
   {loading&&<p role="status">Loading report…</p>}
   {!loading&&!error&&kind==="overview"&&overview&&<Overview value={overview}/>} 
-  {!loading&&!error&&kind!=="overview"&&result&&<>{kind==="sales"&&result.summary&&<div className="report-summary" aria-label="Sales report summary"><strong>{result.summary.postedSalesCount} posted sales</strong><span>Gross {money(result.summary.grossSalesMinor)}</span><span>Discounts {money(result.summary.discountMinor)}</span><span>Tax {money(result.summary.taxMinor)}</span><span>Refunded {money(result.summary.refundedMinor)}</span><strong>Net {money(result.summary.netSalesMinor)}</strong><span>{result.summary.returnedQuantity} units returned</span></div>}<Card><div className="canonical-dashboard__heading"><div><h2>{reports[kind].label}</h2><p className="muted">{result.total} matching records</p></div>{exportKind&&<Button disabled={exporting} onClick={exportReport}>{exporting?"Preparing CSV…":"Export CSV"}</Button>}</div><Table label={reports[kind].label} rows={result.items} rowKey={(r)=>String(r.id??r.productPackageId??r.customerId??r.supplierId??r.batchId)} columns={columns}/><div className="report-pagination"><Button disabled={page===0} onClick={()=>setPage(v=>v-1)}>Previous</Button><span>Page {page+1}</span><Button disabled={(page+1)*PAGE_SIZE>=result.total} onClick={()=>setPage(v=>v+1)}>Next</Button></div></Card></>}
+  {!loading&&!error&&kind!=="overview"&&result&&<>{kind==="sales"&&result.summary&&<div className="report-summary" aria-label="Sales report summary"><strong>{result.summary.postedSalesCount} posted sales</strong><span>Gross {money(result.summary.grossSalesMinor)}</span><span>Discounts {money(result.summary.discountMinor)}</span><span>Tax {money(result.summary.taxMinor)}</span><span>Refunded {money(result.summary.refundedMinor)}</span><strong>Net {money(result.summary.netSalesMinor)}</strong><span>{result.summary.returnedQuantity} units returned</span></div>}<Card><div className="canonical-dashboard__heading"><div><h2>{reports[kind].label}</h2><p className="muted">{result.total} matching records</p></div>{exportKind&&<Button disabled={exporting} onClick={exportReport}>{exporting?"Preparing CSV…":"Export CSV"}</Button>}</div>{result.items.length===0?<EmptyState title={t("empty.reportsTitle")} description={t("empty.reportsCopy")} action={<LinkButton primary to="/sales">{t("empty.reportsAction")}</LinkButton>}/>:<><Table label={reports[kind].label} rows={result.items} rowKey={(r)=>String(r.id??r.productPackageId??r.customerId??r.supplierId??r.batchId)} columns={columns}/><div className="report-pagination"><Button disabled={page===0} onClick={()=>setPage(v=>v-1)}>Previous</Button><span>Page {page+1}</span><Button disabled={(page+1)*PAGE_SIZE>=result.total} onClick={()=>setPage(v=>v+1)}>Next</Button></div></>}</Card></>}
  </div>
 }
 

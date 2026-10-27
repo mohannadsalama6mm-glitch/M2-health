@@ -51,8 +51,8 @@ export async function issueDeviceEnvelope(
       body: {
         deviceId,
         displayName,
-        appVersion: "0.4.0-beta.1",
-        buildId: "20261020.1",
+        appVersion: "0.4.0-beta.2",
+        buildId: "20261022.1",
       },
     },
   );

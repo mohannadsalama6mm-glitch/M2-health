@@ -4,11 +4,15 @@ use m2_health_lib::{
         models::catalog::{CreateProduct, CreateProductPackage, SetPackagePrice},
         repositories::{branches, price_history, product_packages, products},
     },
+    desktop::{create_backup, restore_backup, DesktopState},
     finance::{
         self,
         models::{CreateExpense, FinanceQuery},
     },
-    inventory::balances,
+    inventory::{
+        balances,
+        counts::{self, models as count_models},
+    },
     partners::{
         self,
         models::{CustomerFields, SupplierFields, UpdateCustomer},
@@ -18,6 +22,7 @@ use m2_health_lib::{
     reporting::{self, models::ReportFilter},
     sales::{self, models as sale_models},
 };
+use tempfile::tempdir;
 
 fn id() -> String {
     uuid::Uuid::new_v4().to_string()
@@ -407,6 +412,57 @@ fn phase7c_cross_domain_flow_reconciles_stock_finance_history_and_integrity() {
     sales::post_return(&f.db, &return_post).unwrap();
     sales::post_return(&f.db, &return_post).unwrap();
 
+    let count = counts::create(
+        &f.db,
+        &count_models::Create {
+            branch_id: f.branch.clone(),
+            notes: Some("Desktop closure journey count".into()),
+            created_by: None,
+        },
+    )
+    .unwrap();
+    let count = counts::start(
+        &f.db,
+        &count_models::Transition {
+            session_id: count.session.id,
+            expected_revision: count.session.revision,
+        },
+    )
+    .unwrap();
+    assert_eq!(count.lines.len(), 1);
+    let count = counts::record(
+        &f.db,
+        &count_models::Entry {
+            session_id: count.session.id.clone(),
+            expected_revision: count.session.revision,
+            line_id: count.lines[0].id.clone(),
+            line_revision: count.lines[0].revision,
+            counted_quantity: Some(4),
+            notes: Some("Verified physical count".into()),
+            excluded_reason: None,
+        },
+    )
+    .unwrap();
+    let count = counts::transition(
+        &f.db,
+        &count_models::Transition {
+            session_id: count.session.id,
+            expected_revision: count.session.revision,
+        },
+        count_models::Status::Review,
+    )
+    .unwrap();
+    counts::complete(
+        &f.db,
+        &count_models::Complete {
+            session_id: count.session.id,
+            expected_revision: count.session.revision,
+            request_id: id(),
+            review_token: count.review_token,
+        },
+    )
+    .unwrap();
+
     let (expense_account, cash_account): (String, String) = {
         let c = f.db.lock().unwrap();
         (
@@ -448,7 +504,7 @@ fn phase7c_cross_domain_flow_reconciles_stock_finance_history_and_integrity() {
     assert_eq!(overview["receivedQuantity"], 5);
     assert_eq!(overview["purchaseReturnQuantity"], 1);
     assert_eq!(overview["netUnitsSold"], 1);
-    assert_eq!(overview["currentStockUnits"], 3);
+    assert_eq!(overview["currentStockUnits"], 4);
     assert_eq!(
         reporting::supplier_analytics(
             &f.db,
@@ -489,7 +545,7 @@ fn phase7c_cross_domain_flow_reconciles_stock_finance_history_and_integrity() {
         },
     )
     .unwrap();
-    assert_eq!(dashboard["operational"]["currentStockUnits"], 3);
+    assert_eq!(dashboard["operational"]["currentStockUnits"], 4);
     assert_eq!(dashboard["coverage"]["coverageComplete"], true);
 
     let c = f.db.lock().unwrap();
@@ -507,4 +563,48 @@ fn phase7c_cross_domain_flow_reconciles_stock_finance_history_and_integrity() {
         0
     );
     assert_eq!(c.query_row("SELECT count(*) FROM inventory_movements WHERE reference_type='purchase_return' AND reference_id=?1", [&purchase_return.id], |r| r.get::<_, i64>(0)).unwrap(), 1);
+    drop(c);
+
+    let root = tempdir().unwrap();
+    let backup_state = DesktopState::new(root.path().join("backups"));
+    f.db.lock()
+        .unwrap()
+        .execute(
+            "UPDATE local_settings SET pharmacy_name='Journey Snapshot' WHERE singleton=1",
+            [],
+        )
+        .unwrap();
+    let backup = create_backup(&f.db, &backup_state, "backup").unwrap();
+    f.db.lock()
+        .unwrap()
+        .execute(
+            "UPDATE local_settings SET pharmacy_name='Changed After Backup' WHERE singleton=1",
+            [],
+        )
+        .unwrap();
+    let restored = restore_backup(
+        &f.db,
+        &backup_state,
+        &backup.id,
+        "RESTORE",
+        "Desktop closure acceptance journey",
+    )
+    .unwrap();
+    assert!(restored.restart_required);
+    assert!(root
+        .path()
+        .join("backups")
+        .join(&restored.safety_backup_id)
+        .is_file());
+    assert_eq!(
+        f.db.lock()
+            .unwrap()
+            .query_row(
+                "SELECT pharmacy_name FROM local_settings WHERE singleton=1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .unwrap(),
+        "Journey Snapshot"
+    );
 }

@@ -21,7 +21,7 @@ import {
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import { useBranch } from "../../app/BranchContext";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
 import { listExpiry, writeOffStock, toMajor } from "../../lib/tauri/inventory";
 import type { ExpiryRow, ExpiryPage } from "../../lib/tauri/inventory";
 import { inventoryTabs } from "./Inventory";
@@ -36,7 +36,7 @@ const suggestion = (days: number) =>
   days < 0 ? "Quarantine / write-off" : "Review supplier return";
 export function Expiry() {
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const { branchId } = useBranch();
   const [windowDays, setWindowDays] = useState(30);
   const [search, setSearch] = useState("");
@@ -129,9 +129,7 @@ export function Expiry() {
     {
       key: "value",
       header: "Value at risk",
-      render: (r) => (
-        <PriceDisplay amount={toMajor(r.valueMinor)} />
-      ),
+      render: (r) => <PriceDisplay amount={toMajor(r.valueMinor)} />,
     },
     { key: "branch", header: "Branch", render: (r) => r.branchName },
     {
@@ -143,11 +141,7 @@ export function Expiry() {
       key: "actions",
       header: "Actions",
       render: (r) => (
-        <Button
-          size="sm"
-          variant="danger"
-          onClick={() => setWriteOffRow(r)}
-        >
+        <Button size="sm" variant="danger" onClick={() => setWriteOffRow(r)}>
           Write-off
         </Button>
       ),
@@ -320,7 +314,9 @@ function WriteOffDialog({
           <Button
             variant="danger"
             loading={submitting}
-            disabled={!row || !quantity || Number(quantity) <= 0 || !reason.trim()}
+            disabled={
+              !row || !quantity || Number(quantity) <= 0 || !reason.trim()
+            }
             onClick={() => {
               if (!row) return;
               setSubmitting(true);

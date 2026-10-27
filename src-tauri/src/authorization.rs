@@ -9,6 +9,7 @@ use crate::{
     commands::branches::DatabaseState,
     db::connection::AppDb,
     error::{AppError, ErrorCode},
+    licensing,
 };
 use rusqlite::{Connection, OptionalExtension};
 use serde_json::Value;
@@ -111,6 +112,15 @@ where
             .and_then(|db| authorize_invoke(&command, invoke.message.payload(), db, &auth_state))
         {
             Ok(Some(principal)) => {
+                if policy(&command).is_some_and(|rule| rule.write)
+                    && !license_write_exempt(&command)
+                {
+                    if let Err(error) = database.db().and_then(licensing::enforce_operational_write)
+                    {
+                        invoke.resolver.reject(error);
+                        return true;
+                    }
+                }
                 let _principal_scope = match authorization_state.enter(principal) {
                     Ok(scope) => scope,
                     Err(error) => {
@@ -156,6 +166,9 @@ where
         )
     })?;
     let principal = authorize_invoke(command, payload, db, auth_state)?.ok_or_else(forbidden)?;
+    if policy(command).is_some_and(|rule| rule.write) && !license_write_exempt(command) {
+        licensing::enforce_operational_write(db)?;
+    }
     let _principal_scope = authorization_state.enter(principal)?;
     Ok(operation())
 }
@@ -192,13 +205,35 @@ fn forbidden() -> AppError {
     )
 }
 
+fn license_write_exempt(command: &str) -> bool {
+    matches!(
+        command,
+        "logout" | "cloud_sign_out" | "create_local_backup" | "restore_local_backup"
+    )
+}
+
 pub fn policy(command: &str) -> Option<Policy> {
     use Scope::*;
     let p = match command {
-        "get_auth_status" | "bootstrap_admin" | "login" | "recovery_status" => Policy {
+        "get_auth_status"
+        | "bootstrap_admin"
+        | "login"
+        | "recovery_status"
+        | "get_license_status"
+        | "get_release_info"
+        | "start_license_trial"
+        | "activate_manual_license"
+        | "revalidate_manual_license" => Policy {
             permission: "public",
             scope: Public,
-            write: matches!(command, "bootstrap_admin" | "login"),
+            write: matches!(
+                command,
+                "bootstrap_admin"
+                    | "login"
+                    | "start_license_trial"
+                    | "activate_manual_license"
+                    | "revalidate_manual_license"
+            ),
         },
         "current_session"
         | "logout"
@@ -243,6 +278,36 @@ pub fn policy(command: &str) -> Option<Policy> {
             permission: "roles.manage",
             scope: Global,
             write: true,
+        },
+        "get_local_settings" => Policy {
+            permission: "settings.read",
+            scope: Global,
+            write: false,
+        },
+        "update_local_settings" => Policy {
+            permission: "settings.manage",
+            scope: Global,
+            write: true,
+        },
+        "list_security_audit_events" => Policy {
+            permission: "audit.read",
+            scope: Global,
+            write: false,
+        },
+        "get_local_backup_status" | "validate_local_backup" => Policy {
+            permission: "backup.manage",
+            scope: Global,
+            write: false,
+        },
+        "create_local_backup" | "restore_local_backup" => Policy {
+            permission: "backup.manage",
+            scope: Global,
+            write: true,
+        },
+        "export_diagnostics" => Policy {
+            permission: "backup.manage",
+            scope: Global,
+            write: false,
         },
 
         "get_phase6_dashboard" => Policy {

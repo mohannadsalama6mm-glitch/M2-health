@@ -1,40 +1,43 @@
 # Phase 8C Multi-device Verification
 
-## Verified live (isolated authenticated harness, earlier in Phase 8C)
+## Verified live on 2026-10-20
 
-- Three synthetic devices across two tenants were enrolled through authenticated RPCs.
+- Three synthetic authenticated users and devices across two tenants were created through modern-key administrative setup and user-scoped RPCs.
 - An event pushed by one device was pulled by a second authorized device and acknowledged.
-- Replaying the same event returned the original server sequence and did not duplicate it.
+- Replaying the same event returned the original server identity and did not duplicate it.
 - The server replaced client-supplied actor identity with `auth.uid()`.
-- Cross-tenant push, revoked-device push, and revoked-member push were denied.
+- Refresh-token exchange succeeded.
+- Cross-tenant push, malformed hash, revoked-device access, and revoked-member enrollment were denied.
+- Cleanup was independently verified at zero synthetic users, organizations, and events.
 
-The live harness was not re-run in the final pass because the legacy-key incident is still open.
+## Verified locally in isolated SQLite
 
-## Verified locally (isolated in-memory SQLite, `tests/offline_sync.rs`, 21 tests)
+`tests/offline_sync.rs`: **25 passed, 0 failed**.
 
-- Durable outbox leases, exact receipt matching, checkpoint ordering, duplicate inbox identity, retry scheduling, dependency retry.
-- Immutable Finance journals apply once; canonical Inventory constraints reject negative stock and roll back partially created batches.
-- Catalog products replicate insert-if-absent; a diverged concurrent revision is quarantined as `REVISION_CONFLICT` instead of overwriting.
-- A sale document without its stock dependencies is quarantined instead of partially applied.
-- Paired branch transfers: a local transfer emits exactly one `inventory_transfer` event in the same transaction; a remote transfer applies both legs atomically and idempotently.
-- A remote stock-count completion is quarantined as `UNSUPPORTED_ENTITY` and writes no movement.
-- Authorized `RETRY` reopens a stock conflict without last-write-wins; `DISMISS` requires an audit note.
+- Durable outbox leases, exact receipt matching, checkpoint ordering, duplicate inbox identity, retry scheduling, and dependency retry.
+- Catalog products/packages/barcodes/prices and relevant partner references.
+- Canonical purchase receipt and purchase return document reconstruction with exact stock replay.
+- Canonical inventory document reconstruction with movement links.
+- Canonical sale and sale-return reconstruction including items, allocations, payments/refunds, batches, and movements.
+- Completed stock-count reconstruction when the receiving snapshot matches; `REVISION_CONFLICT` plus atomic rollback when it diverges.
+- Paired transfers emitted once and applied atomically/idempotently; malformed pairs roll back.
+- Immutable Finance journals apply once; negative stock and malformed events quarantine without partial state.
+- Authorized conflict retry/dismissal is audited and never implements last-write-wins.
 
-## Entity coverage
+## Entity behavior
 
-| Entity | Behavior on remote apply |
-| --- | --- |
-| `inventory_movement` (standalone) | Applied once through canonical constraints. |
-| `inventory_transfer` | Both legs applied atomically; one event per transfer. |
-| `finance_journal` | Balanced, immutable, applied once. |
-| `catalog_lookup`, `catalog_product` | Insert if absent; identical replay is a no-op; divergence is quarantined. Later edits do not merge automatically. |
-| `partner_record` (suppliers, customers) | Insert if absent; later revisions are not merged. |
-| `sale_document`, `sale_return` | Full header, items, allocations, payments, batches, and movements in one transaction; missing dependencies are quarantined. |
-| `purchase_receipt`, `purchase_return`, `inventory_document` | **Ledger only**: batches and stock movements converge; the document header and lines are not reconstructed, because local state-machine triggers require DRAFT→POSTED transitions that remote replay does not perform. |
-| `stock_count` | **Quarantined** for operator review; count corrections are relative to each device's live balance and are not replayed. |
+- `inventory_movement`: applied once through canonical stock constraints.
+- `inventory_transfer`: both legs apply atomically as one event.
+- `finance_journal`: balanced, immutable, and idempotent.
+- `catalog_lookup`, `catalog_product`: canonical insert/replay; divergence quarantined.
+- `partner_record`: canonical supplier/customer reference reconstruction; immutable clashes fail closed.
+- `sale_document`, `sale_return`: full guarded document reconstruction and idempotent replay.
+- `purchase_receipt`, `purchase_return`: full guarded document reconstruction and idempotent replay.
+- `inventory_document`: DRAFT -> READY -> POSTED reconstruction; transfers wait for paired-transfer dependency.
+- `stock_count`: exact-snapshot reconstruction; divergence quarantined as `REVISION_CONFLICT`.
 
-## Consistency limits
+## Conflict policy
 
-Two disconnected devices can each sell against stale availability. On convergence, a movement that would violate no-negative-stock is quarantined for operator resolution; stock is never silently overwritten. There is no reservation-based global oversell prevention.
+Offline writes are never merged by last-write-wins. Immutable identity disagreement, stale revision, mismatched count snapshot, negative-stock consequence, unauthorized scope, malformed payload, or missing dependency is retained as an auditable conflict. The sync engine rolls back the complete event transaction, preserves inbox/event context, and advances only according to the durable conflict policy. Operator resolution is permission-checked and note-bearing.
 
-Catalog and partner edits after creation are not merged across devices.
+Global offline reservations are intentionally not fabricated. Concurrent offline oversell converges to quarantine rather than silently creating negative stock.

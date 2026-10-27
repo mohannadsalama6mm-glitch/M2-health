@@ -33,7 +33,7 @@ fn insert_user(connection: &Connection, id: &str, name: &str) {
 #[test]
 fn fresh_foundation_is_local_only_and_fabricates_no_tenant() {
     let db = AppDb::in_memory().unwrap();
-    assert_eq!(count(&db, "_schema_version"), 21);
+    assert_eq!(count(&db, "_schema_version"), 22);
     assert_eq!(count(&db, "organizations"), 0);
     assert_eq!(count(&db, "branch_tenant_ownership"), 0);
     assert_eq!(count(&db, "organization_memberships"), 0);
@@ -71,7 +71,7 @@ fn isolated_v17_upgrade_preserves_rows_and_does_not_adopt_them() {
             .query_row("SELECT max(version) FROM _schema_version", [], |row| row
                 .get::<_, i64>(0))
             .unwrap(),
-        21
+        MIGRATIONS.len() as i64
     );
     assert_eq!(
         connection
@@ -243,7 +243,7 @@ fn failed_future_migration_rolls_back_without_partial_schema() {
         })
         .collect();
     definitions.push(Migration {
-        version: 22,
+        version: (MIGRATIONS.len() + 1) as i64,
         name: "broken",
         sql: "CREATE TABLE partial_cloud(id TEXT); INSERT INTO absent_table VALUES(1);",
     });
@@ -253,7 +253,7 @@ fn failed_future_migration_rolls_back_without_partial_schema() {
             .query_row("SELECT count(*) FROM _schema_version", [], |row| row
                 .get::<_, i64>(0))
             .unwrap(),
-        21
+        MIGRATIONS.len() as i64
     );
     assert_eq!(
         connection

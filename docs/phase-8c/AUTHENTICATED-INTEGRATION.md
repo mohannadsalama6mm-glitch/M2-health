@@ -2,20 +2,18 @@
 
 ## Isolated environment
 
-The integration harness targets only the linked Supabase development project (reference kept in ignored local configuration). It creates synthetic users, organizations, branches, and devices, and removes every row and Auth user in a `finally` cleanup. No real pharmacy data or development SQLite database is opened.
+The harness targets only the linked Supabase development project. It derives the linked project identity from ignored CLI state, retrieves one modern publishable key and one modern secret key transiently through the authenticated official CLI, holds them only in process memory, and never prints or writes them.
 
-The administrative setup path is separated in `scripts/admin/phase8c-live-integration.ps1`. It obtains the modern secret key transiently from the authenticated Supabase CLI, keeps it in process memory, uses it only for isolated Auth-user lifecycle operations, and never passes it to desktop code. All application protocol calls use signed-in user JWTs and the publishable key.
+`scripts/admin/phase8c-live-integration.ps1` creates synthetic users, organizations, branches, and devices and removes every database fixture and Auth user in `finally`. No real pharmacy data or development SQLite database is opened.
 
-## Executed live result
+## Current executed result — 2026-10-20
 
-The live automated run passed with three authenticated users, two tenants, two branches, and three devices. It verified organization bootstrap, owner-controlled membership, enrollment, authenticated push, duplicate replay, second-device pull, acknowledgment, server-derived actor identity, refresh-token exchange, cross-tenant denial, malformed-hash denial, device revocation, and member revocation.
+The live run passed with three authenticated users, two tenants, two branches, and three devices. It verified bootstrap, owner-controlled membership, enrollment, authenticated push, duplicate replay, second-device pull, acknowledgment, server-derived actor identity, refresh-token exchange, cross-tenant denial, malformed-hash denial, device revocation, and member revocation.
 
-Cleanup was verified afterward: zero Phase 8C organizations, zero Phase 8C events, and zero Phase 8C Auth users remained.
+Independent cleanup verification returned zero synthetic users, organizations, and events.
 
-## Security incident and blocker
+## Credential blocker
 
-During a CLI key-metadata audit, `supabase projects api-keys --output json` unexpectedly emitted the complete legacy service-role JWT into command output. It was not copied into source, configuration, logs owned by the app, or frontend storage. Because command output is still an exposure boundary, that legacy key must be disabled or rotated in the Supabase Dashboard before rollout. The modern secret key was not exposed.
+The prior CLI output exposure of the legacy `service_role` JWT remains an open credential incident. Modern keys are proven functional, but the legacy JWT-based keys are still enabled. The dashboard deactivation control was unavailable during the owner-authorized closure attempt. The official Management API fallback was then denied because the current CLI credential lacks API-key write privilege. No deactivation or rejection probe is claimed.
 
-A later redacted probe (HTTP status only) confirmed that the legacy key is still active. The deactivation procedure is prepared in `LEGACY-KEY-DEACTIVATION.md` and awaits owner approval.
-
-Synchronization remains disabled. Phase 8C cannot be declared complete while the exposed legacy credential remains active.
+Synchronization remains disabled until this incident is resolved.

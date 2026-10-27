@@ -264,6 +264,163 @@ body,
 .topbar-end .native-branch-selector select {
   width: 150px;
 }
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+}
+.language-selector select {
+  width: auto;
+  min-width: 54px;
+  min-height: 34px;
+  padding: 4px 22px 4px 7px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: inherit;
+}
+
+.onboarding-progress {
+  display: grid;
+  gap: var(--space-2);
+}
+.onboarding-progress progress {
+  width: 100%;
+  accent-color: var(--color-primary);
+}
+.onboarding-checklist {
+  display: grid;
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+}
+.onboarding-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.onboarding-step.is-complete {
+  border-color: var(--color-success);
+}
+.onboarding-step__icon {
+  color: var(--color-text-muted);
+}
+.onboarding-step.is-complete .onboarding-step__icon {
+  color: var(--color-success);
+}
+.onboarding-step__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.onboarding-step h3,
+.onboarding-step p {
+  margin: 0;
+}
+.onboarding-step p,
+.onboarding-saved,
+.onboarding-recovery {
+  color: var(--color-text-muted);
+}
+.onboarding-step__heading span,
+.onboarding-state {
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+.onboarding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+}
+.onboarding-actions label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.onboarding-step select {
+  margin-block-start: var(--space-3);
+  min-height: 38px;
+}
+.onboarding-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 700px) {
+  .onboarding-step__heading,
+  .onboarding-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+[dir="rtl"] .language-selector select {
+  padding: 4px 7px 4px 22px;
+}
+.guided-tutorial {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+.guided-tutorial__spotlight {
+  position: fixed;
+  border: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px rgb(15 23 42 / 0.25), 0 0 0 5px rgb(209 250 229 / 0.8);
+  transition: inset 180ms ease, width 180ms ease, height 180ms ease;
+  pointer-events: none;
+}
+.guided-tutorial__panel {
+  position: fixed;
+  inset-inline-end: var(--space-5);
+  bottom: calc(27px + var(--space-5));
+  width: min(430px, calc(100vw - 32px));
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+}
+.guided-tutorial__panel h2 {
+  margin-block: var(--space-3) var(--space-2);
+  font-size: var(--text-h2);
+}
+.guided-tutorial__panel p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.guided-tutorial__progress,
+.guided-tutorial__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.guided-tutorial__progress span {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+.guided-tutorial__actions {
+  margin-top: var(--space-5);
+}
+@media (max-width: 700px) {
+  .guided-tutorial__panel {
+    inset-inline: var(--space-3);
+    bottom: calc(27px + var(--space-3));
+    width: auto;
+  }
+}
 .auth-screen { min-height: 100vh; display: grid; place-items: center; padding: var(--space-6); background: radial-gradient(circle at 20% 10%, var(--color-primary-subtle), transparent 40%), var(--color-surface); }
 .auth-card { width: min(440px, 100%); display: grid; gap: var(--space-5); padding: var(--space-7); border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-white); box-shadow: var(--shadow-lg); }
 .auth-card h1 { margin: 0 0 var(--space-1); }

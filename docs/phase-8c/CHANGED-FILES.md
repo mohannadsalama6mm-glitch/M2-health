@@ -17,16 +17,16 @@ The working tree preserves all uncommitted Phase 8A and Phase 8B work. The inher
 
 ## Phase 8C final-pass additions
 
-- `src-tauri/src/cloud/replication.rs` — snapshot and fail-closed apply for Catalog, partners, sales, sale returns, purchase receipts/returns (ledger level), inventory documents (ledger level); stock counts are quarantined.
-- `supabase/migrations/202610100003_phase_8c_transfer_authorization.sql` — applied remotely as ledger version `20261013202018`.
-- `supabase/migrations/202610130001_phase_8c_revoke_rls_auto_enable.sql` — local only, not applied.
+- `src-tauri/src/cloud/replication.rs` — full canonical reconstruction for Catalog, partners, sales/returns, purchasing/returns, inventory documents, exact-snapshot counts, paired transfers, and fail-closed conflicts.
+- `supabase/migrations/202610100003_phase_8c_transfer_authorization.sql` — unchanged canonical SQL; remote ledger reconciled to this version.
+- `supabase/migrations/202610130001_phase_8c_revoke_rls_auto_enable.sql` — forward migration applied and privilege-verified remotely.
 - `docs/phase-8c/LEGACY-KEY-DEACTIVATION.md`
 
 ## Phase 8C final-pass updates
 
 - `src-tauri/src/cloud/mod.rs`, `outbox.rs`, `engine.rs` — replication module, enrolled-actor fallback, document-owned outbox suppression, paired transfer event, retry of open dependency/revision conflicts.
 - Domain hooks emitting replication events inside the existing transactions: `db/repositories/products.rs`, `manufacturers.rs`, `categories.rs`, `routes.rs`, `active_ingredients.rs`, `product_packages.rs`, `partners/mod.rs`, `sales/mod.rs`, `sales/returns.rs`, `purchasing/receiving.rs`, `purchasing/returns.rs`, `inventory/counts/mod.rs`, `inventory/documents/mod.rs`.
-- `src-tauri/tests/offline_sync.rs` — Catalog/sale replication, stock-count quarantine, authorized retry tests.
+- `src-tauri/tests/offline_sync.rs` — 25 focused tests including canonical purchasing, inventory documents, sales/returns, exact-snapshot counts, divergence rollback, paired transfers, revocation, and audited retry.
 - `src-tauri/tests/authorization.rs` — registered command count 169.
 
 ## Phase 8C updates to inherited work

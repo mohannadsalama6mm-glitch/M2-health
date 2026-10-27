@@ -12,7 +12,10 @@ import {
   Modal,
   PageHeader,
   LinkButton,
+  EmptyState,
 } from "../../design-system";
+import { ScopeNotice } from "../../app/ScopeNotice";
+import { useLocalization } from "../../localization/LocalizationContext";
 import * as api from "../../lib/tauri/canonical-sales";
 import { canonicalPartners } from "../../lib/tauri/canonical-partners";
 import type { Customer } from "../../lib/tauri/canonical-partners";
@@ -66,6 +69,7 @@ export function CanonicalSales() {
   return <POS key={branchId} />;
 }
 function POS() {
+  const { t } = useLocalization();
   const { branchId, branchName } = useBranch();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Cart>(() => empty(branchId));
@@ -301,10 +305,11 @@ function POS() {
   return (
     <div className="stack">
       <PageHeader
-        title="Point of Sale"
-        description={`${branchName} · Cart and held sales do not reserve stock.`}
+        title={t("page.posTitle")}
+        description={t("page.posCopy", { branch: branchName })}
       />
       <Navigation />
+      <ScopeNotice />
       <Button
         disabled={busy || pendingPost}
         onClick={() => {
@@ -316,7 +321,7 @@ function POS() {
           navigate("/sales");
         }}
       >
-        New Cart
+        {t("page.newCart")}
       </Button>
       {error && (
         <Alert title="Sale action failed" tone="danger">
@@ -401,7 +406,7 @@ function POS() {
                   },
                 ]}
               />
-              {!current.total && <p>No matching Catalog packages.</p>}
+              {!current.total && <EmptyState title={t("empty.salesCatalogTitle")} description={t("empty.salesCatalogCopy")} action={<LinkButton primary to="/catalog/new">{t("empty.salesCatalogAction")}</LinkButton>} />}
               <div className="row">
                 <Button disabled={page === 0} onClick={() => setPage(page - 1)}>
                   Previous products
@@ -724,6 +729,7 @@ function POS() {
   );
 }
 function History() {
+  const { t } = useLocalization();
   const { branchId } = useBranch();
   const [search, setSearch] = useState(""),
     [status, setStatus] = useState(""),
@@ -786,10 +792,11 @@ function History() {
   return (
     <div className="stack">
       <PageHeader
-        title="Sales History"
-        description="Persisted drafts, held carts and posted sales."
+        title={t("page.salesHistoryTitle")}
+        description={t("page.salesHistoryCopy")}
       />
       <Navigation />
+      <ScopeNotice />
       <Card>
         <div className="row wrap">
           <Input
@@ -892,7 +899,13 @@ function History() {
                 { key: "status", header: "Status", render: (s) => s.status },
               ]}
             />
-            {!current.total && <p>No matching sales.</p>}
+            {!current.total && <EmptyState
+              title={search || status || method || from || to ? t("empty.salesHistoryFilteredTitle") : t("empty.salesHistoryTitle")}
+              description={search || status || method || from || to ? t("empty.salesHistoryFilteredCopy") : t("empty.salesHistoryCopy")}
+              action={search || status || method || from || to
+                ? <Button onClick={() => { setSearch(""); setStatus(""); setMethod(""); setFrom(""); setTo(""); setPage(0); }}>{t("common.clearFilters")}</Button>
+                : <LinkButton primary to="/sales">{t("empty.salesHistoryAction")}</LinkButton>}
+            />}
             <div className="row">
               <Button disabled={!page} onClick={() => setPage(page - 1)}>
                 Previous sales

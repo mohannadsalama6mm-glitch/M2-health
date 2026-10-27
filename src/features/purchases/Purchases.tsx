@@ -26,7 +26,7 @@ import {
 } from "../../design-system";
 import { isDesktopRuntime } from "../../lib/tauri/client";
 import { useBranch } from "../../app/BranchContext";
-import { useDemo } from "../../app/DemoContext";
+import { useFeedback } from "../../app/FeedbackContext";
 import {
   completePurchase,
   voidPurchase,
@@ -197,7 +197,7 @@ export function Purchases() {
 export function PurchaseDetails() {
   const { id } = useParams();
   const desktop = isDesktopRuntime();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const [detail, setDetail] = useState<PurchaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -274,9 +274,7 @@ export function PurchaseDetails() {
       .catch((err: unknown) => {
         setVoidSubmitting(false);
         notify(
-          err instanceof Error
-            ? err.message
-            : "Purchase could not be voided.",
+          err instanceof Error ? err.message : "Purchase could not be voided.",
         );
       });
   };
@@ -374,7 +372,11 @@ export function PurchaseDetails() {
                     </>
                   ),
                 },
-                { key: "quantity", header: "Quantity", render: (l) => l.quantity },
+                {
+                  key: "quantity",
+                  header: "Quantity",
+                  render: (l) => l.quantity,
+                },
                 {
                   key: "cost",
                   header: "Unit cost",
@@ -446,7 +448,7 @@ interface Line {
 export function PurchaseForm() {
   const desktop = isDesktopRuntime();
   const { branchId } = useBranch();
-  const { notify } = useDemo();
+  const notify = useFeedback();
   const navigate = useNavigate();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [supplierId, setSupplierId] = useState("");
@@ -641,7 +643,11 @@ export function PurchaseForm() {
                   key: "add",
                   header: "Action",
                   render: (p) => (
-                    <Button size="sm" variant="outline" onClick={() => addLine(p)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => addLine(p)}
+                    >
                       Add
                     </Button>
                   ),
@@ -857,6 +863,13 @@ export function PurchaseForm() {
 }
 export function ReceivePurchase() {
   const { id } = useParams();
+  if (!isDesktopRuntime())
+    return (
+      <EmptyState
+        title="Connect to the desktop app to receive a purchase."
+        description="The browser preview does not post receipt stock or simulate local persistence."
+      />
+    );
   return (
     <>
       <BackLink to={`/purchases/${id}`} label="Purchase" />
@@ -872,7 +885,9 @@ export function ReceivePurchase() {
         <EmptyState
           title="Stock already received"
           description="Receiving is part of completing a purchase. This order has already posted its stock to local lots."
-          action={<LinkButton to={`/purchases/${id}`}>View purchase</LinkButton>}
+          action={
+            <LinkButton to={`/purchases/${id}`}>View purchase</LinkButton>
+          }
         />
       </div>
     </>
